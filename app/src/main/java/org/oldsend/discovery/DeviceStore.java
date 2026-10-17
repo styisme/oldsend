@@ -24,15 +24,24 @@ public class DeviceStore {
     public void setListener(Listener l) { listener = l; }
 
     public void addDevice(Device d) {
+        // 过滤掉 172.17.x.x 这种虚拟网卡 IP，避免发送失败
+        if (d.ip != null && d.ip.startsWith("172.17.")) {
+            return;
+        }
         synchronized (devices) {
             for (Iterator<Device> it = devices.iterator(); it.hasNext();) {
                 Device e = it.next();
                 boolean same = false;
                 if (d.fingerprint != null && d.fingerprint.length() > 0
                         && d.fingerprint.equals(e.fingerprint)) {
-                    same = true;
+                    // 如果是同一个设备（指纹相同），但新 IP 是 192.168 等真实局域网段，则更新
+                    if (d.ip != null && (d.ip.startsWith("192.168.") || d.ip.startsWith("10."))) {
+                        same = true;
+                        break;
+                    }
                 } else if (d.ip != null && d.ip.equals(e.ip)) {
                     same = true;
+                    break;
                 }
                 if (same) {
                     it.remove();
