@@ -271,6 +271,21 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit();
     }
 
+    
+    public void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) return;
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
+        android.view.ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+    }
+
     private void switchTab(int index) {
         applyAnimation(pageSend, index == 0);
         applyAnimation(pageReceive, index == 1);
@@ -602,6 +617,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     public void onChanged() { 
         adapter.setData(DeviceStore.get().snapshot()); 
         emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
+        setListViewHeightBasedOnChildren(deviceList);
         updateStatus(); 
     }
 
@@ -626,6 +642,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             historyPaths.add(r.path);
         }
         historyAdapter.notifyDataSetChanged();
+        setListViewHeightBasedOnChildren(historyList);
     }
 
     @Override protected void onNewIntent(Intent intent) {

@@ -24,7 +24,13 @@ public class Md3DialogUtils {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
+            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            // 强行限制最大高度防止超出屏幕
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(lp);
         }
 
         TextView tvTitle = (TextView) dialog.findViewById(R.id.dlg_title);
@@ -115,7 +121,13 @@ public class Md3DialogUtils {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
+            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            // 强行限制最大高度防止超出屏幕
+            WindowManager.LayoutParams lp = window.getAttributes();
+            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            window.setAttributes(lp);
         }
 
         ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
