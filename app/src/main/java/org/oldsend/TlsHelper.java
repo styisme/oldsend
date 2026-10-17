@@ -1,4 +1,5 @@
 package org.oldsend;
+import org.oldsend.protocol.Identity;
 
 import android.content.Context;
 import java.io.ByteArrayInputStream;

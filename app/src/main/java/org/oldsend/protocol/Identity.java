@@ -19,7 +19,7 @@ public class Identity {
         SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         String fp = sp.getString(KEY_FP, null);
         if (fp == null) {
-            fp = generate();
+            fp = generateRandom();
             sp.edit().putString(KEY_FP, fp).commit();
         }
         fingerprint = fp;
