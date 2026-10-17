@@ -52,7 +52,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(android.view.Window.FEATURE_LEFT_ICON);
-        super.onCreate(savedInstanceState);
         getWindow().setFeatureDrawableResource(android.view.Window.FEATURE_LEFT_ICON, R.drawable.ic_launcher);
         setContentView(R.layout.activity_main);
 
@@ -128,28 +127,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         log("OldSend MD3 已就绪");
         log("本机IP: " + OldSendService.getLocalIp());
         handleIntent(getIntent());
-    }
-
-    
-    @Override
-    public void showConfirmDialog(String senderAlias, int fileCount, final java.util.concurrent.CountDownLatch latch, final boolean[] result) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("接收文件");
-        builder.setMessage("设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？");
-        builder.setCancelable(false);
-        builder.setPositiveButton("接收", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                result[0] = true;
-                latch.countDown();
-            }
-        });
-        builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                result[0] = false;
-                latch.countDown();
-            }
-        });
-        builder.show();
     }
 
     private void switchTab(boolean isSend) {
@@ -332,6 +309,56 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     public void onChanged() { adapter.setData(DeviceStore.get().snapshot()); updateStatus(); }
-    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null);
-        ReceiveManager.setListener(null); super.onDestroy(); }
+
+    @Override
+    public void showConfirmDialog(String senderAlias, int fileCount, final java.util.concurrent.CountDownLatch latch, final boolean[] result) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("接收文件");
+        builder.setMessage("设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？");
+        builder.setCancelable(false);
+        builder.setPositiveButton("接收", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                result[0] = true;
+                latch.countDown();
+            }
+        });
+        builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                result[0] = false;
+                latch.countDown();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+        String action = intent.getAction();
+        if (Intent.ACTION_SEND.equals(action)) {
+            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (uri != null) {
+                pendingUris.clear();
+                pendingUris.add(uri);
+                selectedFileText.setText("已分享: " + queryDisplayName(uri));
+                log("来自系统分享，请点击设备发送");
+            }
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+            ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            if (uris != null) {
+                pendingUris.clear();
+                pendingUris.addAll(uris);
+                selectedFileText.setText("已分享 " + uris.size() + " 个文件");
+                log("来自系统分享，共 " + uris.size() + " 个文件，请点击设备发送");
+            }
+        }
+    }
+
+    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); super.onDestroy(); }
 }
