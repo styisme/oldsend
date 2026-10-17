@@ -12,9 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -40,11 +37,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView dialogLogView;
     private AlertDialog logDialog;
     private StringBuilder logCache = new StringBuilder();
-    private ScrollView logScroll;
     private Button toggleBtn;
     private ListView deviceList, historyList;
     private ProgressBar progressBar;
-    private CheckBox cbHttps;
     private DeviceAdapter adapter;
     private ArrayAdapter<String> historyAdapter;
     private Handler handler = new Handler();
@@ -64,14 +59,11 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         setContentView(R.layout.activity_main);
 
         status = (TextView) findViewById(R.id.status);
-        
-        
+        selectedFileText = (TextView) findViewById(R.id.selected_file);
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
-        selectedFileText = (TextView) findViewById(R.id.selected_file);
         progressBar = (ProgressBar) findViewById(R.id.progress);
-
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
         tabReceive = (LinearLayout) findViewById(R.id.tab_receive);
@@ -91,11 +83,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         toggleBtn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { toggleService(); } });
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
         findViewById(R.id.manual).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualDialog(); } });
-        
-        findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
-        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSettingsDialog(); } });
         findViewById(R.id.pick_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(); } });
         findViewById(R.id.send_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
+        findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
+        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSettingsDialog(); } });
 
         tabSend.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { switchTab(true); }
@@ -137,6 +128,54 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         log("OldSend MD3 已就绪");
         log("本机IP: " + OldSendService.getLocalIp());
         handleIntent(getIntent());
+    }
+
+    public void log(final String msg) {
+        handler.post(new Runnable() {
+            public void run() {
+                logCache.append(msg).append("\n");
+                if (logCache.length() > 5000) logCache.delete(0, logCache.length() - 5000);
+                if (dialogLogView != null) {
+                    dialogLogView.setText(logCache.toString());
+                    if (logDialog != null && logDialog.isShowing()) {
+                        android.text.Layout layout = dialogLogView.getLayout();
+                        if (layout != null) {
+                            int scrollAmount = layout.getLineTop(dialogLogView.getLineCount()) - dialogLogView.getHeight();
+                            if (scrollAmount > 0) dialogLogView.scrollTo(0, scrollAmount);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    private void showLogDialog() {
+        if (logDialog != null && logDialog.isShowing()) return;
+        dialogLogView = new TextView(this);
+        dialogLogView.setTextSize(11);
+        dialogLogView.setTextColor(0xFF333333);
+        dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
+        dialogLogView.setPadding(16, 16, 16, 16);
+        dialogLogView.setText(logCache.toString());
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(dialogLogView);
+        scroll.setBackgroundColor(0xFFF5F5F5);
+
+        logDialog = new AlertDialog.Builder(this)
+            .setTitle("运行日志")
+            .setView(scroll)
+            .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) { dialogLogView = null; }
+            })
+            .setNegativeButton("清空", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) {
+                    logCache.setLength(0);
+                    if (dialogLogView != null) dialogLogView.setText("");
+                }
+            })
+            .create();
+        logDialog.show();
     }
 
     private void showSettingsDialog() {
@@ -181,25 +220,25 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void showAboutDialog() {
-        String msg = "OldSend v1.0
-
-" +
-                     "一个极简、极轻量的局域网文件传输工具。
-" +
-                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。
-
-" +
-                     "🤖 本项目代码完全由 AI 辅助生成。
-" +
-                     "开源协议: MIT License
-
-" +
+        String msg = "OldSend v1.0\n\n" +
+                     "一个极简、极轻量的局域网文件传输工具。\n" +
+                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。\n\n" +
+                     "AI 辅助生成，开源协议: MIT License\n\n" +
                      "GitHub: github.com/styisme/oldsend";
         new AlertDialog.Builder(this)
             .setTitle("关于 OldSend")
             .setMessage(msg)
             .setPositiveButton("确定", null)
             .show();
+    }
+
+    private void showSetNameDialog() {
+        final EditText input = new EditText(this);
+        input.setText(OldSendService.getAlias(this));
+        new AlertDialog.Builder(this).setTitle("修改设备名").setView(input)
+            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) { if (input.getText().length() > 0) OldSendService.setAlias(MainActivity.this, input.getText().toString()); }
+            }).setNegativeButton("取消", null).show();
     }
 
     private void applyAnimation(View view, boolean visible) {
@@ -278,15 +317,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         new AlertDialog.Builder(this).setTitle("手动输入IP").setView(input)
             .setPositiveButton("确定", new DialogInterface.OnClickListener() { public void onClick(DialogInterface d, int w) { probeIp(input.getText().toString().trim()); } })
             .setNegativeButton("取消", null).show();
-    }
-
-    private void showSetNameDialog() {
-        final EditText input = new EditText(this);
-        input.setText(OldSendService.getAlias(this));
-        new AlertDialog.Builder(this).setTitle("修改设备名").setView(input)
-            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) { if (input.getText().length() > 0) OldSendService.setAlias(MainActivity.this, input.getText().toString()); }
-            }).setNegativeButton("取消", null).show();
     }
 
     private void showSendTextDialog() {
@@ -379,7 +409,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private File copyToCache(Uri uri, String name) throws Exception {
         if ("file".equals(uri.getScheme())) return new File(uri.getPath());
         InputStream in = getContentResolver().openInputStream(uri);
-String safe = name;
+        String safe = name;
         safe = safe.replace("/", "_").replace("\\", "_").replace(":", "_")
                    .replace("*", "_").replace("?", "_").replace("\"", "_")
                    .replace("<", "_").replace(">", "_").replace("|", "_");
@@ -389,55 +419,6 @@ String safe = name;
         while ((n = in.read(buf)) > 0) fos.write(buf, 0, n);
         in.close(); fos.close();
         return out;
-    }
-
-    public void log(final String msg) {
-        handler.post(new Runnable() {
-            public void run() {
-                logCache.append(msg).append("\n");
-                if (logCache.length() > 5000) logCache.delete(0, logCache.length() - 5000);
-                if (dialogLogView != null) {
-                    dialogLogView.setText(logCache.toString());
-                    if (logDialog != null && logDialog.isShowing()) {
-                        // 保持滚动到底部
-                        android.text.Layout layout = dialogLogView.getLayout();
-                        if (layout != null) {
-                            int scrollAmount = layout.getLineTop(dialogLogView.getLineCount()) - dialogLogView.getHeight();
-                            if (scrollAmount > 0) dialogLogView.scrollTo(0, scrollAmount);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    private void showLogDialog() {
-        if (logDialog != null && logDialog.isShowing()) return;
-        dialogLogView = new TextView(this);
-        dialogLogView.setTextSize(11);
-        dialogLogView.setTextColor(0xFF333333);
-        dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
-        dialogLogView.setPadding(16, 16, 16, 16);
-        dialogLogView.setText(logCache.toString());
-
-        ScrollView scroll = new ScrollView(this);
-        scroll.addView(dialogLogView);
-        scroll.setBackgroundColor(0xFFF5F5F5);
-
-        logDialog = new AlertDialog.Builder(this)
-            .setTitle("运行日志")
-            .setView(scroll)
-            .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) { dialogLogView = null; }
-            })
-            .setNegativeButton("清空", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) {
-                    logCache.setLength(0);
-                    if (dialogLogView != null) dialogLogView.setText("");
-                }
-            })
-            .create();
-        logDialog.show();
     }
 
     public void onChanged() { adapter.setData(DeviceStore.get().snapshot()); updateStatus(); }
