@@ -6,11 +6,12 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.ListView;
 import android.widget.TextView;
 import org.oldsend.R;
@@ -18,29 +19,54 @@ import org.oldsend.util.I18nManager;
 
 public class Md3DialogUtils {
 
+    private static boolean isAnimEnabled(Context ctx) {
+        return ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getBoolean("use_anim", true);
+    }
+
+    private static void applyPressAnimation(View view, boolean animEnabled) {
+        if (!animEnabled) return;
+        final ScaleAnimation shrink = new ScaleAnimation(1f, 0.95f, 1f, 0.95f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        shrink.setDuration(100);
+        shrink.setFillAfter(true);
+        final ScaleAnimation grow = new ScaleAnimation(0.95f, 1f, 0.95f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+        grow.setDuration(100);
+        
+        view.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, android.view.MotionEvent event) {
+                if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                    v.startAnimation(shrink);
+                } else if (event.getAction() == android.view.MotionEvent.ACTION_UP || event.getAction() == android.view.MotionEvent.ACTION_CANCEL) {
+                    v.startAnimation(grow);
+                }
+                return false;
+            }
+        });
+    }
+
+    private static void setupWindow(Context ctx, Dialog dialog) {
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            if (!isAnimEnabled(ctx)) {
+                // 如果关闭了动画，直接干掉系统自带的弹窗缩放动画
+                window.setWindowAnimations(0); 
+            }
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
     public static Dialog createBaseDialog(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener, String negative, DialogInterface.OnClickListener negListener) {
         final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_base);
         
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(android.R.color.transparent);
-            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            // 强行限制最大高度防止超出屏幕
-            WindowManager.LayoutParams lp = window.getAttributes();
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            window.setAttributes(lp);
-        }
+        setupWindow(ctx, dialog);
+        boolean animEnabled = isAnimEnabled(ctx);
 
         TextView tvTitle = (TextView) dialog.findViewById(R.id.dlg_title);
         tvTitle.setText(title);
 
         LinearLayout container = (LinearLayout) dialog.findViewById(R.id.dlg_content_container);
-        ScrollView scrollView = (ScrollView) dialog.findViewById(R.id.dlg_scroll);
-        scrollView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f));
         if (contentView != null) {
             container.addView(contentView);
         }
@@ -50,26 +76,23 @@ public class Md3DialogUtils {
 
         if (positive != null) {
             btnPos.setText(positive);
-            btnPos.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) { dialog.dismiss(); }
-            });
             btnPos.setVisibility(View.VISIBLE);
+            applyPressAnimation(btnPos, animEnabled);
         } else {
             btnPos.setVisibility(View.GONE);
         }
 
         if (negative != null) {
             btnNeg.setText(negative);
-            btnNeg.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) { dialog.dismiss(); }
-            });
             btnNeg.setVisibility(View.VISIBLE);
+            applyPressAnimation(btnNeg, animEnabled);
         } else {
             btnNeg.setVisibility(View.GONE);
         }
 
         final DialogInterface.OnClickListener finalPos = posListener;
         final DialogInterface.OnClickListener finalNeg = negListener;
+        
         if (finalPos != null) {
             btnPos.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) { finalPos.onClick(dialog, 0); }
@@ -82,10 +105,6 @@ public class Md3DialogUtils {
         }
 
         return dialog;
-    }
-
-    public static Dialog showCustom(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener) {
-        return createBaseDialog(ctx, title, contentView, positive, posListener, "关闭", null);
     }
 
     public static Dialog showConfirm(Context ctx, String title, String message, String positive, DialogInterface.OnClickListener posListener) {
@@ -104,13 +123,12 @@ public class Md3DialogUtils {
         input.setTextSize(14);
         input.setSingleLine(true);
         input.setBackgroundResource(R.drawable.bg_md3_edittext);
-        input.setSingleLine(true);
         
         Dialog dialog = createBaseDialog(ctx, title, input, I18nManager.get("confirm"), null, I18nManager.get("cancel"), null);
         dialog.findViewById(R.id.dlg_btn_positive).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (listener != null) listener.onInput(input.getText().toString());
-                ((Dialog) v.getTag() == null ? null : (Dialog) v.getTag()).dismiss();
+                ((Dialog) v.getTag()).dismiss();
             }
         });
         // 动态绑定 tag 以关闭
@@ -121,21 +139,12 @@ public class Md3DialogUtils {
     public interface OnInputListener { void onInput(String text); }
 
     public static Dialog showList(Context ctx, String title, String[] items, final OnItemSelectListener listener) {
-        final Dialog dialog = new Dialog(ctx);
+        Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_list);
         
-        Window window = dialog.getWindow();
-        if (window != null) {
-            window.setBackgroundDrawableResource(android.R.color.transparent);
-            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            // 强行限制最大高度防止超出屏幕
-            WindowManager.LayoutParams lp = window.getAttributes();
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            window.setAttributes(lp);
-        }
+        setupWindow(ctx, dialog);
+        boolean animEnabled = isAnimEnabled(ctx);
 
         ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
         ListView listView = (ListView) dialog.findViewById(R.id.dlg_list);
@@ -149,7 +158,9 @@ public class Md3DialogUtils {
             }
         });
 
-        dialog.findViewById(R.id.dlg_btn_negative).setOnClickListener(new View.OnClickListener() {
+        View btnNeg = dialog.findViewById(R.id.dlg_btn_negative);
+        applyPressAnimation(btnNeg, animEnabled);
+        btnNeg.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { d.dismiss(); }
         });
 
@@ -157,4 +168,8 @@ public class Md3DialogUtils {
     }
     
     public interface OnItemSelectListener { void onItemSelect(int position); }
+    
+    public static Dialog showCustom(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener) {
+        return createBaseDialog(ctx, title, contentView, positive, posListener, I18nManager.get("close"), null);
+    }
 }
