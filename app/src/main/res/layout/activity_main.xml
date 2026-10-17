@@ -34,13 +34,23 @@
                 android:text="已停止"/>
         </LinearLayout>
         
-        <!-- 日志按钮 (替代原先的悬浮日志) -->
         <Button
             android:id="@+id/btn_log"
             android:layout_width="wrap_content"
             android:layout_height="36dp"
-            android:text="查看日志"
+            android:text="日志"
             android:textSize="11sp"
+            android:background="@drawable/btn_md3_secondary"
+            android:textColor="#1B5E20"
+            android:layout_marginRight="6dp"/>
+            
+        <!-- 设置按钮 (替代原先繁杂的设置) -->
+        <Button
+            android:id="@+id/btn_settings"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="⚙ 设置"
+            android:textSize="12sp"
             android:background="@drawable/btn_md3_secondary"
             android:textColor="#1B5E20"/>
     </LinearLayout>
@@ -52,7 +62,7 @@
         android:layout_weight="1"
         android:padding="8dp">
 
-        <!-- ========== 发送页面 ========== -->
+        <!-- 发送页面 -->
         <LinearLayout
             android:id="@+id/page_send"
             android:layout_width="match_parent"
@@ -67,7 +77,6 @@
                 android:orientation="vertical"
                 android:padding="8dp">
                 
-                <!-- 第一排控制按钮：均分宽度，适配手表 -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -75,11 +84,8 @@
                     <Button android:id="@+id/toggle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="启动"/>
                     <Button android:id="@+id/scan" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="扫描"/>
                     <Button android:id="@+id/manual" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="加IP"/>
-                    <CheckBox android:id="@+id/cb_https" android:layout_width="wrap_content" android:layout_height="44dp" android:text="加密" android:textSize="12sp" android:textColor="#1B5E20" android:buttonTint="#388E3C" android:layout_marginRight="4dp"/>
-                    <Button android:id="@+id/set_name" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="改名"/>
                 </LinearLayout>
                 
-                <!-- 第二排文件操作 -->
                 <LinearLayout
                     android:orientation="horizontal"
                     android:layout_width="match_parent"
@@ -107,7 +113,7 @@
             <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
         </LinearLayout>
 
-        <!-- ========== 接收页面 ========== -->
+        <!-- 接收页面 -->
         <LinearLayout
             android:id="@+id/page_receive"
             android:layout_width="match_parent"
@@ -119,7 +125,7 @@
         </LinearLayout>
     </FrameLayout>
 
-    <!-- 底部导航栏 (极简版，绝不拥挤) -->
+    <!-- 底部导航栏 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"

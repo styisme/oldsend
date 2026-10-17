@@ -11,6 +11,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.*;
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -67,18 +71,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         historyList = (ListView) findViewById(R.id.history_list);
         selectedFileText = (TextView) findViewById(R.id.selected_file);
         progressBar = (ProgressBar) findViewById(R.id.progress);
-        cbHttps = (CheckBox) findViewById(R.id.cb_https);
-        cbHttps.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false));
-        cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", isChecked).commit();
-                log("加密设置已保存，请重启服务生效");
-                if (running) {
-                    stopService(new Intent(MainActivity.this, OldSendService.class));
-                    startService(new Intent(MainActivity.this, OldSendService.class));
-                }
-            }
-        });
+
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
         tabReceive = (LinearLayout) findViewById(R.id.tab_receive);
@@ -98,8 +91,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         toggleBtn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { toggleService(); } });
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
         findViewById(R.id.manual).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualDialog(); } });
-        findViewById(R.id.set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
+        
         findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
+        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSettingsDialog(); } });
         findViewById(R.id.pick_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(); } });
         findViewById(R.id.send_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
 
@@ -145,16 +139,94 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         handleIntent(getIntent());
     }
 
+    private void showSettingsDialog() {
+        View view = getLayoutInflater().inflate(R.layout.dialog_settings, null);
+        
+        TextView tvName = (TextView) view.findViewById(R.id.tv_current_name);
+        tvName.setText(OldSendService.getAlias(this));
+        
+        view.findViewById(R.id.set_name_row).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { showSetNameDialog(); }
+        });
+        
+        CheckBox cbHttps = (CheckBox) view.findViewById(R.id.cb_https);
+        cbHttps.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false));
+        cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", isChecked).commit();
+                log("加密设置已保存，请重启服务生效");
+                if (running) {
+                    stopService(new Intent(MainActivity.this, OldSendService.class));
+                    startService(new Intent(MainActivity.this, OldSendService.class));
+                }
+            }
+        });
+        
+        CheckBox cbAnim = (CheckBox) view.findViewById(R.id.cb_anim);
+        cbAnim.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true));
+        cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_anim", isChecked).commit();
+            }
+        });
+        
+        view.findViewById(R.id.about_row).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { showAboutDialog(); }
+        });
+
+        new AlertDialog.Builder(this)
+            .setView(view)
+            .setPositiveButton("关闭", null)
+            .show();
+    }
+
+    private void showAboutDialog() {
+        String msg = "OldSend v1.0
+
+" +
+                     "一个极简、极轻量的局域网文件传输工具。
+" +
+                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。
+
+" +
+                     "🤖 本项目代码完全由 AI 辅助生成。
+" +
+                     "开源协议: MIT License
+
+" +
+                     "GitHub: github.com/styisme/oldsend";
+        new AlertDialog.Builder(this)
+            .setTitle("关于 OldSend")
+            .setMessage(msg)
+            .setPositiveButton("确定", null)
+            .show();
+    }
+
+    private void applyAnimation(View view, boolean visible) {
+        if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
+            view.setVisibility(visible ? View.VISIBLE : View.GONE);
+            return;
+        }
+        if (visible) {
+            view.setVisibility(View.VISIBLE);
+            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(250);
+            view.startAnimation(anim);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
     private void switchTab(boolean isSend) {
         if (isSend) {
-            pageSend.setVisibility(View.VISIBLE);
-            pageReceive.setVisibility(View.GONE);
+            applyAnimation(pageSend, true);
+            applyAnimation(pageReceive, false);
             tabSend.setBackgroundResource(R.drawable.bg_tab_selected);
             tabReceive.setBackgroundResource(0);
             tabReceiveText.setTextColor(0xFF49454F);
         } else {
-            pageSend.setVisibility(View.GONE);
-            pageReceive.setVisibility(View.VISIBLE);
+            applyAnimation(pageSend, false);
+            applyAnimation(pageReceive, true);
             tabReceive.setBackgroundResource(R.drawable.bg_tab_selected);
             tabSend.setBackgroundResource(0);
             tabReceiveText.setTextColor(0xFF2E7D32);
