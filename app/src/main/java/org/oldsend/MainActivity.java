@@ -291,7 +291,11 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private File copyToCache(Uri uri, String name) throws Exception {
         if ("file".equals(uri.getScheme())) return new File(uri.getPath());
         InputStream in = getContentResolver().openInputStream(uri);
-        File out = new File(getCacheDir(), name.replaceAll("[/\\\\\\\\:*?\\"<>|]", "_"));
+String safe = name;
+        safe = safe.replace("/", "_").replace("\\", "_").replace(":", "_")
+                   .replace("*", "_").replace("?", "_").replace("\"", "_")
+                   .replace("<", "_").replace(">", "_").replace("|", "_");
+        File out = new File(getCacheDir(), safe);
         FileOutputStream fos = new FileOutputStream(out);
         byte[] buf = new byte[65536]; int n;
         while ((n = in.read(buf)) > 0) fos.write(buf, 0, n);
