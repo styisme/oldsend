@@ -67,7 +67,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         setContentView(R.layout.activity_main);
 
         status = (TextView) findViewById(R.id.status);
-        selectedFileText = (TextView) findViewById(R.id.selected_file);
+        selectedFileText = (TextView) findViewById(R.id.tv_selected_file);
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
@@ -311,14 +311,14 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         ((android.widget.TextView)findViewById(R.id.tab_settings_text)).setText(I18nManager.get("settings"));
         ((android.widget.TextView)findViewById(R.id.tab_send).findViewById(android.R.id.text1)).setText(I18nManager.get("send"));
 
-        findViewById(R.id.toggle).setText(running ? I18nManager.get("stop") : I18nManager.get("start"));
+        ((android.widget.Button) findViewById(R.id.toggle)).setText(running ? I18nManager.get("stop") : I18nManager.get("start"));
         ((android.widget.Button)findViewById(R.id.btn_log)).setText(I18nManager.get("log"));
         ((android.widget.Button)findViewById(R.id.scan)).setText(I18nManager.get("scan"));
 
         ((android.widget.TextView)findViewById(R.id.tv_select_title)).setText(I18nManager.get("select_content"));
         ((android.widget.TextView)findViewById(R.id.tv_nearby_title)).setText(I18nManager.get("nearby_devices"));
         ((android.widget.TextView)findViewById(R.id.empty_hint)).setText(I18nManager.get("no_device"));
-        ((android.widget.TextView)findViewById(R.id.selected_file)).setText(I18nManager.get("not_selected"));
+        selectedFileText.setText(I18nManager.get("not_selected"));
 
         ((android.widget.TextView)findViewById(R.id.card_file).findViewById(R.id.tv_icon)).setText(I18nManager.get("file").substring(0,1));
         ((android.widget.TextView)findViewById(R.id.card_file).findViewById(R.id.tv_name)).setText(I18nManager.get("file"));
