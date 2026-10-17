@@ -80,14 +80,14 @@ public class OldSendService extends Service {
 
             httpServer = new HttpServer(Protocol.DEFAULT_PORT, router);
             httpServer.start();
-            log("HTTP on 0.0.0.0:" + Protocol.DEFAULT_PORT);
+            log("HTTP 服务已启动，端口: " + Protocol.DEFAULT_PORT);
 
             multicastListener = new MulticastListener(Protocol.DEFAULT_PORT, alias);
             multicastListener.start();
-            log("Multicast on " + Protocol.MULTICAST_GROUP + ":" + Protocol.DEFAULT_PORT);
-            log("Local IP: " + getLocalIp());
+            log("组播服务已启动: " + Protocol.MULTICAST_GROUP + ":" + Protocol.DEFAULT_PORT);
+            log("本机IP: " + getLocalIp());
         } catch (Exception e) {
-            log("start failed: " + e);
+            log("启动失败: " + e);
         }
         return START_STICKY;
     }
@@ -112,7 +112,7 @@ public class OldSendService extends Service {
         try { if (multicastLock != null) multicastLock.release(); } catch (Exception ignored) {}
         httpServer = null;
         multicastListener = null;
-        log("service stopped");
+        log("服务已停止");
         super.onDestroy();
     }
 }

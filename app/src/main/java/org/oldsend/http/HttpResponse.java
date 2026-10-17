@@ -38,7 +38,7 @@ public class HttpResponse {
     }
 
     private static String reasonOf(int status) {
-        if (status == 200) return "OK";
+        if (status == 200) return "确定";
         if (status == 204) return "No Content";
         if (status == 400) return "Bad Request";
         if (status == 403) return "Forbidden";

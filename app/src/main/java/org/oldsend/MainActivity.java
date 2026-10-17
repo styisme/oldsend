@@ -42,6 +42,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private Handler handler = new Handler();
     private boolean running = false;
     private Device pendingDevice;
+    private Uri pendingFileUri;
+    private TextView selectedFileText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         logScroll = (ScrollView) findViewById(R.id.log_scroll);
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
+        selectedFileText = (TextView) findViewById(R.id.selected_file);
+        findViewById(R.id.pick_file).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { pickFile(); }
+        });
         adapter = new DeviceAdapter(this);
         deviceList.setAdapter(adapter);
 
@@ -64,11 +70,16 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
-                pendingDevice = adapter.getItem(pos);
-                log("Selected: " + pendingDevice.alias + " (" + pendingDevice.ip + ")");
-                Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-                i.setType("*/*");
-                startActivityForResult(i, REQ_FILE);
+                Device target = adapter.getItem(pos);
+                if (pendingFileUri == null) {
+                    log("请先点击【选择文件】按钮！");
+                    return;
+                }
+                log("准备发送给: " + target.alias + " (" + target.ip + ")");
+                sendFile(target, pendingFileUri);
+                // 发送后清空已选文件，避免重复误发
+                pendingFileUri = null;
+                selectedFileText.setText("未选择文件 (选中后点下方设备发送)");
             }
         });
 
@@ -83,8 +94,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         });
 
         updateStatus();
-        log("OldSend ready");
-        log("IP: " + OldSendService.getLocalIp());
+        log("OldSend 已就绪");
+        log("本机IP: " + OldSendService.getLocalIp());
         refreshDevices();
     }
 
@@ -92,30 +103,30 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (running) {
             stopService(new Intent(this, OldSendService.class));
             running = false;
-            toggleBtn.setText("Start");
+            toggleBtn.setText("启动");
         } else {
             startService(new Intent(this, OldSendService.class));
             running = true;
-            toggleBtn.setText("Stop");
+            toggleBtn.setText("停止");
         }
         updateStatus();
     }
 
     private void updateStatus() {
         String ip = OldSendService.getLocalIp();
-        String s = (running ? "RUNNING" : "STOPPED") + "  IP:" + ip + ":53317  devices:" + adapter.getCount();
+        String s = (running ? "运行中" : "已停止") + "  IP:" + ip + ":53317  devices:" + adapter.getCount();
         status.setText(s);
     }
 
     private void doScan() {
-        log("scanning...");
+        log("正在扫描...");
         MulticastScanner.scanAsync(new MulticastScanner.Callback() {
             public void onDevice(Device d) {
                 DeviceStore.get().addDevice(d);
-                log("found: " + d.alias + " @ " + d.ip);
+                log("发现: " + d.alias + " @ " + d.ip);
             }
             public void onFinished() {
-                log("scan finished, total " + adapter.getCount() + " devices");
+                log("扫描结束，共 " + adapter.getCount() + " 个设备");
             }
         });
     }
@@ -124,15 +135,15 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         final EditText input = new EditText(this);
         input.setHint("192.168.1.100");
         new AlertDialog.Builder(this)
-            .setTitle("Add device by IP")
+            .setTitle("手动输入设备IP")
             .setView(input)
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            .setPositiveButton("确定", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface d, int w) {
                     String ip = input.getText().toString().trim();
                     if (ip.length() > 0) probeIp(ip);
                 }
             })
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show();
     }
 
@@ -144,14 +155,14 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                     String url = "http://" + ip + ":53317" + Protocol.V2_PREFIX + "/info";
                     JSONObject o = HttpClient.getJson(url, 3000);
                     if (o == null) {
-                        log("probe failed: " + ip);
+                        log("探测失败: " + ip);
                         return;
                     }
                     Device d = Device.fromJson(o, ip);
                     DeviceStore.get().addDevice(d);
-                    log("added: " + d.alias + " @ " + ip);
+                    log("已添加: " + d.alias + " @ " + ip);
                 } catch (Exception e) {
-                    log("probe error: " + e);
+                    log("探测错误: " + e);
                 }
             }
         }).start();
@@ -161,16 +172,23 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != REQ_FILE) return;
         if (resultCode != RESULT_OK || data == null || data.getData() == null) {
-            log("file selection cancelled");
+            log("已取消选择文件");
             return;
         }
         Uri uri = data.getData();
         if (pendingDevice == null) {
-            log("no device selected");
+            log("未选择设备");
             return;
         }
         sendFile(pendingDevice, uri);
         pendingDevice = null;
+    }
+
+    
+    private void pickFile() {
+        Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.setType("*/*");
+        startActivityForResult(i, REQ_FILE);
     }
 
     private void sendFile(final Device device, final Uri uri) {
@@ -179,25 +197,25 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 try {
                     String name = queryDisplayName(uri);
                     File tmp = copyToCache(uri, name);
-                    log("sending " + name + " (" + tmp.length() + " bytes) to " + device.alias);
+                    log("正在发送 " + name + " (" + tmp.length() + " 字节) 发送给 " + device.alias);
                     Uploader.upload(device, tmp, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
                             handler.post(new Runnable() {
                                 public void run() {
                                     String pct = total > 0 ? (" " + (sent * 100 / total) + "%") : "";
-                                    status.setText("Sending to " + device.alias + ": " + stage + pct);
+                                    status.setText("正在发送给 " + device.alias + ": " + stage + pct);
                                 }
                             });
                         }
                         public void onDone(boolean ok, String msg) {
-                            log("[" + device.alias + "] " + (ok ? "OK: " : "FAIL: ") + msg);
+                            log("[" + device.alias + "] " + (ok ? "成功: " : "失败: ") + msg);
                             handler.post(new Runnable() {
                                 public void run() { updateStatus(); }
                             });
                         }
                     });
                 } catch (Exception e) {
-                    log("send error: " + e);
+                    log("发送错误: " + e);
                 }
             }
         }).start();

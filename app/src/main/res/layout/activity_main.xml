@@ -13,7 +13,7 @@
         android:textColor="#333"
         android:background="#EEEEEE"
         android:padding="6dp"
-        android:text="STOPPED"/>
+        android:text="已停止"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -27,7 +27,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:text="Start"/>
+            android:text="启动"/>
 
         <Button
             android:id="@+id/scan"
@@ -35,7 +35,7 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:text="Scan"/>
+            android:text="扫描"/>
 
         <Button
             android:id="@+id/manual"
@@ -43,7 +43,35 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            android:text="Add IP"/>
+            android:text="添加IP"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:gravity="center_vertical">
+
+        <Button
+            android:id="@+id/pick_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="选择文件"/>
+
+        <TextView
+            android:id="@+id/selected_file"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#333333"
+            android:paddingLeft="8dp"
+            android:singleLine="true"
+            android:ellipsize="middle"
+            android:text="未选择文件 (选中后点下方设备发送)"/>
     </LinearLayout>
 
     <TextView
@@ -52,7 +80,7 @@
         android:textSize="12sp"
         android:textStyle="bold"
         android:paddingTop="6dp"
-        android:text="Devices (tap to send)"/>
+        android:text="设备列表 (点击发送)"/>
 
     <ListView
         android:id="@+id/devices"
@@ -72,7 +100,7 @@
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:textStyle="bold"
-            android:text="Log"/>
+            android:text="日志"/>
 
         <Button
             android:id="@+id/clear_log"
@@ -82,7 +110,7 @@
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="4dp"
-            android:text="Clear"/>
+            android:text="清空"/>
     </LinearLayout>
 
     <ScrollView

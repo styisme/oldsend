@@ -55,19 +55,19 @@ public class Uploader {
         prepareBody.put("info", info);
         prepareBody.put("files", files);
 
-        if (cb != null) cb.onProgress("prepare-upload", 0, size);
+        if (cb != null) cb.onProgress("准备上传", 0, size);
         String prepareUrl = target.url(Protocol.V2_PREFIX + "/prepare-upload");
         OldSendService.log("POST " + prepareUrl);
         JSONObject resp = HttpClient.postJson(prepareUrl, prepareBody, 15000);
         if (resp == null) {
-            cb.onDone(false, "prepare-upload rejected");
+            cb.onDone(false, "准备上传被拒绝");
             return;
         }
         String sessionId = resp.optString("sessionId", null);
         JSONObject respFiles = resp.optJSONObject("files");
         String token = respFiles != null ? respFiles.optString(fileId, null) : null;
         if (sessionId == null || token == null) {
-            cb.onDone(false, "invalid prepare-upload response");
+            cb.onDone(false, "准备上传响应无效");
             return;
         }
 
@@ -79,13 +79,13 @@ public class Uploader {
 
         boolean ok = HttpClient.uploadFile(uploadUrl, file, new HttpClient.ProgressListener() {
             public void onProgress(final long sent, final long total) {
-                if (cb != null) cb.onProgress("uploading", sent, total);
+                if (cb != null) cb.onProgress("上传中", sent, total);
             }
         });
         if (ok) {
-            cb.onDone(true, "sent " + file.getName() + " (" + size + " bytes)");
+            cb.onDone(true, "已发送 " + file.getName() + " (" + size + " bytes)");
         } else {
-            cb.onDone(false, "upload rejected");
+            cb.onDone(false, "上传被拒绝");
         }
     }
 
