@@ -125,7 +125,7 @@ public class WebShareHandler implements Router.Handler {
             Map<String, String> q = req.getQueryParams();
             String fileName = q.get("name");
             if (fileName == null) fileName = "web_" + System.currentTimeMillis();
-            File target = FileSaver.createTarget(fileName);
+            File target = FileSaver.createTarget(fileName, OldSendService.getPrefBooleanGlobal("save_album", true));
             OldSendService.log("网页上传: " + fileName);
             FileOutputStream fos = new FileOutputStream(target);
             try {

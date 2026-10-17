@@ -20,7 +20,7 @@ public class HttpClient {
         try {
             if (android.os.Build.VERSION.SDK_INT < 24) {
                 try {
-                    Security.insertProviderAt(new org.conscrypt.OpenSSLProvider(), 1);
+                    Security.insertProviderAt(, 1);
                 } catch (Throwable ignored) {}
             }
             TrustManager[] trustAllCerts = new TrustManager[]{

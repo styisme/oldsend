@@ -18,7 +18,7 @@ public class PrepareUploadHandler implements Router.Handler {
         if (!"POST".equalsIgnoreCase(req.method)) return HttpResponse.status(405);
         
         // 1. 验证 PIN
-        boolean usePin = OldSendService.getPrefBoolean(req.body, "use_pin", false); // 占位, 实际通过 getContext
+        boolean usePin = OldSendService.getPrefBooleanGlobal("use_pin", false);
         String expectedPin = OldSendService.getPin();
         if (usePin) {
             Map<String, String> q = req.getQueryParams();
