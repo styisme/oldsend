@@ -11,6 +11,7 @@ import org.oldsend.http.HttpRequest;
 import org.oldsend.http.HttpResponse;
 import org.oldsend.http.Router;
 import org.oldsend.transfer.FileSaver;
+import org.oldsend.model.HistoryStore;
 
 public class UploadHandler implements Router.Handler {
     private final SessionStore store;
@@ -24,22 +25,14 @@ public class UploadHandler implements Router.Handler {
         String fileId = q.get("fileId");
         String token = q.get("token");
 
-        if (sessionId == null || fileId == null || token == null) {
-            return HttpResponse.status(400);
-        }
+        if (sessionId == null || fileId == null || token == null) return HttpResponse.status(400);
         UploadSession session = store.get(sessionId);
-        if (session == null) {
-            OldSendService.log("upload: unknown session " + sessionId);
-            return HttpResponse.status(400);
-        }
+        if (session == null) return HttpResponse.status(400);
         UploadSession.FileEntry entry = session.getFile(fileId);
-        if (entry == null || !entry.token.equals(token)) {
-            return HttpResponse.status(403);
-        }
+        if (entry == null || !entry.token.equals(token)) return HttpResponse.status(403);
 
         File target = FileSaver.createTarget(entry.fileName);
-        OldSendService.log("upload " + entry.fileName + " (" + entry.size
-                + " bytes) -> " + target.getAbsolutePath());
+        OldSendService.log("上传: " + entry.fileName + " -> " + target.getAbsolutePath());
 
         long written = 0;
         FileOutputStream fos = new FileOutputStream(target);
@@ -56,17 +49,19 @@ public class UploadHandler implements Router.Handler {
                 written += n;
                 remaining -= n;
             }
-        } finally {
-            try { fos.close(); } catch (Exception ignored) {}
-        }
+        } finally { try { fos.close(); } catch (Exception ignored) {} }
 
-        OldSendService.log("received " + entry.fileName + " (" + written + " bytes)");
+        OldSendService.log("接收完成: " + entry.fileName + " (" + written + " 字节)");
+        
+        // 记录到历史
+        String timeStr = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
+        HistoryStore.get().add(new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
+
         session.markDone(fileId);
         if (session.allDone()) store.remove(sessionId);
 
         JSONObject resp = new JSONObject();
         resp.put("sessionId", sessionId);
-        resp.put("fileId", fileId);
         return HttpResponse.json(resp.toString());
     }
 }

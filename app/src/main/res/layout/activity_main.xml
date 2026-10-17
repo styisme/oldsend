@@ -3,70 +3,138 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0F2F5"
-    android:padding="10dp">
+    android:background="@drawable/bg_md3_main">
 
+    <!-- 顶部状态栏 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_card"
         android:orientation="vertical"
-        android:padding="12dp">
-
+        android:padding="16dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OldSend"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#1C1B1F"/>
         <TextView
             android:id="@+id/status"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#666666"
+            android:textSize="12sp"
+            android:textColor="#49454F"
+            android:layout_marginTop="4dp"
             android:text="已停止"/>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
-            <Button android:id="@+id/toggle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:background="@drawable/btn_blue" android:textColor="#FFFFFF" android:textSize="13sp" android:text="启动"/>
-            <Button android:id="@+id/scan" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:layout_marginLeft="6dp" android:background="@drawable/btn_grey" android:textColor="#333333" android:textSize="13sp" android:text="扫描"/>
-            <Button android:id="@+id/manual" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:layout_marginLeft="6dp" android:background="@drawable/btn_grey" android:textColor="#333333" android:textSize="13sp" android:text="添加IP"/>
-            <Button android:id="@+id/set_name" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:layout_marginLeft="6dp" android:background="@drawable/btn_grey" android:textColor="#333333" android:textSize="13sp" android:text="改名"/>
-        </LinearLayout>
     </LinearLayout>
 
+    <!-- 页面容器 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- ========== 发送页面 ========== -->
+        <LinearLayout
+            android:id="@+id/page_send"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_md3_card"
+                android:orientation="vertical"
+                android:padding="12dp">
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <Button android:id="@+id/toggle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="14sp" android:text="启动"/>
+                    <Button android:id="@+id/scan" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:layout_marginLeft="8dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="14sp" android:text="扫描"/>
+                    <Button android:id="@+id/manual" android:layout_width="0dp" android:layout_weight="1" android:layout_height="48dp" android:layout_marginLeft="8dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="14sp" android:text="添加IP"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+                    <Button android:id="@+id/pick_file" android:layout_width="wrap_content" android:layout_height="40dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="选文件"/>
+                    <Button android:id="@+id/send_text" android:layout_width="wrap_content" android:layout_height="40dp" android:layout_marginLeft="8dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="发文本"/>
+                    <Button android:id="@+id/set_name" android:layout_width="wrap_content" android:layout_height="40dp" android:layout_marginLeft="8dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="改名"/>
+                    <TextView android:id="@+id/selected_file" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#49454F" android:paddingLeft="10dp" android:singleLine="true" android:ellipsize="middle" android:text="未选择文件"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/progress"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:max="100"
+                android:progress="0"
+                android:visibility="gone"/>
+
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold" android:textColor="#1C1B1F" android:paddingTop="12dp" android:paddingBottom="6dp" android:text="附近设备"/>
+            <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
+        </LinearLayout>
+
+        <!-- ========== 接收页面 ========== -->
+        <LinearLayout
+            android:id="@+id/page_receive"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone">
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="14sp" android:textStyle="bold" android:textColor="#1C1B1F" android:paddingBottom="6dp" android:text="接收记录 (点击打开)"/>
+            <ListView android:id="@+id/history_list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
+        </LinearLayout>
+
+        <!-- ========== 日志悬浮层 ========== -->
+        <ScrollView android:id="@+id/log_scroll" android:layout_width="match_parent" android:layout_height="120dp" android:layout_gravity="bottom" android:layout_margin="10dp" android:background="#E6FFFFFF">
+            <TextView android:id="@+id/log" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="10sp" android:textColor="#666666" android:typeface="monospace" android:padding="4dp"/>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- 底部导航栏 (MD3 样式) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_card"
         android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:padding="10dp">
-
-        <Button android:id="@+id/pick_file" android:layout_width="wrap_content" android:layout_height="40dp" android:background="@drawable/btn_blue" android:textColor="#FFFFFF" android:textSize="12sp" android:text="选文件"/>
-        <Button android:id="@+id/send_text" android:layout_width="wrap_content" android:layout_height="40dp" android:layout_marginLeft="6dp" android:background="@drawable/btn_blue" android:textColor="#FFFFFF" android:textSize="12sp" android:text="发文本"/>
-        <TextView android:id="@+id/selected_file" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#666666" android:paddingLeft="10dp" android:singleLine="true" android:ellipsize="middle" android:text="未选择(可多选)"/>
+        android:background="#F3EDF7"
+        android:padding="8dp"
+        android:gravity="center">
+        <LinearLayout
+            android:id="@+id/tab_send"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_tab_selected"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="发送" android:textColor="#2E7D32" android:textStyle="bold" android:textSize="12sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tab_receive"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView android:id="@+id/tab_receive_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收" android:textColor="#49454F" android:textSize="12sp"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/clear_log"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="清空日志"
+            android:textSize="11sp"
+            android:background="@drawable/btn_md3_secondary"
+            android:textColor="#1B5E20"/>
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:max="100"
-        android:progress="0"
-        android:visibility="gone"/>
-
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="#333333" android:paddingTop="10dp" android:paddingBottom="6dp" android:text="设备列表 (点击发送)"/>
-
-    <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="2" android:background="@drawable/bg_card"/>
-
-    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingTop="10dp" android:paddingBottom="6dp" android:gravity="center_vertical">
-        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="#333333" android:text="运行日志"/>
-        <Button android:id="@+id/clear_log" android:layout_width="wrap_content" android:layout_height="30dp" android:textSize="11sp" android:background="@drawable/btn_grey" android:textColor="#333333" android:text="清空"/>
-    </LinearLayout>
-
-    <ScrollView android:id="@+id/log_scroll" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_card" android:padding="8dp">
-        <TextView android:id="@+id/log" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="11sp" android:textColor="#555555" android:typeface="monospace"/>
-    </ScrollView>
 </LinearLayout>
