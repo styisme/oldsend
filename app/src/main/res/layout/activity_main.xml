@@ -154,35 +154,63 @@
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="自动保存" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_auto_save" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_auto_save"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <!-- 省略其他设置项以节省字数，结构与上版一致 -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到相册" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_save_album" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_save_album"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到历史记录" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_save_history" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_save_history"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用 PIN 密码" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_pin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_pin"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <TextView android:id="@+id/tv_pin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="当前 PIN: 未启用" android:textSize="13sp" android:textColor="#388E3C" android:padding="12dp" android:visibility="gone"/>
 
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="网络与自动化" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用网页传输" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_web" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_web"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="开机自动启动" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_boot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_boot"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="通过通知栏接收" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_receive_notif" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_receive_notif"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
 
                 <LinearLayout android:id="@+id/row_port" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
@@ -197,7 +225,11 @@
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="其他" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="界面切换动画" android:textSize="14sp" android:textColor="#333"/>
-                    <CheckBox android:id="@+id/cb_anim" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
+                    <org.oldsend.ui.Md3Switch
+                    android:id="@+id/cb_anim"
+                    android:layout_width="52dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"/>
                 </LinearLayout>
                 <LinearLayout android:id="@+id/row_set_name" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="修改设备名称" android:textSize="14sp" android:textColor="#333"/>
