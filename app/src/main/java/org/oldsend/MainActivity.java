@@ -17,6 +17,9 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.Animation;
+import android.view.MotionEvent;
 import android.widget.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -111,6 +114,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tabSend.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(0); } });
         tabReceive.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(1); } });
         tabSettings.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(2); } });
+
+        applyTabPressAnimation(tabSend);
+        applyTabPressAnimation(tabReceive);
+        applyTabPressAnimation(tabSettings);
 
         initSettingsUI();
 
@@ -415,6 +422,28 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         if (index == 1) refreshHistory();
         applyI18n();
+    }
+
+    
+    private void applyTabPressAnimation(final View view) {
+        view.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
+                    return false; // 如果关了动画，就不执行
+                }
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ScaleAnimation shrink = new ScaleAnimation(1f, 0.92f, 1f, 0.92f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    shrink.setDuration(100);
+                    shrink.setFillAfter(true);
+                    v.startAnimation(shrink);
+                } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    ScaleAnimation grow = new ScaleAnimation(0.92f, 1f, 0.92f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
+                    grow.setDuration(100);
+                    v.startAnimation(grow);
+                }
+                return false;
+            }
+        });
     }
 
     private void applyAnimation(View view, boolean visible) {
