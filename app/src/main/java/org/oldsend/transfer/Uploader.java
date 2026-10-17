@@ -29,7 +29,7 @@ public class Uploader {
         }, "upload-" + file.getName()).start();
     }
 
-    static void doUpload(Device target, File file, ProgressCallback cb) throws Exception {
+    static void doUpload(final Device target, final File file, final ProgressCallback cb) throws Exception {
         if (target.https) {
             cb.onDone(false, "target requires HTTPS, not supported");
             return;
