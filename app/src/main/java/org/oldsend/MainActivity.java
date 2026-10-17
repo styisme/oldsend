@@ -44,7 +44,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(android.view.Window.FEATURE_LEFT_ICON);
         super.onCreate(savedInstanceState);
+        getWindow().setFeatureDrawableResource(android.view.Window.FEATURE_LEFT_ICON, R.drawable.ic_launcher);
         setContentView(R.layout.activity_main);
         status = (TextView) findViewById(R.id.status);
         logView = (TextView) findViewById(R.id.log);
