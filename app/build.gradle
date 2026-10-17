@@ -1,6 +1,9 @@
 apply plugin: 'com.android.application'
 
 android {
+    packagingOptions {
+        doNotStrip "**/*.so"
+    }
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
 
@@ -32,4 +35,10 @@ android {
 
 dependencies {
     implementation 'org.conscrypt:conscrypt-android:2.5.2'
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith("strip") && task.name.endsWith("DebugSymbols")) {
+        task.enabled = false
+    }
 }
