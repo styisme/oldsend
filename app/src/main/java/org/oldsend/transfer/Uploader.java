@@ -1,8 +1,14 @@
 package org.oldsend.transfer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-
 import org.json.JSONObject;
 import org.oldsend.OldSendService;
 import org.oldsend.Protocol;
@@ -11,94 +17,93 @@ import org.oldsend.model.Device;
 import org.oldsend.protocol.Identity;
 
 public class Uploader {
-
     public interface ProgressCallback {
         void onProgress(String stage, long sent, long total);
         void onDone(boolean ok, String msg);
     }
 
-    public static void upload(final Device target, final File file, final ProgressCallback cb) {
+    public static void uploadFiles(final Device target, final List<File> files, final ProgressCallback cb) {
         new Thread(new Runnable() {
             public void run() {
-                try {
-                    doUpload(target, file, cb);
-                } catch (Exception e) {
-                    if (cb != null) cb.onDone(false, e.toString());
-                }
+                try { doUpload(target, files, cb); } catch (Exception e) { if (cb != null) cb.onDone(false, e.toString()); }
             }
-        }, "upload-" + file.getName()).start();
+        }).start();
     }
 
-    static void doUpload(final Device target, final File file, final ProgressCallback cb) throws Exception {
-        if (target.https) {
-            cb.onDone(false, "target requires HTTPS, not supported");
-            return;
-        }
-        long size = file.length();
-        if (size > Integer.MAX_VALUE) {
-            cb.onDone(false, "file > 2GB not supported");
-            return;
-        }
-        String fileId = UUID.randomUUID().toString().replace("-", "");
+    static void doUpload(Device target, List<File> files, ProgressCallback cb) throws Exception {
+        if (target.https) { cb.onDone(false, "目标开启了HTTPS，请在对方关闭加密"); return; }
+        if (files.isEmpty()) return;
 
         JSONObject info = buildInfo();
-        JSONObject fileDto = new JSONObject();
-        fileDto.put("id", fileId);
-        fileDto.put("fileName", file.getName());
-        fileDto.put("size", size);
-        fileDto.put("fileType", guessMime(file.getName()));
+        JSONObject filesJson = new JSONObject();
+        long totalSize = 0;
+        String[] fileIds = new String[files.size()];
 
-        JSONObject files = new JSONObject();
-        files.put(fileId, fileDto);
+        for (int i = 0; i < files.size(); i++) {
+            File f = files.get(i);
+            String id = UUID.randomUUID().toString().replace("-", "");
+            fileIds[i] = id;
+            totalSize += f.length();
+            JSONObject fileDto = new JSONObject();
+            fileDto.put("id", id); fileDto.put("fileName", f.getName());
+            fileDto.put("size", f.length()); fileDto.put("fileType", guessMime(f.getName()));
+            filesJson.put(id, fileDto);
+        }
 
         JSONObject prepareBody = new JSONObject();
-        prepareBody.put("info", info);
-        prepareBody.put("files", files);
+        prepareBody.put("info", info); prepareBody.put("files", filesJson);
 
-        if (cb != null) cb.onProgress("准备上传", 0, size);
+        cb.onProgress("准备上传", 0, totalSize);
         String prepareUrl = target.url(Protocol.V2_PREFIX + "/prepare-upload");
-        OldSendService.log("POST " + prepareUrl);
         JSONObject resp = HttpClient.postJson(prepareUrl, prepareBody, 15000);
-        if (resp == null) {
-            cb.onDone(false, "准备上传被拒绝");
-            return;
-        }
+        if (resp == null) { cb.onDone(false, "对方拒绝接收"); return; }
         String sessionId = resp.optString("sessionId", null);
         JSONObject respFiles = resp.optJSONObject("files");
-        String token = respFiles != null ? respFiles.optString(fileId, null) : null;
-        if (sessionId == null || token == null) {
-            cb.onDone(false, "准备上传响应无效");
-            return;
+        if (sessionId == null || respFiles == null) { cb.onDone(false, "响应无效"); return; }
+
+        long totalSent = 0;
+        for (int i = 0; i < files.size(); i++) {
+            File f = files.get(i);
+            String fileId = fileIds[i];
+            String token = respFiles.optString(fileId, null);
+            if (token == null) continue;
+            String uploadUrl = target.url(Protocol.V2_PREFIX + "/upload") + "?sessionId=" + enc(sessionId) + "&fileId=" + enc(fileId) + "&token=" + enc(token);
+            boolean ok = uploadFile(uploadUrl, f, totalSent, totalSize, cb);
+            if (!ok) { cb.onDone(false, "上传失败"); return; }
+            totalSent += f.length();
         }
+        cb.onDone(true, "发送成功");
+    }
 
-        String uploadUrl = target.url(Protocol.V2_PREFIX + "/upload")
-                + "?sessionId=" + enc(sessionId)
-                + "&fileId=" + enc(fileId)
-                + "&token=" + enc(token);
-        OldSendService.log("POST " + uploadUrl + " (" + size + " bytes)");
-
-        boolean ok = HttpClient.uploadFile(uploadUrl, file, new HttpClient.ProgressListener() {
-            public void onProgress(final long sent, final long total) {
-                if (cb != null) cb.onProgress("上传中", sent, total);
+    static boolean uploadFile(String url, File file, final long baseSent, final long totalSize, final ProgressCallback cb) throws Exception {
+        long size = file.length();
+        HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
+        c.setConnectTimeout(15000); c.setReadTimeout(300000);
+        c.setRequestMethod("POST"); c.setDoOutput(true);
+        c.setRequestProperty("Content-Type", "application/octet-stream");
+        c.setFixedLengthStreamingMode((int) size);
+        try {
+            OutputStream os = c.getOutputStream();
+            FileInputStream fis = new FileInputStream(file);
+            byte[] buf = new byte[65536];
+            int n;
+            long fileSent = 0;
+            while ((n = fis.read(buf)) > 0) {
+                os.write(buf, 0, n); fileSent += n;
+                if (cb != null) cb.onProgress("发送中", baseSent + fileSent, totalSize);
             }
-        });
-        if (ok) {
-            cb.onDone(true, "已发送 " + file.getName() + " (" + size + " bytes)");
-        } else {
-            cb.onDone(false, "上传被拒绝");
-        }
+            os.flush(); fis.close(); os.close();
+        } catch (Exception e) { c.disconnect(); throw e; }
+        try { return c.getResponseCode() >= 200 && c.getResponseCode() < 300; }
+        finally { c.disconnect(); }
     }
 
     static JSONObject buildInfo() throws Exception {
         JSONObject o = new JSONObject();
-        o.put("alias", android.os.Build.MODEL);
-        o.put("version", Protocol.VERSION);
-        o.put("deviceModel", "Android " + android.os.Build.VERSION.RELEASE);
-        o.put("deviceType", "mobile");
-        o.put("fingerprint", Identity.getFingerprint());
-        o.put("port", Protocol.DEFAULT_PORT);
-        o.put("protocol", "http");
-        o.put("download", false);
+        o.put("alias", OldSendService.getAlias(null));
+        o.put("version", Protocol.VERSION); o.put("deviceModel", "Android " + android.os.Build.VERSION.RELEASE);
+        o.put("deviceType", "mobile"); o.put("fingerprint", Identity.getFingerprint());
+        o.put("port", Protocol.DEFAULT_PORT); o.put("protocol", "http"); o.put("download", false);
         return o;
     }
 
@@ -106,22 +111,10 @@ public class Uploader {
         String lower = name.toLowerCase();
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
         if (lower.endsWith(".png")) return "image/png";
-        if (lower.endsWith(".gif")) return "image/gif";
-        if (lower.endsWith(".webp")) return "image/webp";
-        if (lower.endsWith(".mp4")) return "video/mp4";
-        if (lower.endsWith(".mov")) return "video/quicktime";
-        if (lower.endsWith(".mp3")) return "audio/mpeg";
-        if (lower.endsWith(".wav")) return "audio/wav";
-        if (lower.endsWith(".pdf")) return "application/pdf";
         if (lower.endsWith(".txt")) return "text/plain";
-        if (lower.endsWith(".json")) return "application/json";
-        if (lower.endsWith(".zip")) return "application/zip";
-        if (lower.endsWith(".apk")) return "application/vnd.android.package-archive";
+        if (lower.endsWith(".mp4")) return "video/mp4";
         return "application/octet-stream";
     }
 
-    static String enc(String s) {
-        try { return java.net.URLEncoder.encode(s, "UTF-8"); }
-        catch (Exception e) { return s; }
-    }
+    static String enc(String s) { try { return java.net.URLEncoder.encode(s, "UTF-8"); } catch (Exception e) { return s; } }
 }

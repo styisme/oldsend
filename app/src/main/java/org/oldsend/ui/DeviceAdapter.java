@@ -6,10 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.oldsend.R;
 import org.oldsend.model.Device;
 
@@ -18,13 +16,7 @@ public class DeviceAdapter extends BaseAdapter {
     private final List<Device> data = new ArrayList<Device>();
 
     public DeviceAdapter(Context ctx) { this.ctx = ctx; }
-
-    public void setData(List<Device> list) {
-        data.clear();
-        if (list != null) data.addAll(list);
-        notifyDataSetChanged();
-    }
-
+    public void setData(List<Device> list) { data.clear(); if (list != null) data.addAll(list); notifyDataSetChanged(); }
     public int getCount() { return data.size(); }
     public Device getItem(int pos) { return data.get(pos); }
     public long getItemId(int pos) { return pos; }
@@ -37,17 +29,18 @@ public class DeviceAdapter extends BaseAdapter {
             h.alias = (TextView) cv.findViewById(R.id.item_alias);
             h.info = (TextView) cv.findViewById(R.id.item_info);
             cv.setTag(h);
-        } else {
-            h = (ViewHolder) cv.getTag();
-        }
+        } else { h = (ViewHolder) cv.getTag(); }
         Device d = data.get(pos);
-        h.alias.setText(d.alias + (d.https ? " [TLS]" : ""));
+        
+        String icon = "[设备]";
+        if ("mobile".equals(d.deviceType)) icon = "[手机]";
+        else if ("desktop".equals(d.deviceType)) icon = "[电脑]";
+        else if ("web".equals(d.deviceType)) icon = "[网页]";
+        else if ("headless".equals(d.deviceType)) icon = "[服务]";
+
+        h.alias.setText(icon + " " + d.alias + (d.https ? " [加密]" : ""));
         h.info.setText(d.ip + ":" + d.port + "  v" + d.version);
         return cv;
     }
-
-    static class ViewHolder {
-        TextView alias;
-        TextView info;
-    }
+    static class ViewHolder { TextView alias; TextView info; }
 }
