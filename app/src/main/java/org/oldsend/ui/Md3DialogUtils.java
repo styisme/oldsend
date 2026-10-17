@@ -99,7 +99,10 @@ public class Md3DialogUtils {
     public static Dialog showInput(final Context ctx, String title, String defaultValue, final OnInputListener listener) {
         final EditText input = new EditText(ctx);
         input.setText(defaultValue);
-        input.setPadding(24, 16, 24, 16);
+        input.setGravity(android.view.Gravity.CENTER_VERTICAL);
+        input.setPadding(20, 12, 20, 12);
+        input.setTextSize(14);
+        input.setSingleLine(true);
         input.setBackgroundResource(R.drawable.bg_md3_edittext);
         input.setSingleLine(true);
         
