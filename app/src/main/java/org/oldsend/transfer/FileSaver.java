@@ -22,17 +22,20 @@ public class FileSaver {
 
     private static File getTargetDir(String name) {
         String lower = name.toLowerCase();
-        File ext = Environment.getExternalStorageDirectory();
+        // 图片依然进相册
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".gif")) {
-            return new File(ext, Environment.DIRECTORY_PICTURES + "/OldSend");
-        } else if (lower.endsWith(".mp4") || lower.endsWith(".mkv") || lower.endsWith(".avi")) {
-            return new File(ext, Environment.DIRECTORY_MOVIES + "/OldSend");
-        } else if (lower.endsWith(".mp3") || lower.endsWith(".wav")) {
-            return new File(ext, Environment.DIRECTORY_MUSIC + "/OldSend");
-        } else if (lower.endsWith(".apk")) {
-            return new File(ext, "Download/OldSend");
+            return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "OldSend");
+        } 
+        // 视频进 Movies
+        else if (lower.endsWith(".mp4") || lower.endsWith(".mkv") || lower.endsWith(".avi")) {
+            return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "OldSend");
+        } 
+        // 音频进 Music
+        else if (lower.endsWith(".mp3") || lower.endsWith(".wav")) {
+            return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC), "OldSend");
         }
-        return new File(ext, "OldSend");
+        // 其他所有文件（包括 apk、txt、zip）默认进系统的 Download/OldSend 目录
+        return new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OldSend");
     }
 
     private static String sanitize(String name) {
