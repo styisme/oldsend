@@ -26,6 +26,9 @@ public class I18nManager {
         zh.put("language", "语言 (Language)"); zh.put("follow_system", "跟随系统"); zh.put("cancel", "取消");
         zh.put("confirm", "确定"); zh.put("close", "关闭"); zh.put("clear", "清空"); zh.put("input_ip", "手动输入 IP");
         zh.put("input_text", "发送文本"); zh.put("select_lang", "选择语言"); zh.put("restart_tip", "切换语言成功");
+        zh.put("backup_title", "备份与恢复");
+        zh.put("backup_export", "导出设置到剪贴板");
+        zh.put("backup_import", "从剪贴板导入设置");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -62,6 +65,9 @@ public class I18nManager {
         en.put("language", "Language"); en.put("follow_system", "Follow System"); en.put("cancel", "Cancel");
         en.put("confirm", "OK"); en.put("close", "Close"); en.put("clear", "Clear"); en.put("input_ip", "Manual IP");
         en.put("input_text", "Send Text"); en.put("select_lang", "Select Language"); en.put("restart_tip", "Language changed");
+        en.put("backup_title", "Backup & Restore");
+        en.put("backup_export", "Export to Clipboard");
+        en.put("backup_import", "Import from Clipboard");
         dict.put("en", en);
 
         // ============ 日语 (ja) ============
@@ -80,6 +86,9 @@ public class I18nManager {
         ja.put("language", "言語 (Language)"); ja.put("follow_system", "システムに従う"); ja.put("cancel", "キャンセル");
         ja.put("confirm", "OK"); ja.put("close", "閉じる"); ja.put("clear", "クリア"); ja.put("input_ip", "手動IP入力");
         ja.put("input_text", "テキスト送信"); ja.put("select_lang", "言語を選択"); ja.put("restart_tip", "言語を変更しました");
+        ja.put("backup_title", "バックアップと復元");
+        ja.put("backup_export", "クリップボードにエクスポート");
+        ja.put("backup_import", "クリップボードからインポート");
         dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
@@ -98,6 +107,9 @@ public class I18nManager {
         ko.put("language", "언어 (Language)"); ko.put("follow_system", "시스템 설정 따름"); ko.put("cancel", "취소");
         ko.put("confirm", "확인"); ko.put("close", "닫기"); ko.put("clear", "지우기"); ko.put("input_ip", "수동 IP 입력");
         ko.put("input_text", "텍스트 보내기"); ko.put("select_lang", "언어 선택"); ko.put("restart_tip", "언어가 변경되었습니다");
+        ko.put("backup_title", "백업 및 복원");
+        ko.put("backup_export", "클립보드로 내보내기");
+        ko.put("backup_import", "클립보드에서 가져오기");
         dict.put("ko", ko);
 
         // ============ 德语 (de) ============
@@ -116,6 +128,9 @@ public class I18nManager {
         de.put("language", "Sprache"); de.put("follow_system", "Systemsprache"); de.put("cancel", "Abbrechen");
         de.put("confirm", "OK"); de.put("close", "Schließen"); de.put("clear", "Löschen"); de.put("input_ip", "Manuelle IP");
         de.put("input_text", "Text senden"); de.put("select_lang", "Sprache wählen"); de.put("restart_tip", "Sprache geändert");
+        de.put("backup_title", "Sicherung & Wiederherstellung");
+        de.put("backup_export", "In Zwischenablage exportieren");
+        de.put("backup_import", "Aus Zwischenablage importieren");
         dict.put("de", de);
 
         // ============ 法语 (fr) ============
@@ -134,6 +149,9 @@ public class I18nManager {
         fr.put("language", "Langue"); fr.put("follow_system", "Système"); fr.put("cancel", "Annuler");
         fr.put("confirm", "OK"); fr.put("close", "Fermer"); fr.put("clear", "Effacer"); fr.put("input_ip", "IP manuelle");
         fr.put("input_text", "Envoyer texte"); fr.put("select_lang", "Choisir la langue"); fr.put("restart_tip", "Langue modifiée");
+        fr.put("backup_title", "Sauvegarde & Restauration");
+        fr.put("backup_export", "Exporter vers le presse-papiers");
+        fr.put("backup_import", "Importer depuis le presse-papiers");
         dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
@@ -152,6 +170,9 @@ public class I18nManager {
         es.put("language", "Idioma"); es.put("follow_system", "Sistema"); es.put("cancel", "Cancelar");
         es.put("confirm", "Aceptar"); es.put("close", "Cerrar"); es.put("clear", "Limpiar"); es.put("input_ip", "IP manual");
         es.put("input_text", "Enviar texto"); es.put("select_lang", "Seleccionar idioma"); es.put("restart_tip", "Idioma cambiado");
+        es.put("backup_title", "Copia de seguridad y restauración");
+        es.put("backup_export", "Exportar al portapapeles");
+        es.put("backup_import", "Importar desde el portapapeles");
         dict.put("es", es);
 
         // ============ 俄语 (ru) ============
@@ -170,6 +191,9 @@ public class I18nManager {
         ru.put("language", "Язык"); ru.put("follow_system", "Системный"); ru.put("cancel", "Отмена");
         ru.put("confirm", "ОК"); ru.put("close", "Закрыть"); ru.put("clear", "Очистить"); ru.put("input_ip", "Ввести IP");
         ru.put("input_text", "Отправить текст"); ru.put("select_lang", "Выбрать язык"); ru.put("restart_tip", "Язык изменен");
+        ru.put("backup_title", "Резервное копирование");
+        ru.put("backup_export", "Экспорт в буфер обмена");
+        ru.put("backup_import", "Импорт из буфера обмена");
         dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
@@ -188,6 +212,9 @@ public class I18nManager {
         pt.put("language", "Idioma"); pt.put("follow_system", "Sistema"); pt.put("cancel", "Cancelar");
         pt.put("confirm", "OK"); pt.put("close", "Fechar"); pt.put("clear", "Limpar"); pt.put("input_ip", "IP manual");
         pt.put("input_text", "Enviar texto"); pt.put("select_lang", "Selecionar idioma"); pt.put("restart_tip", "Idioma alterado");
+        pt.put("backup_title", "Backup e Restauração");
+        pt.put("backup_export", "Exportar para a área de transferência");
+        pt.put("backup_import", "Importar da área de transferência");
         dict.put("pt", pt);
     }
 
