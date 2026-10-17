@@ -15,6 +15,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
 import org.oldsend.api.*;
+import org.oldsend.api.WebShareHandler;
 import org.oldsend.discovery.MulticastListener;
 import org.oldsend.http.HttpServer;
 import org.oldsend.http.Router;
@@ -101,6 +102,9 @@ public class OldSendService extends Service {
             router.register(Protocol.V2_PREFIX + "/prepare-upload", new PrepareUploadHandler(store));
             router.register(Protocol.V2_PREFIX + "/upload", new UploadHandler(store));
             router.register(Protocol.V2_PREFIX + "/cancel", new CancelHandler(store));
+            router.register("/", new WebShareHandler());
+            router.register("/index.html", new WebShareHandler());
+            router.register("/web-upload", new WebShareHandler());
 
             httpServer = new HttpServer(Protocol.DEFAULT_PORT, router);
             httpServer.start();
