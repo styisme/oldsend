@@ -17,7 +17,7 @@ import org.oldsend.R;
 public class Md3DialogUtils {
 
     public static Dialog createBaseDialog(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener, String negative, DialogInterface.OnClickListener negListener) {
-        Dialog dialog = new Dialog(ctx);
+        final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_base);
         
@@ -102,7 +102,7 @@ public class Md3DialogUtils {
     public interface OnInputListener { void onInput(String text); }
 
     public static Dialog showList(Context ctx, String title, String[] items, final OnItemSelectListener listener) {
-        Dialog dialog = new Dialog(ctx);
+        final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_list);
         
