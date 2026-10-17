@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.*;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import java.io.File;
