@@ -224,8 +224,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_web, I18nManager.get("web_enable"));
         safeSetText(R.id.tv_boot, I18nManager.get("auto_start"));
         safeSetText(R.id.tv_notif, I18nManager.get("receive_notif"));
-        safeSetText(R.id.tv_port, I18nManager.get("port"));
-        safeSetText(R.id.tv_timeout, I18nManager.get("timeout"));
+        safeSetText(R.id.tv_port_title, I18nManager.get("port"));
+        safeSetText(R.id.tv_timeout_title, I18nManager.get("timeout"));
         safeSetText(R.id.tv_other, I18nManager.get("other"));
         safeSetText(R.id.tv_lang_title, I18nManager.get("language"));
         
@@ -290,8 +290,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbHttps = (CheckBox) findViewById(R.id.cb_https);
         tvPin = (TextView) findViewById(R.id.tv_pin);
         tvName = (TextView) findViewById(R.id.tv_name);
-        tvPort = (TextView) findViewById(R.id.tv_port);
-        tvTimeout = (TextView) findViewById(R.id.tv_timeout);
+        tvPort = (TextView) findViewById(R.id.tv_port_value);
+        tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));

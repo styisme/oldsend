@@ -99,6 +99,8 @@ public class Md3DialogUtils {
     public static Dialog showInput(final Context ctx, String title, String defaultValue, final OnInputListener listener) {
         final EditText input = new EditText(ctx);
         input.setText(defaultValue);
+        input.setPadding(24, 16, 24, 16);
+        input.setBackgroundResource(R.drawable.bg_md3_edittext);
         input.setSingleLine(true);
         
         Dialog dialog = createBaseDialog(ctx, title, input, I18nManager.get("confirm"), null, I18nManager.get("cancel"), null);
