@@ -114,6 +114,9 @@ public class WebShareHandler implements Router.Handler {
         "</html>";
 
     public HttpResponse handle(HttpRequest req) throws Exception {
+        if (!OldSendService.getPrefBooleanGlobal("web_enable", true)) {
+            return HttpResponse.status(404);
+        }
         if (req.path.equals("/") || req.path.equals("/index.html")) {
             HttpResponse resp = new HttpResponse();
             resp.contentType = "text/html; charset=utf-8";

@@ -123,11 +123,12 @@ public class OldSendService extends Service {
 
             boolean useHttps = getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false);
             javax.net.ssl.SSLContext sslContext = useHttps ? TlsHelper.getServerSSLContext(this) : null;
-            httpServer = new HttpServer(Protocol.DEFAULT_PORT, router, sslContext);
+            int port = getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", Protocol.DEFAULT_PORT);
+            httpServer = new HttpServer(port, router, sslContext);
             httpServer.start();
-            log((useHttps ? "HTTPS" : "HTTP") + " 服务已启动，端口: " + Protocol.DEFAULT_PORT);
+            log((useHttps ? "HTTPS" : "HTTP") + " 服务已启动，端口: " + port);
 
-            multicastListener = new MulticastListener(Protocol.DEFAULT_PORT, alias);
+            multicastListener = new MulticastListener(port, alias);
             multicastListener.start();
             log("组播服务已启动: " + Protocol.MULTICAST_GROUP + ":" + Protocol.DEFAULT_PORT);
             log("本机IP: " + getLocalIp());

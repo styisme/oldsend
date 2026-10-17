@@ -50,7 +50,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim;
+    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot;
+    private TextView tvPort, tvTimeout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,6 +136,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         log("OldSend 已就绪");
         log("本机IP: " + OldSendService.getLocalIp());
         handleIntent(getIntent());
+        checkAndRequestPermission();
     }
 
     private void initSettingsUI() {
@@ -145,8 +147,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbAnim = (CheckBox) findViewById(R.id.cb_anim);
         tvPin = (TextView) findViewById(R.id.tv_pin);
         tvName = (TextView) findViewById(R.id.tv_name);
+        cbWeb = (CheckBox) findViewById(R.id.cb_web);
+        cbBoot = (CheckBox) findViewById(R.id.cb_boot);
+        tvPort = (TextView) findViewById(R.id.tv_port);
+        tvTimeout = (TextView) findViewById(R.id.tv_timeout);
 
         tvName.setText(OldSendService.getAlias(this));
+        cbWeb.setChecked(OldSendService.getPrefBooleanGlobal("web_enable", true));
+        cbBoot.setChecked(OldSendService.getPrefBooleanGlobal("auto_start", false));
+        int p = getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317);
+        tvPort.setText(String.valueOf(p));
+        int t = getSharedPreferences("oldsend", MODE_PRIVATE).getInt("timeout", 500);
+        tvTimeout.setText(String.valueOf(t));
         
         boolean autoSave = OldSendService.getPrefBooleanGlobal("auto_save", false);
         boolean saveAlbum = OldSendService.getPrefBooleanGlobal("save_album", true);
@@ -165,6 +177,47 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbSaveAlbum.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_album", c); } });
         cbSaveHistory.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_history", c); } });
         cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("use_anim", c); } });
+        cbWeb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("web_enable", c); } });
+        cbBoot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_start", c); } });
+        
+        findViewById(R.id.row_port).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final EditText input = new EditText(MainActivity.this);
+                input.setText(tvPort.getText());
+                input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+                new AlertDialog.Builder(MainActivity.this).setTitle("修改端口 (1024-65535)").setView(input)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface d, int w) {
+                            try {
+                                int val = Integer.parseInt(input.getText().toString());
+                                if (val >= 1024 && val <= 65535) {
+                                    getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("port", val).commit();
+                                    tvPort.setText(String.valueOf(val));
+                                    log("端口已修改，请重启服务生效");
+                                }
+                            } catch (Exception e) {}
+                        }
+                    }).setNegativeButton("取消", null).show();
+            }
+        });
+
+        findViewById(R.id.row_timeout).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final EditText input = new EditText(MainActivity.this);
+                input.setText(tvTimeout.getText());
+                input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+                new AlertDialog.Builder(MainActivity.this).setTitle("搜索超时 (毫秒)").setView(input)
+                    .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface d, int w) {
+                            try {
+                                int val = Integer.parseInt(input.getText().toString());
+                                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("timeout", val).commit();
+                                tvTimeout.setText(String.valueOf(val));
+                            } catch (Exception e) {}
+                        }
+                    }).setNegativeButton("取消", null).show();
+            }
+        });
         
         cbPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { 
             public void onCheckedChanged(CompoundButton v, boolean c) { 
@@ -197,6 +250,28 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     private void savePref(String key, boolean val) {
         getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit();
+    }
+
+    private void checkAndRequestPermission() {
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{
+                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                }, 1001);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == 1001) {
+            if (grantResults.length > 0 && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                log("存储权限已授予");
+            } else {
+                log("未授予存储权限，可能无法收发文件");
+            }
+        }
     }
 
     private void switchTab(int index) {

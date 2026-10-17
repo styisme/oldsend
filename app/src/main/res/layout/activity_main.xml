@@ -154,6 +154,31 @@
                     <TextView android:id="@+id/tv_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#999"/>
                 </LinearLayout>
 
+                
+                <!-- 网页开关 -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用网页传输" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_web" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+                
+                <!-- 开机自启 -->
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="开机自动启动" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_boot" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <!-- 端口 -->
+                <LinearLayout android:id="@+id/row_port" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="端口" android:textSize="14sp"/>
+                    <TextView android:id="@+id/tv_port" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="53317" android:textSize="14sp" android:textColor="#999"/>
+                </LinearLayout>
+
+                <!-- 超时 -->
+                <LinearLayout android:id="@+id/row_timeout" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="搜索设备超时" android:textSize="14sp"/>
+                    <TextView android:id="@+id/tv_timeout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="500" android:textSize="14sp" android:textColor="#999"/>
+                </LinearLayout>
+
                 <LinearLayout android:id="@+id/row_about" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="关于 OldSend" android:textSize="14sp" android:textColor="#388E3C" android:textStyle="bold"/>
                 </LinearLayout>
