@@ -108,6 +108,36 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         updateStatus();
         log("OldSend 已就绪");
         log("本机IP: " + OldSendService.getLocalIp());
+        handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+        String action = intent.getAction();
+        if (Intent.ACTION_SEND.equals(action)) {
+            Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (uri != null) {
+                pendingUris.clear();
+                pendingUris.add(uri);
+                selectedFileText.setText("已分享: " + queryDisplayName(uri));
+                log("来自系统分享，请点击设备发送");
+            }
+        } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+            ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+            if (uris != null) {
+                pendingUris.clear();
+                pendingUris.addAll(uris);
+                selectedFileText.setText("已分享 " + uris.size() + " 个文件");
+                log("来自系统分享，共 " + uris.size() + " 个文件，请点击设备发送");
+            }
+        }
     }
 
     private void toggleService() {

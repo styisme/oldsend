@@ -1,6 +1,7 @@
 package org.oldsend.http;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -10,6 +11,8 @@ public class HttpResponse {
     public int status = 200;
     public String contentType = "application/json; charset=utf-8";
     public byte[] body = new byte[0];
+    public InputStream stream = null;
+    public long contentLength = -1;
     public Map<String, String> headers = new HashMap<String, String>();
 
     public static HttpResponse json(String s) {
@@ -27,18 +30,31 @@ public class HttpResponse {
     public void writeTo(OutputStream out) throws IOException {
         out.write(("HTTP/1.1 " + status + " " + reasonOf(status) + "\r\n").getBytes("UTF-8"));
         out.write(("Content-Type: " + contentType + "\r\n").getBytes("UTF-8"));
-        out.write(("Content-Length: " + body.length + "\r\n").getBytes("UTF-8"));
+        if (contentLength >= 0) {
+            out.write(("Content-Length: " + contentLength + "\r\n").getBytes("UTF-8"));
+        } else {
+            out.write(("Content-Length: " + body.length + "\r\n").getBytes("UTF-8"));
+        }
         Iterator<Map.Entry<String, String>> it = headers.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, String> e = it.next();
             out.write((e.getKey() + ": " + e.getValue() + "\r\n").getBytes("UTF-8"));
         }
         out.write("Connection: close\r\n\r\n".getBytes("UTF-8"));
-        out.write(body);
+        
+        if (stream != null) {
+            byte[] buf = new byte[65536];
+            int n;
+            try {
+                while ((n = stream.read(buf)) > 0) out.write(buf, 0, n);
+            } finally { stream.close(); }
+        } else {
+            out.write(body);
+        }
     }
 
     private static String reasonOf(int status) {
-        if (status == 200) return "确定";
+        if (status == 200) return "OK";
         if (status == 204) return "No Content";
         if (status == 400) return "Bad Request";
         if (status == 403) return "Forbidden";
