@@ -2,10 +2,11 @@ package org.oldsend;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ContentResolver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,10 +14,6 @@ import android.os.Handler;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.*;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.Manifest;
-import android.content.pm.PackageManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -33,9 +30,9 @@ import org.oldsend.ui.DeviceAdapter;
 
 public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener, ReceiveManager.DialogListener {
     private static final int REQ_FILE = 1001;
-    private static final int REQ_PERM = 2001;
+    private static final int REQ_MEDIA = 1002;
 
-    private TextView status, selectedFileText;
+    private TextView status, selectedFileText, topTitle, tvPin, tvName;
     private TextView dialogLogView;
     private AlertDialog logDialog;
     private StringBuilder logCache = new StringBuilder();
@@ -49,9 +46,11 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private List<Uri> pendingUris = new ArrayList<Uri>();
     private List<String> historyPaths = new ArrayList<String>();
 
-    private LinearLayout tabSend, tabReceive;
-    private TextView tabReceiveText;
-    private View pageSend, pageReceive;
+    private LinearLayout tabSend, tabReceive, tabSettings;
+    private TextView tabReceiveText, tabSettingsText;
+    private View pageSend, pageReceive, pageSettings;
+
+    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,6 +60,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         setContentView(R.layout.activity_main);
 
         status = (TextView) findViewById(R.id.status);
+        topTitle = (TextView) findViewById(R.id.top_title);
         selectedFileText = (TextView) findViewById(R.id.selected_file);
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
@@ -69,9 +69,13 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
         tabReceive = (LinearLayout) findViewById(R.id.tab_receive);
+        tabSettings = (LinearLayout) findViewById(R.id.tab_settings);
         tabReceiveText = (TextView) findViewById(R.id.tab_receive_text);
+        tabSettingsText = (TextView) findViewById(R.id.tab_settings_text);
+        
         pageSend = findViewById(R.id.page_send);
         pageReceive = findViewById(R.id.page_receive);
+        pageSettings = findViewById(R.id.page_settings);
 
         adapter = new DeviceAdapter(this);
         deviceList.setAdapter(adapter);
@@ -82,25 +86,26 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         DeviceStore.get().setListener(this);
         ReceiveManager.setListener(this);
 
+        // 绑定快捷卡片
+        findViewById(R.id.card_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(false); } });
+        findViewById(R.id.card_media).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(true); } });
+        findViewById(R.id.card_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
+        findViewById(R.id.card_clipboard).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { sendClipboard(); } });
+
         toggleBtn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { toggleService(); } });
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
-        findViewById(R.id.manual).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualDialog(); } });
-        findViewById(R.id.pick_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(); } });
-        findViewById(R.id.send_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
         findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
-        findViewById(R.id.btn_settings).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSettingsDialog(); } });
 
-        tabSend.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { switchTab(true); }
-        });
-        tabReceive.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { switchTab(false); }
-        });
+        tabSend.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(0); } });
+        tabReceive.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(1); } });
+        tabSettings.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(2); } });
+
+        initSettingsUI();
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 Device target = adapter.getItem(pos);
-                if (pendingUris.isEmpty()) { log("请先选文件或发文本！"); return; }
+                if (pendingUris.isEmpty()) { log("请先选择文件或输入文本！"); return; }
                 log("发送给: " + target.alias);
                 List<File> files = new ArrayList<File>();
                 for (Uri u : pendingUris) {
@@ -127,28 +132,139 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         updateStatus();
         refreshHistory();
-        log("OldSend MD3 已就绪");
+        log("OldSend 已就绪");
         log("本机IP: " + OldSendService.getLocalIp());
         handleIntent(getIntent());
     }
 
-    public void log(final String msg) {
-        handler.post(new Runnable() {
-            public void run() {
-                logCache.append(msg).append("\n");
-                if (logCache.length() > 5000) logCache.delete(0, logCache.length() - 5000);
-                if (dialogLogView != null) {
-                    dialogLogView.setText(logCache.toString());
-                    if (logDialog != null && logDialog.isShowing()) {
-                        android.text.Layout layout = dialogLogView.getLayout();
-                        if (layout != null) {
-                            int scrollAmount = layout.getLineTop(dialogLogView.getLineCount()) - dialogLogView.getHeight();
-                            if (scrollAmount > 0) dialogLogView.scrollTo(0, scrollAmount);
-                        }
-                    }
+    private void initSettingsUI() {
+        cbAutoSave = (CheckBox) findViewById(R.id.cb_auto_save);
+        cbSaveAlbum = (CheckBox) findViewById(R.id.cb_save_album);
+        cbSaveHistory = (CheckBox) findViewById(R.id.cb_save_history);
+        cbPin = (CheckBox) findViewById(R.id.cb_pin);
+        cbAnim = (CheckBox) findViewById(R.id.cb_anim);
+        tvPin = (TextView) findViewById(R.id.tv_pin);
+        tvName = (TextView) findViewById(R.id.tv_name);
+
+        tvName.setText(OldSendService.getAlias(this));
+        
+        boolean autoSave = OldSendService.getPrefBooleanGlobal("auto_save", false);
+        boolean saveAlbum = OldSendService.getPrefBooleanGlobal("save_album", true);
+        boolean saveHistory = OldSendService.getPrefBooleanGlobal("save_history", true);
+        boolean usePin = OldSendService.getPrefBooleanGlobal("use_pin", false);
+        boolean useAnim = OldSendService.getPrefBooleanGlobal("use_anim", true);
+
+        cbAutoSave.setChecked(autoSave);
+        cbSaveAlbum.setChecked(saveAlbum);
+        cbSaveHistory.setChecked(saveHistory);
+        cbPin.setChecked(usePin);
+        cbAnim.setChecked(useAnim);
+        updatePinDisplay(usePin);
+
+        cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
+        cbSaveAlbum.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_album", c); } });
+        cbSaveHistory.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_history", c); } });
+        cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("use_anim", c); } });
+        
+        cbPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { 
+            public void onCheckedChanged(CompoundButton v, boolean c) { 
+                savePref("use_pin", c); 
+                updatePinDisplay(c);
+                if (running) {
+                    stopService(new Intent(MainActivity.this, OldSendService.class));
+                    startService(new Intent(MainActivity.this, OldSendService.class));
                 }
-            }
+            } 
         });
+
+        findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
+        findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
+    }
+
+    private void updatePinDisplay(boolean visible) {
+        if (visible) {
+            String pin = getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", null);
+            if (pin == null) {
+                pin = String.format("%04d", (int)(Math.random() * 10000));
+                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", pin).commit();
+            }
+            tvPin.setText("当前 PIN 码: " + pin);
+            tvPin.setVisibility(View.VISIBLE);
+        } else {
+            tvPin.setVisibility(View.GONE);
+        }
+    }
+
+    private void savePref(String key, boolean val) {
+        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit();
+    }
+
+    private void switchTab(int index) {
+        applyAnimation(pageSend, index == 0);
+        applyAnimation(pageReceive, index == 1);
+        applyAnimation(pageSettings, index == 2);
+
+        tabSend.setBackgroundResource(index == 0 ? R.drawable.bg_tab_selected : 0);
+        tabReceive.setBackgroundResource(index == 1 ? R.drawable.bg_tab_selected : 0);
+        tabSettings.setBackgroundResource(index == 2 ? R.drawable.bg_tab_selected : 0);
+
+        tabReceiveText.setTextColor(index == 1 ? 0xFF2E7D32 : 0xFF49454F);
+        tabSettingsText.setTextColor(index == 2 ? 0xFF2E7D32 : 0xFF49454F);
+
+        if (index == 0) topTitle.setText("发送");
+        else if (index == 1) { topTitle.setText("接收"); refreshHistory(); }
+        else topTitle.setText("设置");
+    }
+
+    private void applyAnimation(View view, boolean visible) {
+        if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
+            view.setVisibility(visible ? View.VISIBLE : View.GONE);
+            return;
+        }
+        if (visible) {
+            view.setVisibility(View.VISIBLE);
+            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
+            anim.setDuration(250);
+            view.startAnimation(anim);
+        } else {
+            view.setVisibility(View.GONE);
+        }
+    }
+
+    private void sendClipboard() {
+        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = cm.getPrimaryClip();
+        if (clip != null && clip.getItemCount() > 0) {
+            CharSequence text = clip.getItemAt(0).coerceToText(this);
+            if (text != null && text.length() > 0) {
+                prepareText(text.toString(), "剪贴板");
+            }
+        } else {
+            Toast.makeText(this, "剪贴板为空", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showSendTextDialog() {
+        final EditText input = new EditText(this);
+        input.setHint("输入要发送的文字...");
+        new AlertDialog.Builder(this).setTitle("发送文本").setView(input)
+            .setPositiveButton("发送", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) {
+                    String text = input.getText().toString();
+                    if (text.length() > 0) prepareText(text, "文本");
+                }
+            }).setNegativeButton("取消", null).show();
+    }
+
+    private void prepareText(String text, String source) {
+        try {
+            File f = new File(getCacheDir(), "text_" + System.currentTimeMillis() + ".txt");
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(text.getBytes("UTF-8")); fos.close();
+            pendingUris.clear(); pendingUris.add(Uri.fromFile(f));
+            selectedFileText.setText("已准备" + source + ": " + text.substring(0, Math.min(10, text.length())) + "...");
+            switchTab(0);
+        } catch (Exception e) { log("生成" + source + "失败"); }
     }
 
     private void showLogDialog() {
@@ -167,71 +283,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         logDialog = new AlertDialog.Builder(this)
             .setTitle("运行日志")
             .setView(scroll)
-            .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) { dialogLogView = null; }
-            })
-            .setNegativeButton("清空", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) {
-                    logCache.setLength(0);
-                    if (dialogLogView != null) dialogLogView.setText("");
-                }
-            })
+            .setPositiveButton("关闭", new DialogInterface.OnClickListener() { public void onClick(DialogInterface d, int w) { dialogLogView = null; } })
+            .setNegativeButton("清空", new DialogInterface.OnClickListener() { public void onClick(DialogInterface d, int w) { logCache.setLength(0); if (dialogLogView != null) dialogLogView.setText(""); } })
             .create();
         logDialog.show();
-    }
-
-    private void showSettingsDialog() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_settings, null);
-        
-        TextView tvName = (TextView) view.findViewById(R.id.tv_current_name);
-        tvName.setText(OldSendService.getAlias(this));
-        
-        view.findViewById(R.id.set_name_row).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { showSetNameDialog(); }
-        });
-        
-        CheckBox cbHttps = (CheckBox) view.findViewById(R.id.cb_https);
-        cbHttps.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false));
-        cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", isChecked).commit();
-                log("加密设置已保存，请重启服务生效");
-                if (running) {
-                    stopService(new Intent(MainActivity.this, OldSendService.class));
-                    startService(new Intent(MainActivity.this, OldSendService.class));
-                }
-            }
-        });
-        
-        CheckBox cbAnim = (CheckBox) view.findViewById(R.id.cb_anim);
-        cbAnim.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true));
-        cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_anim", isChecked).commit();
-            }
-        });
-        
-        view.findViewById(R.id.about_row).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { showAboutDialog(); }
-        });
-
-        new AlertDialog.Builder(this)
-            .setView(view)
-            .setPositiveButton("关闭", null)
-            .show();
-    }
-
-    private void showAboutDialog() {
-        String msg = "OldSend v1.0\n\n" +
-                     "一个极简、极轻量的局域网文件传输工具。\n" +
-                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。\n\n" +
-                     "AI 辅助生成，开源协议: MIT License\n\n" +
-                     "GitHub: github.com/styisme/oldsend";
-        new AlertDialog.Builder(this)
-            .setTitle("关于 OldSend")
-            .setMessage(msg)
-            .setPositiveButton("确定", null)
-            .show();
     }
 
     private void showSetNameDialog() {
@@ -239,52 +294,22 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         input.setText(OldSendService.getAlias(this));
         new AlertDialog.Builder(this).setTitle("修改设备名").setView(input)
             .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) { if (input.getText().length() > 0) OldSendService.setAlias(MainActivity.this, input.getText().toString()); }
+                public void onClick(DialogInterface d, int w) { 
+                    if (input.getText().length() > 0) { 
+                        OldSendService.setAlias(MainActivity.this, input.getText().toString()); 
+                        tvName.setText(input.getText().toString());
+                    } 
+                }
             }).setNegativeButton("取消", null).show();
     }
 
-    private void applyAnimation(View view, boolean visible) {
-        if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
-            view.setVisibility(visible ? View.VISIBLE : View.GONE);
-            return;
-        }
-        if (visible) {
-            view.setVisibility(View.VISIBLE);
-            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-            anim.setDuration(250);
-            view.startAnimation(anim);
-        } else {
-            view.setVisibility(View.GONE);
-        }
-    }
-
-    private void switchTab(boolean isSend) {
-        if (isSend) {
-            applyAnimation(pageSend, true);
-            applyAnimation(pageReceive, false);
-            tabSend.setBackgroundResource(R.drawable.bg_tab_selected);
-            tabReceive.setBackgroundResource(0);
-            tabReceiveText.setTextColor(0xFF49454F);
-        } else {
-            applyAnimation(pageSend, false);
-            applyAnimation(pageReceive, true);
-            tabReceive.setBackgroundResource(R.drawable.bg_tab_selected);
-            tabSend.setBackgroundResource(0);
-            tabReceiveText.setTextColor(0xFF2E7D32);
-            refreshHistory();
-        }
-    }
-
-    private void refreshHistory() {
-        List<HistoryStore.Record> list = HistoryStore.get().snapshot();
-        historyAdapter.clear();
-        historyPaths.clear();
-        for (HistoryStore.Record r : list) {
-            String sizeStr = r.size > 1024*1024 ? (r.size/1024/1024)+"MB" : (r.size/1024)+"KB";
-            historyAdapter.add("[" + r.time + "] " + r.fileName + " (" + sizeStr + ")");
-            historyPaths.add(r.path);
-        }
-        historyAdapter.notifyDataSetChanged();
+    private void showAboutDialog() {
+        String msg = "OldSend v2.0\n\n" +
+                     "一个极简、极轻量的局域网文件传输工具。\n" +
+                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。\n\n" +
+                     "AI 辅助生成，开源协议: MIT License\n\n" +
+                     "GitHub: github.com/styisme/oldsend";
+        new AlertDialog.Builder(this).setTitle("关于 OldSend").setMessage(msg).setPositiveButton("确定", null).show();
     }
 
     private void toggleService() {
@@ -313,61 +338,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         });
     }
 
-    private void showManualDialog() {
-        final EditText input = new EditText(this);
-        input.setHint("192.168.1.100");
-        new AlertDialog.Builder(this).setTitle("手动输入IP").setView(input)
-            .setPositiveButton("确定", new DialogInterface.OnClickListener() { public void onClick(DialogInterface d, int w) { probeIp(input.getText().toString().trim()); } })
-            .setNegativeButton("取消", null).show();
-    }
-
-    private void showSendTextDialog() {
-        final EditText input = new EditText(this);
-        input.setHint("输入文字...");
-        new AlertDialog.Builder(this).setTitle("发送文本").setView(input)
-            .setPositiveButton("发送", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface d, int w) {
-                    String text = input.getText().toString();
-                    if (text.length() > 0) {
-                        try {
-                            File f = new File(getCacheDir(), "text_" + System.currentTimeMillis() + ".txt");
-                            FileOutputStream fos = new FileOutputStream(f);
-                            fos.write(text.getBytes("UTF-8")); fos.close();
-                            pendingUris.clear(); pendingUris.add(Uri.fromFile(f));
-                            selectedFileText.setText("已准备文本");
-                        } catch (Exception e) { log("生成失败"); }
-                    }
-                }
-            }).setNegativeButton("取消", null).show();
-    }
-
-    private void probeIp(final String ip) {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    JSONObject o = HttpClient.getJson("http://" + ip + ":53317" + Protocol.V2_PREFIX + "/info", 3000);
-                    if (o != null) DeviceStore.get().addDevice(Device.fromJson(o, ip));
-                } catch (Exception e) { log("探测失败"); }
-            }
-        }).start();
-    }
-
-    private void pickFile() {
-        if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQ_PERM);
-            return;
-        }
+    private void pickFile(boolean isMedia) {
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.setType("*/*"); i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(i, "选择文件"), REQ_FILE);
-    }
-
-    @Override public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQ_PERM && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) pickFile();
+        i.setType(isMedia ? "*/*" : "*/*");
+        if (isMedia) {
+            i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
+        }
+        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        startActivityForResult(Intent.createChooser(i, isMedia ? "选择媒体" : "选择文件"), isMedia ? REQ_MEDIA : REQ_FILE);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode != REQ_FILE || resultCode != RESULT_OK || data == null) return;
+        if ((requestCode != REQ_FILE && requestCode != REQ_MEDIA) || resultCode != RESULT_OK || data == null) return;
         pendingUris.clear();
         if (data.getClipData() != null) {
             int count = data.getClipData().getItemCount();
@@ -386,9 +368,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 try {
                     Uploader.uploadFiles(device, files, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
-                            handler.post(new Runnable() { public void run() {
-                                progressBar.setProgress(total > 0 ? (int)(sent * 100 / total) : 0);
-                            }});
+                            handler.post(new Runnable() { public void run() { progressBar.setProgress(total > 0 ? (int)(sent * 100 / total) : 0); } });
                         }
                         public void onDone(boolean ok, String msg) {
                             log("[" + device.alias + "] " + (ok ? "成功" : "失败") + ": " + msg);
@@ -402,7 +382,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     private String queryDisplayName(Uri uri) {
         if ("file".equals(uri.getScheme())) return new File(uri.getPath()).getName();
-        String name = null; Cursor c = null;
+        String name = null; android.database.Cursor c = null;
         try { c = getContentResolver().query(uri, new String[] { "_display_name" }, null, null, null); if (c != null && c.moveToFirst()) name = c.getString(0); } catch (Exception ignored) {} finally { if (c != null) try { c.close(); } catch (Exception ignored) {} }
         if (name == null) name = uri.getLastPathSegment();
         return name == null ? "file" : name;
@@ -411,10 +391,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private File copyToCache(Uri uri, String name) throws Exception {
         if ("file".equals(uri.getScheme())) return new File(uri.getPath());
         InputStream in = getContentResolver().openInputStream(uri);
-        String safe = name;
-        safe = safe.replace("/", "_").replace("\\", "_").replace(":", "_")
-                   .replace("*", "_").replace("?", "_").replace("\"", "_")
-                   .replace("<", "_").replace(">", "_").replace("|", "_");
+        String safe = name.replace("/", "_").replace("\\", "_").replace(":", "_").replace("*", "_").replace("?", "_").replace("\"", "_").replace("<", "_").replace(">", "_").replace("|", "_");
         File out = new File(getCacheDir(), safe);
         FileOutputStream fos = new FileOutputStream(out);
         byte[] buf = new byte[65536]; int n;
@@ -423,31 +400,50 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         return out;
     }
 
+    public void log(final String msg) {
+        handler.post(new Runnable() {
+            public void run() {
+                logCache.append(msg).append("\n");
+                if (logCache.length() > 5000) logCache.delete(0, logCache.length() - 5000);
+                if (dialogLogView != null) {
+                    dialogLogView.setText(logCache.toString());
+                    if (logDialog != null && logDialog.isShowing()) {
+                        android.text.Layout layout = dialogLogView.getLayout();
+                        if (layout != null) {
+                            int scrollAmount = layout.getLineTop(dialogLogView.getLineCount()) - dialogLogView.getHeight();
+                            if (scrollAmount > 0) dialogLogView.scrollTo(0, scrollAmount);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     public void onChanged() { adapter.setData(DeviceStore.get().snapshot()); updateStatus(); }
 
     @Override
     public void showConfirmDialog(String senderAlias, int fileCount, final java.util.concurrent.CountDownLatch latch, final boolean[] result) {
+        if (isFinishing()) { latch.countDown(); return; }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("接收文件");
-        builder.setMessage("设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？");
-        builder.setCancelable(false);
-        builder.setPositiveButton("接收", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                result[0] = true;
-                latch.countDown();
-            }
-        });
-        builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                result[0] = false;
-                latch.countDown();
-            }
-        });
+        builder.setTitle("接收文件").setMessage("设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？").setCancelable(false);
+        builder.setPositiveButton("接收", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) { result[0] = true; latch.countDown(); } });
+        builder.setNegativeButton("拒绝", new DialogInterface.OnClickListener() { public void onClick(DialogInterface dialog, int which) { result[0] = false; latch.countDown(); } });
         builder.show();
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
+    private void refreshHistory() {
+        List<HistoryStore.Record> list = HistoryStore.get().snapshot();
+        historyAdapter.clear();
+        historyPaths.clear();
+        for (HistoryStore.Record r : list) {
+            String sizeStr = r.size > 1024*1024 ? (r.size/1024/1024)+"MB" : (r.size/1024)+"KB";
+            historyAdapter.add("[" + r.time + "] " + r.fileName + " (" + sizeStr + ")");
+            historyPaths.add(r.path);
+        }
+        historyAdapter.notifyDataSetChanged();
+    }
+
+    @Override protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
         handleIntent(intent);
@@ -459,18 +455,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (Intent.ACTION_SEND.equals(action)) {
             Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
             if (uri != null) {
-                pendingUris.clear();
-                pendingUris.add(uri);
+                pendingUris.clear(); pendingUris.add(uri);
                 selectedFileText.setText("已分享: " + queryDisplayName(uri));
                 log("来自系统分享，请点击设备发送");
+                switchTab(0);
             }
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
             if (uris != null) {
-                pendingUris.clear();
-                pendingUris.addAll(uris);
+                pendingUris.clear(); pendingUris.addAll(uris);
                 selectedFileText.setText("已分享 " + uris.size() + " 个文件");
                 log("来自系统分享，共 " + uris.size() + " 个文件，请点击设备发送");
+                switchTab(0);
             }
         }
     }

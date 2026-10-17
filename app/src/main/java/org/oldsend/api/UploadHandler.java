@@ -31,7 +31,8 @@ public class UploadHandler implements Router.Handler {
         UploadSession.FileEntry entry = session.getFile(fileId);
         if (entry == null || !entry.token.equals(token)) return HttpResponse.status(403);
 
-        File target = FileSaver.createTarget(entry.fileName);
+        boolean saveAlbum = OldSendService.getPrefBooleanGlobal("save_album", true);
+        File target = FileSaver.createTarget(entry.fileName, saveAlbum);
         OldSendService.log("上传: " + entry.fileName + " -> " + target.getAbsolutePath());
 
         long written = 0;
@@ -55,7 +56,10 @@ public class UploadHandler implements Router.Handler {
         
         // 记录到历史
         String timeStr = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
-        HistoryStore.get().add(new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
+        boolean saveHistory = OldSendService.getPrefBooleanGlobal("save_history", true);
+        if (saveHistory) {
+            HistoryStore.get().add(new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
+        }
 
         session.markDone(fileId);
         if (session.allDone()) store.remove(sessionId);

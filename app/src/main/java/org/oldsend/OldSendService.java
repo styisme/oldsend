@@ -31,6 +31,22 @@ public class OldSendService extends Service {
     private MulticastListener multicastListener;
     private WifiManager.MulticastLock multicastLock;
 
+    public static boolean getPrefBooleanGlobal(String key, boolean def) {
+        Context ctx = getContext();
+        if (ctx == null) return def;
+        return ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getBoolean(key, def);
+    }
+    
+    public static String getPin() {
+        Context ctx = getContext();
+        if (ctx == null) return "0000";
+        return ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getString("pin_code", "1234");
+    }
+
+    private static Context appContext;
+    public static Context getContext() { return appContext; }
+    @Override public void onCreate() { super.onCreate(); appContext = this; Identity.init(getApplicationContext()); startForegroundNotification(); }
+    
     public static String getAlias(Context ctx) {
         if (ctx == null) return Build.MODEL;
         SharedPreferences sp = ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE);
@@ -55,8 +71,7 @@ public class OldSendService extends Service {
     }
 
     @Override public IBinder onBind(Intent intent) { return null; }
-    @Override public void onCreate() { super.onCreate(); Identity.init(getApplicationContext()); startForegroundNotification(); }
-
+    
     private void startForegroundNotification() {
         String channelId = "oldsend_channel";
         if (Build.VERSION.SDK_INT >= 26) {

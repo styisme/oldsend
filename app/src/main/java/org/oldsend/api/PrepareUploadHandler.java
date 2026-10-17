@@ -1,6 +1,7 @@
 package org.oldsend.api;
 
 import java.util.Iterator;
+import java.util.Map;
 import org.json.JSONObject;
 import org.oldsend.OldSendService;
 import org.oldsend.ReceiveManager;
@@ -15,6 +16,21 @@ public class PrepareUploadHandler implements Router.Handler {
 
     public HttpResponse handle(HttpRequest req) throws Exception {
         if (!"POST".equalsIgnoreCase(req.method)) return HttpResponse.status(405);
+        
+        // 1. 验证 PIN
+        boolean usePin = OldSendService.getPrefBoolean(req.body, "use_pin", false); // 占位, 实际通过 getContext
+        String expectedPin = OldSendService.getPin();
+        if (usePin) {
+            Map<String, String> q = req.getQueryParams();
+            String clientPin = q.get("pin");
+            if (clientPin == null || !clientPin.equals(expectedPin)) {
+                HttpResponse res = HttpResponse.status(401);
+                res.headers.put("X-LocalSend-Pin", "true");
+                OldSendService.log("拦截：对方未提供正确的 PIN");
+                return res;
+            }
+        }
+
         String body = RegisterHandler.readAll(req);
         JSONObject o = new JSONObject(body);
         JSONObject files = o.optJSONObject("files");
@@ -27,8 +43,15 @@ public class PrepareUploadHandler implements Router.Handler {
         int fileCount = files.length();
         OldSendService.log("收到请求: " + senderAlias + " 请求发送 " + fileCount + " 个文件");
 
-        // 弹窗询问用户是否接收
-        boolean accepted = ReceiveManager.askUser(senderAlias, fileCount);
+        // 2. 检查是否开启了自动保存 (跳过弹窗)
+        boolean autoSave = OldSendService.getPrefBooleanGlobal("auto_save", false);
+        boolean accepted = true;
+        if (!autoSave) {
+            accepted = ReceiveManager.askUser(senderAlias, fileCount);
+        } else {
+            OldSendService.log("自动保存已开启，直接接收");
+        }
+
         if (!accepted) {
             OldSendService.log("已拒绝 " + senderAlias + " 的发送请求");
             return HttpResponse.status(403);

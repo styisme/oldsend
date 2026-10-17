@@ -4,8 +4,8 @@ import android.os.Environment;
 import java.io.File;
 
 public class FileSaver {
-    public static File createTarget(String fileName) {
-        File dir = getTargetDir(fileName);
+    public static File createTarget(String fileName, boolean saveAlbum) {
+        File dir = getTargetDir(fileName, saveAlbum);
         if (!dir.exists()) dir.mkdirs();
         String safe = sanitize(fileName);
         File f = new File(dir, safe);
@@ -20,7 +20,7 @@ public class FileSaver {
         return f;
     }
 
-    private static File getTargetDir(String name) {
+    private static File getTargetDir(String name, boolean saveAlbum) {
         String lower = name.toLowerCase();
         // 图片依然进相册
         if (lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".png") || lower.endsWith(".gif")) {

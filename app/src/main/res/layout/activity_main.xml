@@ -3,129 +3,165 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_md3_main">
+    android:background="#FDF7FF">
 
-    <!-- 顶部状态栏 -->
+    <!-- 顶部栏 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="12dp"
         android:gravity="center_vertical">
-        <LinearLayout
+        <TextView
+            android:id="@+id/top_title"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="OldSend"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#1C1B1F"/>
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp"
-                android:textColor="#49454F"
-                android:layout_marginTop="2dp"
-                android:text="已停止"/>
-        </LinearLayout>
-        
+            android:text="发送"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#1C1B1F"/>
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textColor="#49454F"
+            android:text="已停止"/>
         <Button
             android:id="@+id/btn_log"
             android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:layout_height="32dp"
             android:text="日志"
             android:textSize="11sp"
             android:background="@drawable/btn_md3_secondary"
             android:textColor="#1B5E20"
-            android:layout_marginRight="6dp"/>
-            
-        <!-- 设置按钮 (替代原先繁杂的设置) -->
-        <Button
-            android:id="@+id/btn_settings"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="⚙ 设置"
-            android:textSize="12sp"
-            android:background="@drawable/btn_md3_secondary"
-            android:textColor="#1B5E20"/>
+            android:layout_marginLeft="8dp"/>
     </LinearLayout>
 
     <!-- 页面容器 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="8dp">
+        android:layout_weight="1">
 
-        <!-- 发送页面 -->
+        <!-- ================= 发送页面 ================= -->
         <LinearLayout
             android:id="@+id/page_send"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:padding="12dp"
             android:visibility="visible">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_md3_card"
-                android:orientation="vertical"
-                android:padding="8dp">
-                
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                    <Button android:id="@+id/toggle" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="启动"/>
-                    <Button android:id="@+id/scan" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="扫描"/>
-                    <Button android:id="@+id/manual" android:layout_width="0dp" android:layout_weight="1" android:layout_height="44dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:textSize="12sp" android:text="加IP"/>
+            
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="选择" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="8dp"/>
+            
+            <!-- 2x3 快捷卡片 -->
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:weightSum="3">
+                <LinearLayout android:id="@+id/card_file" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_btn_card" android:gravity="center" android:layout_marginRight="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📄" android:textSize="24sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件" android:textSize="12sp" android:layout_marginTop="4dp"/>
                 </LinearLayout>
-                
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:gravity="center_vertical">
-                    <Button android:id="@+id/pick_file" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="选文件"/>
-                    <Button android:id="@+id/send_text" android:layout_width="0dp" android:layout_weight="1" android:layout_height="40dp" android:layout_marginLeft="4dp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:textSize="12sp" android:text="发文本"/>
+                <LinearLayout android:id="@+id/card_media" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_btn_card" android:gravity="center" android:layout_marginRight="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🖼" android:textSize="24sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="媒体" android:textSize="12sp" android:layout_marginTop="4dp"/>
                 </LinearLayout>
-
-                <TextView android:id="@+id/selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="11sp" android:textColor="#49454F" android:layout_marginTop="4dp" android:singleLine="true" android:ellipsize="middle" android:text="未选择文件"/>
+                <LinearLayout android:id="@+id/card_clipboard" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_btn_card" android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📋" android:textSize="24sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="剪贴板" android:textSize="12sp" android:layout_marginTop="4dp"/>
+                </LinearLayout>
+            </LinearLayout>
+            
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:weightSum="3" android:layout_marginTop="6dp">
+                <LinearLayout android:id="@+id/card_text" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_btn_card" android:gravity="center" android:layout_marginRight="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📝" android:textSize="24sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文本" android:textSize="12sp" android:layout_marginTop="4dp"/>
+                </LinearLayout>
+                <!-- 占位，可扩展 -->
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:layout_marginRight="6dp" android:visibility="invisible"/>
+                <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:visibility="invisible"/>
             </LinearLayout>
 
-            <ProgressBar
-                android:id="@+id/progress"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:max="100"
-                android:progress="0"
-                android:visibility="gone"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="16dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="附近的设备" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
+                <Button android:id="@+id/toggle" android:layout_width="wrap_content" android:layout_height="32dp" android:text="启动" android:textSize="11sp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF"/>
+                <Button android:id="@+id/scan" android:layout_width="wrap_content" android:layout_height="32dp" android:text="扫描" android:textSize="11sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:layout_marginLeft="4dp"/>
+            </LinearLayout>
 
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="#1C1B1F" android:paddingTop="8dp" android:paddingBottom="4dp" android:text="附近设备"/>
-            <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
+            <TextView android:id="@+id/selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#49454F" android:layout_marginTop="6dp" android:text="未选择文件"/>
+            <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:max="100" android:visibility="gone"/>
+
+            <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:layout_marginTop="8dp" android:background="@drawable/bg_md3_card"/>
         </LinearLayout>
 
-        <!-- 接收页面 -->
+        <!-- ================= 接收页面 ================= -->
         <LinearLayout
             android:id="@+id/page_receive"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:padding="12dp"
             android:visibility="gone">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textStyle="bold" android:textColor="#1C1B1F" android:paddingBottom="4dp" android:text="接收记录 (点击打开)"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="接收记录" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="8dp"/>
             <ListView android:id="@+id/history_list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
         </LinearLayout>
+
+        <!-- ================= 设置页面 ================= -->
+        <ScrollView
+            android:id="@+id/page_settings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+                
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="8dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="自动保存" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_auto_save" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到相册" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_save_album" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到历史记录" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_save_history" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用 PIN 密码" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_pin" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <TextView android:id="@+id/tv_pin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="当前 PIN: 未启用" android:textSize="14sp" android:textColor="#388E3C" android:padding="12dp" android:visibility="gone"/>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="其他" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="界面切换动画" android:textSize="14sp"/>
+                    <CheckBox android:id="@+id/cb_anim" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/row_set_name" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="修改设备名称" android:textSize="14sp"/>
+                    <TextView android:id="@+id/tv_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#999"/>
+                </LinearLayout>
+
+                <LinearLayout android:id="@+id/row_about" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:padding="12dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="关于 OldSend" android:textSize="14sp" android:textColor="#388E3C" android:textStyle="bold"/>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
     </FrameLayout>
 
-    <!-- 底部导航栏 -->
+    <!-- 底部三栏导航 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -133,25 +169,16 @@
         android:background="#F3EDF7"
         android:padding="6dp"
         android:gravity="center">
-        <LinearLayout
-            android:id="@+id/tab_send"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:background="@drawable/bg_tab_selected"
-            android:gravity="center"
-            android:orientation="vertical">
+        <LinearLayout android:id="@+id/tab_receive" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+            <TextView android:id="@+id/tab_receive_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收" android:textColor="#49454F" android:textSize="13sp"/>
+        </LinearLayout>
+        <View android:layout_width="8dp" android:layout_height="match_parent"/>
+        <LinearLayout android:id="@+id/tab_send" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:background="@drawable/bg_tab_selected" android:gravity="center" android:orientation="vertical">
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="发送" android:textColor="#2E7D32" android:textStyle="bold" android:textSize="13sp"/>
         </LinearLayout>
         <View android:layout_width="8dp" android:layout_height="match_parent"/>
-        <LinearLayout
-            android:id="@+id/tab_receive"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
-            <TextView android:id="@+id/tab_receive_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收" android:textColor="#49454F" android:textSize="13sp"/>
+        <LinearLayout android:id="@+id/tab_settings" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
+            <TextView android:id="@+id/tab_settings_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="设置" android:textColor="#49454F" android:textSize="13sp"/>
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>
