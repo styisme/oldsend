@@ -177,6 +177,10 @@
                     <org.oldsend.ui.Md3Switch android:id="@+id/cb_receive_notif" android:layout_width="44dp" android:layout_height="26dp"/>
                 </LinearLayout>
 
+                <LinearLayout android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:padding="14dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="开启 HTTPS 加密" android:textSize="13sp" android:textColor="#333"/>
+                    <org.oldsend.ui.Md3Switch android:id="@+id/cb_https" android:layout_width="44dp" android:layout_height="26dp"/>
+                </LinearLayout>
                 <LinearLayout android:id="@+id/row_port" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:padding="14dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="6dp">
                     <TextView android:id="@+id/tv_port" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="端口" android:textSize="13sp" android:textColor="#333"/>
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="53317" android:textSize="13sp" android:textColor="#888"/>

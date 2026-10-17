@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabSendText, tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif;
+    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -287,6 +287,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbWeb = (CheckBox) findViewById(R.id.cb_web);
         cbBoot = (CheckBox) findViewById(R.id.cb_boot);
         cbReceiveNotif = (CheckBox) findViewById(R.id.cb_receive_notif);
+        cbHttps = (CheckBox) findViewById(R.id.cb_https);
         tvPin = (TextView) findViewById(R.id.tv_pin);
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPort = (TextView) findViewById(R.id.tv_port);
@@ -301,6 +302,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (cbWeb != null) cbWeb.setChecked(OldSendService.getPrefBooleanGlobal("web_enable", true));
         if (cbBoot != null) cbBoot.setChecked(OldSendService.getPrefBooleanGlobal("auto_start", false));
         if (cbReceiveNotif != null) cbReceiveNotif.setChecked(OldSendService.getPrefBooleanGlobal("receive_notif", false));
+        if (cbHttps != null) cbHttps.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false));
         
         if (tvPort != null) tvPort.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317)));
         if (tvTimeout != null) tvTimeout.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("timeout", 500)));
@@ -312,6 +314,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (cbWeb != null) cbWeb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("web_enable", c); } });
         if (cbBoot != null) cbBoot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_start", c); } });
         if (cbReceiveNotif != null) cbReceiveNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("receive_notif", c); } });
+        if (cbHttps != null) cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", c).commit(); if (running) { stopService(new Intent(MainActivity.this, OldSendService.class)); startService(new Intent(MainActivity.this, OldSendService.class)); } } });
         
         if (cbPin != null) cbPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { 
             public void onCheckedChanged(CompoundButton v, boolean c) { 
