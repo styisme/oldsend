@@ -14,6 +14,7 @@ import android.widget.ScrollView;
 import android.widget.ListView;
 import android.widget.TextView;
 import org.oldsend.R;
+import org.oldsend.util.I18nManager;
 
 public class Md3DialogUtils {
 
@@ -92,7 +93,7 @@ public class Md3DialogUtils {
         msg.setText(message);
         msg.setTextSize(14);
         msg.setTextColor(0xFF49454F);
-        return createBaseDialog(ctx, title, msg, positive, posListener, "取消", null);
+        return createBaseDialog(ctx, title, msg, positive, posListener, I18nManager.get("cancel"), null);
     }
 
     public static Dialog showInput(final Context ctx, String title, String defaultValue, final OnInputListener listener) {
@@ -100,7 +101,7 @@ public class Md3DialogUtils {
         input.setText(defaultValue);
         input.setSingleLine(true);
         
-        Dialog dialog = createBaseDialog(ctx, title, input, "确定", null, "取消", null);
+        Dialog dialog = createBaseDialog(ctx, title, input, I18nManager.get("confirm"), null, I18nManager.get("cancel"), null);
         dialog.findViewById(R.id.dlg_btn_positive).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (listener != null) listener.onInput(input.getText().toString());

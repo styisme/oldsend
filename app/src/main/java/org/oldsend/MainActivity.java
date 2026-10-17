@@ -32,6 +32,7 @@ import org.oldsend.model.Device;
 import org.oldsend.model.HistoryStore;
 import org.oldsend.transfer.Uploader;
 import org.oldsend.ui.DeviceAdapter;
+import org.oldsend.util.I18nManager;
 import org.oldsend.ui.Md3DialogUtils;
 
 public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener, ReceiveManager.DialogListener {
@@ -60,6 +61,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        I18nManager.init(this);
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE); // 移除标题栏
         setContentView(R.layout.activity_main);
@@ -142,6 +144,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         log("本机IP: " + OldSendService.getLocalIp());
         handleIntent(getIntent());
         checkAndRequestPermission();
+        applyI18n();
     }
 
     private void checkAndRequestPermission() {
@@ -218,6 +221,22 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         });
 
         findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
+        findViewById(R.id.row_language).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final String[] items = new String[]{I18nManager.get("follow_system"), "简体中文", "繁體中文", "English", "日本語", "한국어", "Deutsch", "Français", "Español", "Русский", "Português"};
+                Md3DialogUtils.showList(MainActivity.this, I18nManager.get("select_lang"), items, new Md3DialogUtils.OnItemSelectListener() {
+                    public void onItemSelect(int pos) {
+                        String[] codes = {"system", "zh", "zh_TW", "en", "ja", "ko", "de", "fr", "es", "ru", "pt"};
+                        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("app_lang", codes[pos]).commit();
+                        Toast.makeText(MainActivity.this, I18nManager.get("restart_tip"), Toast.LENGTH_SHORT).show();
+                        Intent intent = getIntent();
+                        finish();
+                        startActivity(intent);
+                    }
+                }).show();
+            }
+        });
+        
         findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
         findViewById(R.id.row_backup).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
         
@@ -286,6 +305,75 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         listView.setLayoutParams(params);
     }
 
+    
+    private void applyI18n() {
+        ((android.widget.TextView)findViewById(R.id.tab_receive_text)).setText(I18nManager.get("receive"));
+        ((android.widget.TextView)findViewById(R.id.tab_settings_text)).setText(I18nManager.get("settings"));
+        ((android.widget.TextView)findViewById(R.id.tab_send).findViewById(android.R.id.text1)).setText(I18nManager.get("send"));
+
+        findViewById(R.id.toggle).setText(running ? I18nManager.get("stop") : I18nManager.get("start"));
+        ((android.widget.Button)findViewById(R.id.btn_log)).setText(I18nManager.get("log"));
+        ((android.widget.Button)findViewById(R.id.scan)).setText(I18nManager.get("scan"));
+
+        ((android.widget.TextView)findViewById(R.id.tv_select_title)).setText(I18nManager.get("select_content"));
+        ((android.widget.TextView)findViewById(R.id.tv_nearby_title)).setText(I18nManager.get("nearby_devices"));
+        ((android.widget.TextView)findViewById(R.id.empty_hint)).setText(I18nManager.get("no_device"));
+        ((android.widget.TextView)findViewById(R.id.selected_file)).setText(I18nManager.get("not_selected"));
+
+        ((android.widget.TextView)findViewById(R.id.card_file).findViewById(R.id.tv_icon)).setText(I18nManager.get("file").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_file).findViewById(R.id.tv_name)).setText(I18nManager.get("file"));
+        ((android.widget.TextView)findViewById(R.id.card_media).findViewById(R.id.tv_icon)).setText(I18nManager.get("media").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_media).findViewById(R.id.tv_name)).setText(I18nManager.get("media"));
+        ((android.widget.TextView)findViewById(R.id.card_folder).findViewById(R.id.tv_icon)).setText(I18nManager.get("folder").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_folder).findViewById(R.id.tv_name)).setText(I18nManager.get("folder"));
+        ((android.widget.TextView)findViewById(R.id.card_app).findViewById(R.id.tv_icon)).setText(I18nManager.get("app").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_app).findViewById(R.id.tv_name)).setText(I18nManager.get("app"));
+        ((android.widget.TextView)findViewById(R.id.card_text).findViewById(R.id.tv_icon)).setText(I18nManager.get("text").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_text).findViewById(R.id.tv_name)).setText(I18nManager.get("text"));
+        ((android.widget.TextView)findViewById(R.id.card_clipboard).findViewById(R.id.tv_icon)).setText(I18nManager.get("clipboard").substring(0,1));
+        ((android.widget.TextView)findViewById(R.id.card_clipboard).findViewById(R.id.tv_name)).setText(I18nManager.get("clipboard"));
+
+        ((android.widget.TextView)findViewById(R.id.tv_receive_title)).setText(I18nManager.get("receive_history"));
+
+        ((android.widget.TextView)findViewById(R.id.tv_set_rx)).setText(I18nManager.get("receive"));
+        ((android.widget.TextView)findViewById(R.id.tv_auto_save)).setText(I18nManager.get("auto_save"));
+        ((android.widget.TextView)findViewById(R.id.tv_save_album)).setText(I18nManager.get("save_album"));
+        ((android.widget.TextView)findViewById(R.id.tv_save_history)).setText(I18nManager.get("save_history"));
+        ((android.widget.TextView)findViewById(R.id.tv_use_pin)).setText(I18nManager.get("use_pin"));
+        ((android.widget.TextView)findViewById(R.id.tv_net)).setText(I18nManager.get("network"));
+        ((android.widget.TextView)findViewById(R.id.tv_web)).setText(I18nManager.get("web_enable"));
+        ((android.widget.TextView)findViewById(R.id.tv_boot)).setText(I18nManager.get("auto_start"));
+        ((android.widget.TextView)findViewById(R.id.tv_notif)).setText(I18nManager.get("receive_notif"));
+        ((android.widget.TextView)findViewById(R.id.tv_port)).setText(I18nManager.get("port"));
+        ((android.widget.TextView)findViewById(R.id.tv_timeout)).setText(I18nManager.get("timeout"));
+        ((android.widget.TextView)findViewById(R.id.tv_other)).setText(I18nManager.get("other"));
+        ((android.widget.TextView)findViewById(R.id.tv_lang_title)).setText(I18nManager.get("language"));
+        
+        String lang = getSharedPreferences("oldsend", MODE_PRIVATE).getString("app_lang", "system");
+        if ("system".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText(I18nManager.get("follow_system"));
+        else if ("zh".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("简体中文");
+        else if ("zh_TW".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("繁體中文");
+        else if ("en".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("English");
+        else if ("ja".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("日本語");
+        else if ("ko".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("한국어");
+        else if ("de".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("Deutsch");
+        else if ("fr".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("Français");
+        else if ("es".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("Español");
+        else if ("ru".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("Русский");
+        else if ("pt".equals(lang)) ((android.widget.TextView)findViewById(R.id.tv_lang_value)).setText("Português");
+
+        ((android.widget.TextView)findViewById(R.id.tv_anim_title)).setText(I18nManager.get("anim"));
+        ((android.widget.TextView)findViewById(R.id.tv_set_name)).setText(I18nManager.get("set_name"));
+        ((android.widget.TextView)findViewById(R.id.tv_backup)).setText(I18nManager.get("backup"));
+        ((android.widget.TextView)findViewById(R.id.tv_about)).setText(I18nManager.get("about"));
+
+        if (cbPin.isChecked()) {
+            tvPin.setText(I18nManager.get("pin_on") + getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
+        } else {
+            tvPin.setText(I18nManager.get("pin_off"));
+        }
+    }
+
     private void switchTab(int index) {
         applyAnimation(pageSend, index == 0);
         applyAnimation(pageReceive, index == 1);
@@ -299,6 +387,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tabSettingsText.setTextColor(index == 2 ? 0xFF2E7D32 : 0xFF49454F);
 
         if (index == 1) refreshHistory();
+        applyI18n();
     }
 
     private void applyAnimation(View view, boolean visible) {
