@@ -175,13 +175,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             log("已取消选择文件");
             return;
         }
-        Uri uri = data.getData();
-        if (pendingDevice == null) {
-            log("未选择设备");
-            return;
+        try {
+            pendingFileUri = data.getData();
+            String name = queryDisplayName(pendingFileUri);
+            if (selectedFileText != null) {
+                selectedFileText.setText("已选择: " + name);
+            }
+            log("已选择文件: " + name + "，请点击下方设备发送");
+            android.widget.Toast.makeText(this, "已选: " + name, android.widget.Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            log("解析文件失败: " + e);
+            android.widget.Toast.makeText(this, "解析文件失败", android.widget.Toast.LENGTH_SHORT).show();
         }
-        sendFile(pendingDevice, uri);
-        pendingDevice = null;
     }
 
     
