@@ -40,6 +40,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private Button toggleBtn;
     private ListView deviceList, historyList;
     private ProgressBar progressBar;
+    private CheckBox cbHttps;
     private DeviceAdapter adapter;
     private ArrayAdapter<String> historyAdapter;
     private Handler handler = new Handler();
@@ -66,6 +67,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         historyList = (ListView) findViewById(R.id.history_list);
         selectedFileText = (TextView) findViewById(R.id.selected_file);
         progressBar = (ProgressBar) findViewById(R.id.progress);
+        cbHttps = (CheckBox) findViewById(R.id.cb_https);
+        cbHttps.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false));
+        cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", isChecked).commit();
+                log("加密设置已保存，请重启服务生效");
+                if (running) {
+                    stopService(new Intent(MainActivity.this, OldSendService.class));
+                    startService(new Intent(MainActivity.this, OldSendService.class));
+                }
+            }
+        });
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
         tabReceive = (LinearLayout) findViewById(R.id.tab_receive);

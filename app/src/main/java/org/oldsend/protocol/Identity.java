@@ -1,6 +1,7 @@
 package org.oldsend.protocol;
 
 import android.content.Context;
+import org.oldsend.TlsHelper;
 import android.content.SharedPreferences;
 
 import java.security.MessageDigest;
@@ -13,6 +14,8 @@ public class Identity {
     private static String fingerprint;
 
     public static void init(Context ctx) {
+        fingerprint = TlsHelper.getFingerprint(ctx);
+        if (fingerprint != null) return;
         SharedPreferences sp = ctx.getSharedPreferences(PREF, Context.MODE_PRIVATE);
         String fp = sp.getString(KEY_FP, null);
         if (fp == null) {
@@ -29,7 +32,7 @@ public class Identity {
         return fingerprint;
     }
 
-    private static String generate() {
+    public static String generateRandom() {
         try {
             String seed = String.valueOf(System.currentTimeMillis())
                     + String.valueOf(Math.random())

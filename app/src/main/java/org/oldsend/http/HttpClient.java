@@ -8,10 +8,38 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
 
 import org.json.JSONObject;
 
 public class HttpClient {
+
+    static {
+        try {
+            if (android.os.Build.VERSION.SDK_INT < 24) {
+                try {
+                    Security.insertProviderAt(new org.conscrypt.OpenSSLProvider(), 1);
+                } catch (Throwable ignored) {}
+            }
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) {}
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[0]; }
+                }
+            };
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) { return true; }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public interface ProgressListener {
         void onProgress(long sent, long total);

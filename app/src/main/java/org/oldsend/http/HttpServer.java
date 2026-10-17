@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
+import javax.net.ssl.SSLContext;
 import java.net.Socket;
 
 import org.oldsend.OldSendService;
@@ -13,17 +14,23 @@ import org.oldsend.OldSendService;
 public class HttpServer {
     private final int port;
     private final Router router;
+    private final SSLContext sslContext;
     private ServerSocket server;
     private volatile boolean running;
 
-    public HttpServer(int port, Router router) {
+    public HttpServer(int port, Router router, SSLContext sslContext) {
         this.port = port;
         this.router = router;
+        this.sslContext = sslContext;
     }
 
     public void start() throws IOException {
         running = true;
-        server = new ServerSocket(port);
+        if (sslContext != null) {
+            server = sslContext.getServerSocketFactory().createServerSocket(port);
+        } else {
+            server = new ServerSocket(port);
+        }
         Thread t = new Thread(new Runnable() {
             public void run() {
                 while (running) {

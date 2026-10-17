@@ -106,9 +106,11 @@ public class OldSendService extends Service {
             router.register("/index.html", new WebShareHandler());
             router.register("/web-upload", new WebShareHandler());
 
-            httpServer = new HttpServer(Protocol.DEFAULT_PORT, router);
+            boolean useHttps = getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false);
+            javax.net.ssl.SSLContext sslContext = useHttps ? TlsHelper.getServerSSLContext(this) : null;
+            httpServer = new HttpServer(Protocol.DEFAULT_PORT, router, sslContext);
             httpServer.start();
-            log("HTTP 服务已启动，端口: " + Protocol.DEFAULT_PORT);
+            log((useHttps ? "HTTPS" : "HTTP") + " 服务已启动，端口: " + Protocol.DEFAULT_PORT);
 
             multicastListener = new MulticastListener(Protocol.DEFAULT_PORT, alias);
             multicastListener.start();
