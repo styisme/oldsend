@@ -47,6 +47,42 @@ public class OldSendService extends Service {
     public static Context getContext() { return appContext; }
     @Override public void onCreate() { super.onCreate(); appContext = this; Identity.init(getApplicationContext()); startForegroundNotification(); }
     
+    public static void showReceiveNotification(String alias, int count) {
+        Context ctx = getContext();
+        if (ctx == null) return;
+        android.app.NotificationManager nm = (android.app.NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (nm == null) return;
+
+        String channelId = "oldsend_receive";
+        if (Build.VERSION.SDK_INT >= 26) {
+            android.app.NotificationChannel channel = new android.app.NotificationChannel(channelId, "接收文件", android.app.NotificationManager.IMPORTANCE_HIGH);
+            nm.createNotificationChannel(channel);
+        }
+
+        Intent acceptIntent = new Intent(ctx, NotificationReceiver.class);
+        acceptIntent.setAction(NotificationReceiver.ACTION_ACCEPT);
+        android.app.PendingIntent acceptPi = android.app.PendingIntent.getBroadcast(ctx, 1, acceptIntent, android.app.PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent rejectIntent = new Intent(ctx, NotificationReceiver.class);
+        rejectIntent.setAction(NotificationReceiver.ACTION_REJECT);
+        android.app.PendingIntent rejectPi = android.app.PendingIntent.getBroadcast(ctx, 2, rejectIntent, android.app.PendingIntent.FLAG_UPDATE_CURRENT);
+
+        android.app.Notification.Builder b;
+        if (Build.VERSION.SDK_INT >= 26) {
+            b = new android.app.Notification.Builder(ctx, channelId);
+        } else {
+            b = new android.app.Notification.Builder(ctx);
+        }
+        b.setSmallIcon(android.R.drawable.stat_sys_download)
+         .setContentTitle("接收文件请求")
+         .setContentText("【" + alias + "】请求发送 " + count + " 个文件")
+         .setAutoCancel(true)
+         .addAction(new android.app.Notification.Action.Builder(android.R.drawable.ic_input_add, "接收", acceptPi).build())
+         .addAction(new android.app.Notification.Action.Builder(android.R.drawable.ic_delete, "拒绝", rejectPi).build());
+
+        nm.notify(100, b.build());
+    }
+
     public static String getAlias(Context ctx) {
         if (ctx == null) return Build.MODEL;
         SharedPreferences sp = ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE);

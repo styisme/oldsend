@@ -74,6 +74,10 @@ public class Md3DialogUtils {
         return dialog;
     }
 
+    public static Dialog showCustom(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener) {
+        return createBaseDialog(ctx, title, contentView, positive, posListener, "关闭", null);
+    }
+
     public static Dialog showConfirm(Context ctx, String title, String message, String positive, DialogInterface.OnClickListener posListener) {
         TextView msg = new TextView(ctx);
         msg.setText(message);

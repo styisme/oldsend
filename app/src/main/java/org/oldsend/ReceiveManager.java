@@ -23,6 +23,22 @@ public class ReceiveManager {
         }
         final CountDownLatch latch = new CountDownLatch(1);
         final boolean[] result = new boolean[]{false};
+        
+        boolean useNotif = OldSendService.getPrefBooleanGlobal("receive_notif", false);
+        if (useNotif && android.os.Build.VERSION.SDK_INT >= 16) {
+            NotificationReceiver.waitingLatch = latch;
+            NotificationReceiver.waitingResult = result;
+            OldSendService.showReceiveNotification(alias, count);
+            try {
+                boolean released = latch.await(30, TimeUnit.SECONDS);
+                NotificationReceiver.waitingLatch = null;
+                NotificationReceiver.waitingResult = null;
+                return released && result[0];
+            } catch (InterruptedException e) {
+                return false;
+            }
+        }
+
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(new Runnable() {
             public void run() {

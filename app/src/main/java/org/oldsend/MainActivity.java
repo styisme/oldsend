@@ -55,7 +55,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot;
+    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -173,6 +173,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbAnim = (CheckBox) findViewById(R.id.cb_anim);
         cbWeb = (CheckBox) findViewById(R.id.cb_web);
         cbBoot = (CheckBox) findViewById(R.id.cb_boot);
+        cbReceiveNotif = (CheckBox) findViewById(R.id.cb_receive_notif);
         tvPin = (TextView) findViewById(R.id.tv_pin);
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPort = (TextView) findViewById(R.id.tv_port);
@@ -186,6 +187,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbAnim.setChecked(OldSendService.getPrefBooleanGlobal("use_anim", true));
         cbWeb.setChecked(OldSendService.getPrefBooleanGlobal("web_enable", true));
         cbBoot.setChecked(OldSendService.getPrefBooleanGlobal("auto_start", false));
+        cbReceiveNotif.setChecked(OldSendService.getPrefBooleanGlobal("receive_notif", false));
         
         int p = getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317);
         tvPort.setText(String.valueOf(p));
@@ -200,6 +202,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("use_anim", c); } });
         cbWeb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("web_enable", c); } });
         cbBoot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_start", c); } });
+        cbReceiveNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("receive_notif", c); } });
         
         cbPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { 
             public void onCheckedChanged(CompoundButton v, boolean c) { 
@@ -214,6 +217,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
         findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
+        findViewById(R.id.row_backup).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
         
         findViewById(R.id.row_port).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -442,12 +446,48 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void showAboutDialog() {
-        String msg = "OldSend v1.0.0\n\n" +
-                     "一个极简、极轻量的局域网文件传输工具。\n" +
-                     "完美兼容 LocalSend 协议，最低支持 Android 2.3。\n\n" +
-                     "AI 辅助生成，开源协议: MIT License\n\n" +
-                     "GitHub: github.com/styisme/oldsend";
-        Md3DialogUtils.showConfirm(this, "关于 OldSend", msg, "确定", null).show();
+        View v = getLayoutInflater().inflate(R.layout.dialog_about, null);
+        Md3DialogUtils.showCustom(this, "", v, "确定", null).show();
+    }
+    
+    private void showBackupDialog() {
+        final String[] items = new String[]{"导出设置到剪贴板", "从剪贴板导入设置"};
+        Md3DialogUtils.showList(this, "备份 / 恢复", items, new Md3DialogUtils.OnItemSelectListener() {
+            public void onItemSelect(int pos) {
+                ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (pos == 0) {
+                    try {
+                        JSONObject json = new JSONObject();
+                        Map<String, ?> all = getSharedPreferences("oldsend", MODE_PRIVATE).getAll();
+                        for (Map.Entry<String, ?> entry : all.entrySet()) {
+                            json.put(entry.getKey(), entry.getValue());
+                        }
+                        cm.setPrimaryClip(ClipData.newPlainText("OldSend备份", json.toString()));
+                        Toast.makeText(MainActivity.this, "已导出到剪贴板", Toast.LENGTH_SHORT).show();
+                    } catch (Exception e) { Toast.makeText(MainActivity.this, "导出失败", Toast.LENGTH_SHORT).show(); }
+                } else {
+                    try {
+                        ClipData clip = cm.getPrimaryClip();
+                        if (clip != null && clip.getItemCount() > 0) {
+                            String text = clip.getItemAt(0).coerceToText(MainActivity.this).toString();
+                            JSONObject json = new JSONObject(text);
+                            android.content.SharedPreferences.Editor editor = getSharedPreferences("oldsend", MODE_PRIVATE).edit();
+                            java.util.Iterator<String> keys = json.keys();
+                            while (keys.hasNext()) {
+                                String key = keys.next();
+                                Object val = json.get(key);
+                                if (val instanceof Boolean) editor.putBoolean(key, (Boolean) val);
+                                else if (val instanceof Integer) editor.putInt(key, (Integer) val);
+                                else if (val instanceof String) editor.putString(key, (String) val);
+                            }
+                            editor.commit();
+                            Toast.makeText(MainActivity.this, "导入成功，请重启服务", Toast.LENGTH_SHORT).show();
+                            initSettingsUI(); // 刷新界面
+                        }
+                    } catch (Exception e) { Toast.makeText(MainActivity.this, "导入失败", Toast.LENGTH_SHORT).show(); }
+                }
+            }
+        }).show();
     }
 
     private void toggleService() {

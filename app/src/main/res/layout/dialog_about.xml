@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_md3_card"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- 用几个圆环拼凑一个简易 Logo -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="◎"
+            android:textSize="80sp"
+            android:textColor="#388E3C" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OldSend"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#1C1B1F"
+            android:layout_marginTop="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="© 2026 styisme"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="github.com/styisme/oldsend"
+            android:textSize="14sp"
+            android:textColor="#388E3C"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。
+
+AI 辅助生成，开源协议: MIT License。"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:layout_marginTop="20dp"
+            android:lineSpacingExtra="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="作者
+styisme
+
+贡献者
+AI 助手 (大语言模型)"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginTop="20dp"
+            android:lineSpacingExtra="2dp" />
+    </LinearLayout>
+</ScrollView>
