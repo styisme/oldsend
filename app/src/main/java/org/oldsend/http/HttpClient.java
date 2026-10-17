@@ -1,5 +1,4 @@
 package org.oldsend.http;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,16 +10,12 @@ import java.net.URL;
 import java.security.Security;
 import javax.net.ssl.*;
 import java.security.cert.X509Certificate;
-
 import org.json.JSONObject;
-
 public class HttpClient {
-
     static {
         try {
             if (android.os.Build.VERSION.SDK_INT < 24) {
                 try {
-                    Security.insertProviderAt(, 1);
                 } catch (Throwable ignored) {}
             }
             TrustManager[] trustAllCerts = new TrustManager[]{
@@ -40,12 +35,9 @@ public class HttpClient {
             e.printStackTrace();
         }
     }
-
-
     public interface ProgressListener {
         void onProgress(long sent, long total);
     }
-
     public static JSONObject getJson(String url, int timeoutMs) throws Exception {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(timeoutMs);
@@ -63,7 +55,6 @@ public class HttpClient {
             c.disconnect();
         }
     }
-
     public static JSONObject postJson(String url, JSONObject body, int timeoutMs) throws Exception {
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(timeoutMs);
@@ -94,11 +85,9 @@ public class HttpClient {
             c.disconnect();
         }
     }
-
     public static boolean uploadFile(String url, File file, ProgressListener listener) throws Exception {
         long size = file.length();
         if (size > Integer.MAX_VALUE) throw new IOException("file too large for API 10 (>2GB)");
-
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(15000);
         c.setReadTimeout(300000);
@@ -106,7 +95,6 @@ public class HttpClient {
         c.setDoOutput(true);
         c.setRequestProperty("Content-Type", "application/octet-stream");
         c.setFixedLengthStreamingMode((int) size);
-
         try {
             OutputStream os = c.getOutputStream();
             FileInputStream fis = new FileInputStream(file);
@@ -128,7 +116,6 @@ public class HttpClient {
             c.disconnect();
             throw e;
         }
-
         try {
             int code = c.getResponseCode();
             return code >= 200 && code < 300;
@@ -136,7 +123,6 @@ public class HttpClient {
             c.disconnect();
         }
     }
-
     public static String readAll(InputStream in) throws IOException {
         ByteArrayOutputStream bo = new ByteArrayOutputStream();
         byte[] buf = new byte[4096];
