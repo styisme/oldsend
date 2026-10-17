@@ -32,7 +32,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private static final int REQ_FILE = 1001;
     private static final int REQ_PERM = 2001;
 
-    private TextView status, logView, selectedFileText;
+    private TextView status, selectedFileText;
+    private TextView dialogLogView;
+    private AlertDialog logDialog;
+    private StringBuilder logCache = new StringBuilder();
     private ScrollView logScroll;
     private Button toggleBtn;
     private ListView deviceList, historyList;
@@ -56,8 +59,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         setContentView(R.layout.activity_main);
 
         status = (TextView) findViewById(R.id.status);
-        logView = (TextView) findViewById(R.id.log);
-        logScroll = (ScrollView) findViewById(R.id.log_scroll);
+        
+        
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
@@ -83,7 +86,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
         findViewById(R.id.manual).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualDialog(); } });
         findViewById(R.id.set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
-        findViewById(R.id.clear_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { logView.setText(""); } });
+        findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
         findViewById(R.id.pick_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(); } });
         findViewById(R.id.send_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
 
@@ -135,7 +138,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             pageReceive.setVisibility(View.GONE);
             tabSend.setBackgroundResource(R.drawable.bg_tab_selected);
             tabReceive.setBackgroundResource(0);
-            tabReceiveText.setTextColor(0xFF4E5B4A);
+            tabReceiveText.setTextColor(0xFF49454F);
         } else {
             pageSend.setVisibility(View.GONE);
             pageReceive.setVisibility(View.VISIBLE);
@@ -306,10 +309,50 @@ String safe = name;
     public void log(final String msg) {
         handler.post(new Runnable() {
             public void run() {
-                logView.append(msg + "\n");
-                if (logScroll != null) logScroll.fullScroll(View.FOCUS_DOWN);
+                logCache.append(msg).append("\n");
+                if (logCache.length() > 5000) logCache.delete(0, logCache.length() - 5000);
+                if (dialogLogView != null) {
+                    dialogLogView.setText(logCache.toString());
+                    if (logDialog != null && logDialog.isShowing()) {
+                        // 保持滚动到底部
+                        android.text.Layout layout = dialogLogView.getLayout();
+                        if (layout != null) {
+                            int scrollAmount = layout.getLineTop(dialogLogView.getLineCount()) - dialogLogView.getHeight();
+                            if (scrollAmount > 0) dialogLogView.scrollTo(0, scrollAmount);
+                        }
+                    }
+                }
             }
         });
+    }
+
+    private void showLogDialog() {
+        if (logDialog != null && logDialog.isShowing()) return;
+        dialogLogView = new TextView(this);
+        dialogLogView.setTextSize(11);
+        dialogLogView.setTextColor(0xFF333333);
+        dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
+        dialogLogView.setPadding(16, 16, 16, 16);
+        dialogLogView.setText(logCache.toString());
+
+        ScrollView scroll = new ScrollView(this);
+        scroll.addView(dialogLogView);
+        scroll.setBackgroundColor(0xFFF5F5F5);
+
+        logDialog = new AlertDialog.Builder(this)
+            .setTitle("运行日志")
+            .setView(scroll)
+            .setPositiveButton("关闭", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) { dialogLogView = null; }
+            })
+            .setNegativeButton("清空", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface d, int w) {
+                    logCache.setLength(0);
+                    if (dialogLogView != null) dialogLogView.setText("");
+                }
+            })
+            .create();
+        logDialog.show();
     }
 
     public void onChanged() { adapter.setData(DeviceStore.get().snapshot()); updateStatus(); }
