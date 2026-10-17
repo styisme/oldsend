@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONObject;
 import org.oldsend.discovery.DeviceStore;
 import org.oldsend.discovery.MulticastScanner;
