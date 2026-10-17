@@ -38,7 +38,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private static final int REQ_FILE = 1001;
     private static final int REQ_MEDIA = 1002;
 
-    private TextView status, selectedFileText, tvPin, tvName, tvPort, tvTimeout;
+    private TextView status, selectedFileText, tvPin, tvName, tvPort, tvTimeout, emptyHint;
     private TextView dialogLogView;
     private Dialog logDialog;
     private StringBuilder logCache = new StringBuilder();
@@ -177,6 +177,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbReceiveNotif = (CheckBox) findViewById(R.id.cb_receive_notif);
         tvPin = (TextView) findViewById(R.id.tv_pin);
         tvName = (TextView) findViewById(R.id.tv_name);
+        emptyHint = (TextView) findViewById(R.id.empty_hint);
         tvPort = (TextView) findViewById(R.id.tv_port);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout);
 
@@ -598,7 +599,11 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         });
     }
 
-    public void onChanged() { adapter.setData(DeviceStore.get().snapshot()); updateStatus(); }
+    public void onChanged() { 
+        adapter.setData(DeviceStore.get().snapshot()); 
+        emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
+        updateStatus(); 
+    }
 
     @Override
     public void showConfirmDialog(String senderAlias, int fileCount, final java.util.concurrent.CountDownLatch latch, final boolean[] result) {

@@ -3,34 +3,65 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_md3_main">
+    android:background="#F4F6F8">
 
-    <!-- 顶部栏 -->
+    <!-- 发送页顶部栏 (包含状态和扫描按钮) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical">
-        <TextView
-            android:id="@+id/status"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:text="已停止"/>
-        <TextView
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OldSend"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#1C1B1F"/>
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="#666666"
+                android:layout_marginTop="2dp"
+                android:text="已停止"/>
+        </LinearLayout>
+        
+        <Button
+            android:id="@+id/toggle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="启动"
+            android:textSize="12sp"
+            android:background="@drawable/btn_md3_primary"
+            android:textColor="#FFFFFF"
+            android:minHeight="0dp"
+            android:minWidth="60dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"/>
+            
+        <Button
             android:id="@+id/btn_log"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="查看日志"
+            android:layout_height="36dp"
+            android:text="日志"
             android:textSize="12sp"
-            android:textColor="#388E3C"
-            android:padding="8dp"/>
+            android:background="@drawable/btn_md3_secondary"
+            android:textColor="#1B5E20"
+            android:layout_marginLeft="8dp"
+            android:minHeight="0dp"
+            android:minWidth="50dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"/>
     </LinearLayout>
 
-    <!-- 页面容器 -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -45,49 +76,54 @@
             android:padding="12dp"
             android:visibility="visible">
             
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="选择内容" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="12dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="选择内容" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginBottom="8dp"/>
             
-            <!-- 2x3 卡片网格 -->
+            <!-- 统一纯色图标网格 -->
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:weightSum="3">
-                <LinearLayout android:id="@+id/card_file" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📄" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_file" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="文" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/card_media" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="🖼" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="媒体" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_media" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="图" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="媒体" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/card_folder" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📁" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件夹" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_folder" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="夹" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件夹" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
             </LinearLayout>
             
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:weightSum="3" android:layout_marginTop="8dp">
-                <LinearLayout android:id="@+id/card_app" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📱" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="应用" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_app" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="应" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="应用" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/card_text" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📝" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文本" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_text" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center" android:layout_marginRight="8dp">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="字" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文本" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
-                <LinearLayout android:id="@+id/card_clipboard" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="80dp" android:background="@drawable/bg_md3_card" android:gravity="center">
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📋" android:textSize="24sp"/>
-                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="剪贴板" android:textSize="12sp" android:layout_marginTop="6dp" android:textColor="#333"/>
+                <LinearLayout android:id="@+id/card_clipboard" android:orientation="vertical" android:layout_width="0dp" android:layout_weight="1" android:layout_height="90dp" android:background="@drawable/bg_md3_card" android:gravity="center">
+                    <TextView android:layout_width="40dp" android:layout_height="40dp" android:background="@drawable/bg_icon_circle" android:gravity="center" android:text="贴" android:textColor="#1B5E20" android:textStyle="bold" android:textSize="16sp"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="剪贴板" android:textSize="13sp" android:layout_marginTop="6dp" android:textColor="#333"/>
                 </LinearLayout>
             </LinearLayout>
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="16dp" android:layout_marginBottom="8dp">
-                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="附近的设备" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
-                <Button android:id="@+id/toggle" android:layout_width="wrap_content" android:layout_height="36dp" android:text="启动" android:textSize="12sp" android:background="@drawable/btn_md3_primary" android:textColor="#FFFFFF" android:minHeight="0dp"/>
-                <Button android:id="@+id/scan" android:layout_width="wrap_content" android:layout_height="36dp" android:text="扫描" android:textSize="12sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:layout_marginLeft="8dp" android:minHeight="0dp"/>
+            <!-- 附近设备标题栏 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="20dp" android:layout_marginBottom="8dp">
+                <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="附近的设备" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
+                <Button android:id="@+id/scan" android:layout_width="wrap_content" android:layout_height="32dp" android:text="扫描" android:textSize="12sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:minHeight="0dp" android:minWidth="60dp"/>
             </LinearLayout>
 
-            <TextView android:id="@+id/selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#666" android:layout_marginBottom="4dp" android:text="未选择文件"/>
+            <TextView android:id="@+id/selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#388E3C" android:layout_marginBottom="4dp" android:text="未选择文件"/>
             <ProgressBar android:id="@+id/progress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:visibility="gone"/>
 
-            <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card" android:layout_marginTop="4dp"/>
+            <!-- 设备列表 -->
+            <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card">
+                <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@null" android:dividerHeight="0dp"/>
+                <!-- 空状态提示 -->
+                <TextView android:id="@+id/empty_hint" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="暂无设备，点击扫描" android:textColor="#999999" android:textSize="14sp" android:visibility="gone"/>
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 接收页面 -->
@@ -98,11 +134,11 @@
             android:orientation="vertical"
             android:padding="12dp"
             android:visibility="gone">
-            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="接收记录" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="12dp"/>
-            <ListView android:id="@+id/history_list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="接收记录" android:textSize="16sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="12dp"/>
+            <ListView android:id="@+id/history_list" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:background="@drawable/bg_md3_card" android:divider="@null" android:dividerHeight="8dp"/>
         </LinearLayout>
 
-        <!-- 设置页面 -->
+        <!-- 设置页面 (保持之前优化后的白底黑字布局) -->
         <ScrollView
             android:id="@+id/page_settings"
             android:layout_width="match_parent"
@@ -114,75 +150,62 @@
                 android:orientation="vertical"
                 android:padding="12dp">
                 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收设置" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginBottom="8dp"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收设置" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginBottom="8dp"/>
 
-                <!-- 开启自定义开关 -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="自动保存" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_auto_save" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-
+                <!-- 省略其他设置项以节省字数，结构与上版一致 -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到相册" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_save_album" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="保存到历史记录" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_save_history" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用 PIN 密码" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_pin" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-
                 <TextView android:id="@+id/tv_pin" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="当前 PIN: 未启用" android:textSize="13sp" android:textColor="#388E3C" android:padding="12dp" android:visibility="gone"/>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="网络与自动化" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
-
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="网络与自动化" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="启用网页传输" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_web" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-                
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="开机自动启动" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_boot" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-                
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="通过通知栏接收" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_receive_notif" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
 
-                <!-- 点击项 -->
                 <LinearLayout android:id="@+id/row_port" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="端口" android:textSize="14sp" android:textColor="#333"/>
                     <TextView android:id="@+id/tv_port" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="53317" android:textSize="14sp" android:textColor="#888"/>
                 </LinearLayout>
-
                 <LinearLayout android:id="@+id/row_timeout" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="搜索设备超时" android:textSize="14sp" android:textColor="#333"/>
                     <TextView android:id="@+id/tv_timeout" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="500" android:textSize="14sp" android:textColor="#888"/>
                 </LinearLayout>
 
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="其他" android:textSize="15sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
-
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="其他" android:textSize="14sp" android:textStyle="bold" android:textColor="#666666" android:layout_marginTop="16dp" android:layout_marginBottom="8dp"/>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="界面切换动画" android:textSize="14sp" android:textColor="#333"/>
                     <CheckBox android:id="@+id/cb_anim" android:layout_width="wrap_content" android:layout_height="wrap_content" android:button="@null" android:background="@drawable/md3_switch_selector" android:thumb="@drawable/switch_thumb"/>
                 </LinearLayout>
-
                 <LinearLayout android:id="@+id/row_set_name" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="修改设备名称" android:textSize="14sp" android:textColor="#333"/>
                     <TextView android:id="@+id/tv_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="" android:textSize="14sp" android:textColor="#888"/>
                 </LinearLayout>
-                
                 <LinearLayout android:id="@+id/row_backup" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="备份 / 恢复设置" android:textSize="14sp" android:textColor="#333"/>
                 </LinearLayout>
-
                 <LinearLayout android:id="@+id/row_about" android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:padding="16dp" android:background="@drawable/bg_md3_card" android:gravity="center_vertical" android:layout_marginTop="8dp" android:layout_marginBottom="24dp">
                     <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="关于 OldSend" android:textSize="14sp" android:textColor="#333"/>
                 </LinearLayout>
@@ -190,7 +213,7 @@
         </ScrollView>
     </FrameLayout>
 
-    <!-- 底部导航 -->
+    <!-- 底部导航栏 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="64dp"
