@@ -1,67 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_md3_card"
-    android:padding="20dp"
-    android:maxHeight="480dp"> <!-- 强制限制最大高度 -->
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
-    <LinearLayout
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="◎"
+        android:textSize="56sp"
+        android:textColor="#388E3C" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OldSend"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#1C1B1F"
+        android:layout_marginTop="4dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="© 2026 styisme"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_marginTop="2dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="github.com/styisme/oldsend"
+        android:textSize="13sp"
+        android:textColor="#388E3C"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp" />
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。"
+        android:textSize="13sp"
+        android:textColor="#333333"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="2dp" />
 
-        <!-- 缩小一点 Logo -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="◎"
-            android:textSize="64sp"
-            android:textColor="#388E3C" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OldSend"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#1C1B1F"
-            android:layout_marginTop="8dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="© 2026 styisme"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:layout_marginTop="4dp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="github.com/styisme/oldsend"
-            android:textSize="13sp"
-            android:textColor="#388E3C"
-            android:textStyle="bold"
-            android:layout_marginTop="12dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。"
-            android:textSize="13sp"
-            android:textColor="#333333"
-            android:layout_marginTop="16dp"
-            android:lineSpacingExtra="2dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)"
-            android:textSize="13sp"
-            android:textColor="#666666"
-            android:layout_marginTop="16dp"
-            android:lineSpacingExtra="2dp" />
-    </LinearLayout>
-</ScrollView>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)"
+        android:textSize="13sp"
+        android:textColor="#666666"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="2dp" />
+</LinearLayout>

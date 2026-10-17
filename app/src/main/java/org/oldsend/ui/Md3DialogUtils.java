@@ -24,15 +24,15 @@ public class Md3DialogUtils {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
-            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, maxHeight);
         }
 
         TextView tvTitle = (TextView) dialog.findViewById(R.id.dlg_title);
         tvTitle.setText(title);
 
         LinearLayout container = (LinearLayout) dialog.findViewById(R.id.dlg_content_container);
+        ScrollView scrollView = (ScrollView) dialog.findViewById(R.id.dlg_scroll);
+        scrollView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f));
         if (contentView != null) {
             container.addView(contentView);
         }
@@ -115,9 +115,7 @@ public class Md3DialogUtils {
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
-            int maxHeight = (int) (ctx.getResources().getDisplayMetrics().heightPixels * 0.85);
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, maxHeight);
         }
 
         ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
