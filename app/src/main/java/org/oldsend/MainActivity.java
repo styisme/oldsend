@@ -359,6 +359,25 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         
 findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
         findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
+
+        // 强行绑定拦截后缀点击事件
+        TextView tvFilterVal = (TextView) findViewById(R.id.tv_filter_value);
+        if (tvFilterVal != null) tvFilterVal.setText(OldSendService.getPrefStringGlobal("filter_ext", "exe,bat,cmd,vbs,sh"));
+        
+        findViewById(R.id.row_filter_ext).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String current = OldSendService.getPrefStringGlobal("filter_ext", "exe,bat,cmd,vbs,sh");
+                Md3DialogUtils.showInput(MainActivity.this, "拦截后缀 (逗号分隔, 留空为不拦截)", current, new Md3DialogUtils.OnInputListener() {
+                    public void onInput(String text) {
+                        String val = text.replace(" ", "").toLowerCase();
+                        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("filter_ext", val).commit();
+                        ((TextView) findViewById(R.id.tv_filter_value)).setText(val);
+                        Toast.makeText(MainActivity.this, "拦截规则已更新", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+            }
+        });
+        
         findViewById(R.id.row_backup).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
         findViewById(R.id.row_port).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
