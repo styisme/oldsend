@@ -138,7 +138,7 @@ public class CrossNetActivity extends Activity {
                             isTransferring = false; 
                         }
                     });
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     handler.post(new Runnable() {
                         public void run() { tvStatus.setText("发送失败: " + e.getMessage()); isTransferring = false; }
                     });
@@ -203,7 +203,7 @@ public class CrossNetActivity extends Activity {
                             isTransferring = false; 
                         }
                     });
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     handler.post(new Runnable() {
                         public void run() { tvStatus.setText("接收失败: " + e.getMessage()); isTransferring = false; }
                     });
