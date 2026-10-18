@@ -53,6 +53,7 @@ public class I18nManager {
         zh.put("enter_pin", "请输入接收方 PIN 码");
         zh.put("pin_incorrect", "PIN 码错误，请重试");
         zh.put("modify_pin", "修改 PIN 码");
+        zh.put("pin_code", "PIN 码");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -116,6 +117,7 @@ public class I18nManager {
         en.put("enter_pin", "Enter Receiver PIN");
         en.put("pin_incorrect", "Incorrect PIN, try again");
         en.put("modify_pin", "Modify PIN");
+        en.put("pin_code", "PIN Code");
         dict.put("en", en);
 
         // ============ 日语 (ja) ============
@@ -161,6 +163,7 @@ public class I18nManager {
         ja.put("enter_pin", "受信者のPINを入力");
         ja.put("pin_incorrect", "PINが違います。再試行してください");
         ja.put("modify_pin", "PINを変更");
+        ja.put("pin_code", "PINコード");
         dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
@@ -206,6 +209,7 @@ public class I18nManager {
         ko.put("enter_pin", "수신자 PIN 입력");
         ko.put("pin_incorrect", "PIN이 잘못되었습니다. 다시 시도하세요.");
         ko.put("modify_pin", "PIN 수정");
+        ko.put("pin_code", "PIN 코드");
         dict.put("ko", ko);
 
         // ============ 德语 (de) ============
@@ -251,6 +255,7 @@ public class I18nManager {
         de.put("enter_pin", "Empfänger-PIN eingeben");
         de.put("pin_incorrect", "Falsche PIN, versuchen Sie es erneut");
         de.put("modify_pin", "PIN ändern");
+        de.put("pin_code", "PIN-Code");
         dict.put("de", de);
 
         // ============ 法语 (fr) ============
@@ -296,6 +301,7 @@ public class I18nManager {
         fr.put("enter_pin", "Entrez le PIN du récepteur");
         fr.put("pin_incorrect", "PIN incorrect, réessayez");
         fr.put("modify_pin", "Modifier le PIN");
+        fr.put("pin_code", "Code PIN");
         dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
@@ -341,6 +347,7 @@ public class I18nManager {
         es.put("enter_pin", "Ingrese el PIN del receptor");
         es.put("pin_incorrect", "PIN incorrecto, inténtelo de nuevo");
         es.put("modify_pin", "Modificar PIN");
+        es.put("pin_code", "Código PIN");
         dict.put("es", es);
 
         // ============ 俄语 (ru) ============
@@ -386,6 +393,7 @@ public class I18nManager {
         ru.put("enter_pin", "Введите PIN получателя");
         ru.put("pin_incorrect", "Неверный PIN, попробуйте еще раз");
         ru.put("modify_pin", "Изменить PIN");
+        ru.put("pin_code", "PIN-код");
         dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
@@ -431,6 +439,7 @@ public class I18nManager {
         pt.put("enter_pin", "Digite o PIN do receptor");
         pt.put("pin_incorrect", "PIN incorreto, tente novamente");
         pt.put("modify_pin", "Modificar PIN");
+        pt.put("pin_code", "Código PIN");
         dict.put("pt", pt);
     }
 

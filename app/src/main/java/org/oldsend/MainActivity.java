@@ -45,7 +45,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private static final int REQ_FILE = 1001;
     private static final int REQ_MEDIA = 1002;
 
-    private TextView status, selectedFileText, tvPin, tvName, tvPort, tvTimeout, emptyHint;
+    private TextView status, selectedFileText, tvPin, tvPinValue, tvName, tvPort, tvTimeout, emptyHint;
     private TextView dialogLogView;
     private Dialog logDialog;
     private StringBuilder logCache = new StringBuilder();
@@ -240,6 +240,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_notif, I18nManager.get("receive_notif"));
         safeSetText(R.id.tv_port_title, I18nManager.get("port"));
         safeSetText(R.id.tv_timeout_title, I18nManager.get("timeout"));
+        safeSetText(R.id.tv_pin_title, I18nManager.get("modify_pin"));
+        if (tvPinValue != null) tvPinValue.setText(getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
         safeSetText(R.id.tv_other, I18nManager.get("other"));
         safeSetText(R.id.tv_lang_title, I18nManager.get("language"));
         
@@ -307,6 +309,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbReceiveNotif = (CheckBox) findViewById(R.id.cb_receive_notif);
         cbHttps = (CheckBox) findViewById(R.id.cb_https);
         tvPin = (TextView) findViewById(R.id.tv_pin);
+        tvPinValue = (TextView) findViewById(R.id.tv_pin_value);
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPort = (TextView) findViewById(R.id.tv_port_value);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
