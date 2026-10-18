@@ -385,13 +385,47 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         applyAnimation(pageSend, index == 0);
         applyAnimation(pageReceive, index == 1);
         applyAnimation(pageSettings, index == 2);
-        if (tabSend != null) tabSend.setBackgroundResource(index == 0 ? R.drawable.bg_tab_selected : 0);
-        if (tabReceive != null) tabReceive.setBackgroundResource(index == 1 ? R.drawable.bg_tab_selected : 0);
-        if (tabSettings != null) tabSettings.setBackgroundResource(index == 2 ? R.drawable.bg_tab_selected : 0);
-        if (tabSendText != null) tabSendText.setTextColor(index == 0 ? 0xFF2E7D32 : 0xFF49454F);
-        if (tabReceiveText != null) tabReceiveText.setTextColor(index == 1 ? 0xFF2E7D32 : 0xFF49454F);
-        if (tabSettingsText != null) tabSettingsText.setTextColor(index == 2 ? 0xFF2E7D32 : 0xFF49454F);
+        
+        boolean isDark = ThemeUtils.isDarkMode(this);
+        int activeBg = isDark ? R.drawable.bg_tab_pill_dark : R.drawable.bg_tab_pill;
+        int activeColor = isDark ? 0xFF81C784 : 0xFF1B5E20;
+        int inactiveColor = isDark ? 0xFFAAAAAA : 0xFF666666;
+
+        if (tabSend != null) tabSend.setBackgroundResource(index == 0 ? activeBg : 0);
+        if (tabReceive != null) tabReceive.setBackgroundResource(index == 1 ? activeBg : 0);
+        if (tabSettings != null) tabSettings.setBackgroundResource(index == 2 ? activeBg : 0);
+        
+        TextView sendIcon = (TextView) findViewById(R.id.tab_send_icon);
+        TextView recvIcon = (TextView) findViewById(R.id.tab_receive_icon);
+        TextView setIcon = (TextView) findViewById(R.id.tab_settings_icon);
+
+        if (tabSendText != null) tabSendText.setTextColor(index == 0 ? activeColor : inactiveColor);
+        if (tabReceiveText != null) tabReceiveText.setTextColor(index == 1 ? activeColor : inactiveColor);
+        if (tabSettingsText != null) tabSettingsText.setTextColor(index == 2 ? activeColor : inactiveColor);
+        
+        if (sendIcon != null) sendIcon.setTextColor(index == 0 ? activeColor : inactiveColor);
+        if (recvIcon != null) recvIcon.setTextColor(index == 1 ? activeColor : inactiveColor);
+        if (setIcon != null) setIcon.setTextColor(index == 2 ? activeColor : inactiveColor);
+
         if (index == 1) refreshHistory();
+        
+        // 实时更新深色模式下的下拉框背景
+        if (index == 2) {
+            int bgDropdown = isDark ? R.drawable.bg_md3_dropdown_dark : R.drawable.bg_md3_dropdown;
+            findViewById(R.id.tv_lang_value).getParent().setBackgroundResource(bgDropdown);
+            findViewById(R.id.tv_name).getParent().setBackgroundResource(bgDropdown);
+            findViewById(R.id.tv_pin_value).getParent().setBackgroundResource(bgDropdown);
+            
+            if (isDark) {
+                ((TextView)findViewById(R.id.tv_lang_value)).setTextColor(0xFF81C784);
+                ((TextView)findViewById(R.id.tv_name)).setTextColor(0xFF81C784);
+                ((TextView)findViewById(R.id.tv_pin_value)).setTextColor(0xFF81C784);
+            } else {
+                ((TextView)findViewById(R.id.tv_lang_value)).setTextColor(0xFF1B5E20);
+                ((TextView)findViewById(R.id.tv_name)).setTextColor(0xFF1B5E20);
+                ((TextView)findViewById(R.id.tv_pin_value)).setTextColor(0xFF1B5E20);
+            }
+        }
     }
 
     private void applyAnimation(View view, boolean visible) {
