@@ -711,12 +711,14 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     private void pickFile(boolean isMedia) {
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
+        i.addCategory(Intent.CATEGORY_OPENABLE);
         i.setType("*/*");
         if (isMedia) {
             i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
         }
+        // 强制激活多选
         i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(i, "Select"), isMedia ? REQ_MEDIA : REQ_FILE);
+        startActivityForResult(Intent.createChooser(i, "Select Files"), isMedia ? REQ_MEDIA : REQ_FILE);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {

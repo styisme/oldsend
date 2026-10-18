@@ -181,7 +181,18 @@ public class TransferActivity extends Activity {
                     Uploader.uploadFiles(targetDevice, files, pin, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
                             handler.post(new Runnable() { public void run() {
-                                if (!isDone) updateProgress(sent, total, files.get(0).getName());
+                                if (!isDone) {
+                                    long accumulated = 0;
+                                    String currentName = files.get(0).getName();
+                                    for (File f : files) {
+                                        accumulated += f.length();
+                                        if (sent <= accumulated) {
+                                            currentName = f.getName();
+                                            break;
+                                        }
+                                    }
+                                    updateProgress(sent, total, currentName);
+                                }
                             }});
                         }
                         public void onDone(final boolean ok, String msg) {
@@ -218,7 +229,19 @@ public class TransferActivity extends Activity {
                     Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
                             handler.post(new Runnable() { public void run() {
-                                if (!isDone) updateProgress(sent, total, files.get(0).getName());
+                                if (!isDone) {
+                                    // 根据已发送的字节数，算出当前正在发第几个文件
+                                    long accumulated = 0;
+                                    String currentName = files.get(0).getName();
+                                    for (File f : files) {
+                                        accumulated += f.length();
+                                        if (sent <= accumulated) {
+                                            currentName = f.getName();
+                                            break;
+                                        }
+                                    }
+                                    updateProgress(sent, total, currentName);
+                                }
                             }});
                         }
                         public void onDone(final boolean ok, String msg) {
