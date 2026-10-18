@@ -105,7 +105,7 @@ public class TransferActivity extends Activity {
             
             btnAccept.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    sendBroadcast(new Intent(NotificationReceiver.ACTION_ACCEPT));
+                    sendBroadcast(new Intent("org.oldsend.MANUAL_ACCEPT"));
                     layoutConfirm.setVisibility(View.GONE);
                     layoutProgress.setVisibility(View.VISIBLE);
                     tvTitle.setText(I18nManager.get("receiving_title"));
@@ -116,7 +116,7 @@ public class TransferActivity extends Activity {
             
             btnReject.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    sendBroadcast(new Intent(NotificationReceiver.ACTION_REJECT));
+                    sendBroadcast(new Intent("org.oldsend.MANUAL_REJECT"));
                     finish();
                 }
             });

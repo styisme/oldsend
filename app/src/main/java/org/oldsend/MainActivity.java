@@ -65,6 +65,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     
 
     private BroadcastReceiver progressReceiver;
+    private BroadcastReceiver receiveConfirmReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -127,13 +128,22 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 Device target = adapter.getItem(pos);
                 if (pendingUris.isEmpty()) { log(I18nManager.get("not_selected")); return; }
                 log("Sending to: " + target.alias);
-                List<File> files = new ArrayList<File>();
-                for (Uri u : pendingUris) {
-                    try { files.add(copyToCache(u, queryDisplayName(u))); } catch (Exception e) { log("Read failed"); }
-                }
-                pendingUris.clear();
-                selectedFileText.setText(I18nManager.get("not_selected"));
-                doSend(target, files);
+                final Device finalTarget = target;
+                new Thread(new Runnable() {
+                    public void run() {
+                        final List<File> files = new ArrayList<File>();
+                        for (Uri u : pendingUris) {
+                            try { files.add(copyToCache(u, queryDisplayName(u))); } catch (Exception e) { log("Read failed"); }
+                        }
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+                                pendingUris.clear();
+                                selectedFileText.setText(I18nManager.get("not_selected"));
+                                doSend(finalTarget, files);
+                            }
+                        });
+                    }
+                }).start();
             }
         });
 
@@ -161,6 +171,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         };
         registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_UPDATE_PROGRESS));
         registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_TRANSFER_DONE));
+
+        receiveConfirmReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                if (ReceiveManager.pendingCallback != null) {
+                    ReceiveManager.pendingCallback.onResult(intent.getAction().equals("org.oldsend.MANUAL_ACCEPT"));
+                    ReceiveManager.pendingCallback = null;
+                }
+            }
+        };
+        registerReceiver(receiveConfirmReceiver, new IntentFilter("org.oldsend.MANUAL_ACCEPT"));
+        registerReceiver(receiveConfirmReceiver, new IntentFilter("org.oldsend.MANUAL_REJECT"));
+        
 
         updateStatus();
         refreshHistory();
@@ -657,5 +679,6 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         }
     }
 
-    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); if (progressReceiver != null) { try { unregisterReceiver(progressReceiver); } catch (Exception ignored) {} } super.onDestroy(); }
+    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); if (progressReceiver != null) { try { unregisterReceiver(progressReceiver); } catch (Exception ignored) {} }
+        if (receiveConfirmReceiver != null) { try { unregisterReceiver(receiveConfirmReceiver); } catch (Exception ignored) {} } super.onDestroy(); }
 }

@@ -14,6 +14,7 @@ public class ReceiveManager {
     }
 
     private static DialogListener listener;
+    public static Callback pendingCallback; // 新增：用于外部唤醒
     public static void setListener(DialogListener l) { listener = l; }
 
     public static boolean askUser(final String alias, final int count) {
@@ -23,20 +24,22 @@ public class ReceiveManager {
         final Object lock = new Object();
         final boolean[] result = new boolean[]{false};
         final boolean[] waiting = new boolean[]{true};
+        
+        pendingCallback = new Callback() {
+            public void onResult(boolean accepted) {
+                synchronized (lock) {
+                    result[0] = accepted;
+                    waiting[0] = false;
+                    lock.notifyAll();
+                }
+            }
+        };
 
         Handler mainHandler = new Handler(Looper.getMainLooper());
         mainHandler.post(new Runnable() {
             public void run() {
                 if (listener != null) {
-                    listener.showConfirmDialog(alias, count, new Callback() {
-                        public void onResult(boolean accepted) {
-                            synchronized (lock) {
-                                result[0] = accepted;
-                                waiting[0] = false;
-                                lock.notifyAll();
-                            }
-                        }
-                    });
+                    listener.showConfirmDialog(alias, count, pendingCallback);
                 } else {
                     synchronized (lock) {
                         result[0] = true;

@@ -10,7 +10,11 @@ public class BootReceiver extends BroadcastReceiver {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
             boolean autoStart = context.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getBoolean("auto_start", false);
             if (autoStart) {
-                context.startService(new Intent(context, OldSendService.class));
+                if (android.os.Build.VERSION.SDK_INT >= 26) {
+                    context.startForegroundService(new Intent(context, OldSendService.class));
+                } else {
+                    context.startService(new Intent(context, OldSendService.class));
+                }
             }
         }
     }

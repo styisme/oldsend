@@ -148,7 +148,7 @@ public class WebShareHandler implements Router.Handler {
         }
         
         if (req.path.equals("/web-files") && req.method.equalsIgnoreCase("GET")) {
-            File dir = new File(Environment.getExternalStorageDirectory(), "OldSend");
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OldSend");
             JSONArray files = new JSONArray();
             if (dir.exists() && dir.isDirectory()) {
                 File[] list = dir.listFiles();
@@ -170,7 +170,7 @@ public class WebShareHandler implements Router.Handler {
             Map<String, String> q = req.getQueryParams();
             String name = q.get("name");
             if (name != null) {
-                File dir = new File(Environment.getExternalStorageDirectory(), "OldSend");
+                File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "OldSend");
                 File f = new File(dir, name);
                 if (f.exists() && f.isFile()) {
                     HttpResponse resp = new HttpResponse();
