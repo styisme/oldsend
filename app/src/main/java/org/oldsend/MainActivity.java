@@ -59,6 +59,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private boolean running = false;
     private List<Uri> pendingUris = new ArrayList<Uri>();
     private List<String> historyPaths = new ArrayList<String>();
+    private boolean pendingAppend = false;
 
     private LinearLayout tabSend, tabReceive, tabSettings;
     private TextView tabSendText, tabReceiveText, tabSettingsText;
@@ -108,12 +109,12 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         DeviceStore.get().setListener(this);
         ReceiveManager.setListener(this);
 
-        findViewById(R.id.card_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(false); } });
-        findViewById(R.id.card_media).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(true); } });
+        findViewById(R.id.card_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(false, false); } });
+        findViewById(R.id.card_media).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(true, false); } });
         findViewById(R.id.card_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
         findViewById(R.id.card_clipboard).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { sendClipboard(); } });
-        findViewById(R.id.card_folder).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFolder(); } });
-        findViewById(R.id.card_app).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickApp(); } });
+        findViewById(R.id.card_folder).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFolder(false); } });
+        findViewById(R.id.card_app).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickApp(false); } });
 
         toggleBtn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { toggleService(); } });
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
@@ -130,7 +131,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
 
         if (btnAddFilesMore != null) btnAddFilesMore.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAddFilesDialog(); } });
-        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); } });
+        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); Toast.makeText(MainActivity.this, "已清空选择", Toast.LENGTH_SHORT).show(); } });
         if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
         
         initSettingsUI();
@@ -424,7 +425,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         } catch (Exception e) { log("Prepare text failed"); }
     }
 
-    private void pickFolder() { showFolderSelector(android.os.Environment.getExternalStorageDirectory()); }
+    private void pickFolder(boolean append) { pendingAppend = append; showFolderSelector(android.os.Environment.getExternalStorageDirectory()); }
 
     private void showFolderSelector(final File dir) {
         final File[] files = dir.listFiles();
@@ -441,7 +442,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                     getAllFiles(dir, allFiles);
                     if (allFiles.isEmpty()) { Toast.makeText(MainActivity.this, "Empty folder", Toast.LENGTH_SHORT).show(); }
                     else {
-                        pendingUris.clear();
+                        if (!pendingAppend) pendingUris.clear();
                         for (File f : allFiles) pendingUris.add(Uri.fromFile(f));
                         if (selectedFileText != null) updateSelectedFilesUI();
                         switchTab(0);
@@ -457,7 +458,8 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         for (File f : fs) { if (f.isDirectory()) getAllFiles(f, out); else out.add(f); }
     }
 
-    private void pickApp() {
+    private void pickApp(boolean append) {
+        pendingAppend = append;
         PackageManager pm = getPackageManager();
         List<PackageInfo> packages = pm.getInstalledPackages(0);
         final List<ApplicationInfo> apps = new ArrayList<ApplicationInfo>();
@@ -467,7 +469,8 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         Dialog d = Md3DialogUtils.showList(this, "Select App (APK)", items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int position) {
                 ApplicationInfo app = apps.get(position); String apkPath = app.sourceDir;
-                pendingUris.clear(); pendingUris.add(Uri.fromFile(new File(apkPath)));
+                if (!pendingAppend) pendingUris.clear(); 
+                pendingUris.add(Uri.fromFile(new File(apkPath)));
                 if (selectedFileText != null) updateSelectedFilesUI();
                 switchTab(0);
             }
@@ -599,10 +602,10 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         final String[] items = new String[]{"文件", "媒体", "应用", "文件夹"};
         Md3DialogUtils.showList(this, "加入文件", items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int pos) {
-                if (pos == 0) pickFile(false);
-                else if (pos == 1) pickFile(true);
-                else if (pos == 2) pickApp();
-                else if (pos == 3) pickFolder();
+                if (pos == 0) pickFile(false, true);
+                else if (pos == 1) pickFile(true, true);
+                else if (pos == 2) pickApp(true);
+                else if (pos == 3) pickFolder(true);
             }
         }).show();
     }
@@ -652,7 +655,8 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         
     private void doScan() { log("Scanning..."); MulticastScanner.scanAsync(new MulticastScanner.Callback() { public void onDevice(Device d) { DeviceStore.get().addDevice(d); log("Found: " + d.alias); } public void onFinished() { log("Scan finished"); } }); }
 
-    private void pickFile(boolean isMedia) {
+    private void pickFile(boolean isMedia, boolean append) {
+        pendingAppend = append;
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
         i.setType("*/*"); i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
         if (isMedia) i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
@@ -661,7 +665,9 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if ((requestCode != REQ_FILE && requestCode != REQ_MEDIA) || resultCode != RESULT_OK || data == null) return;
-        pendingUris.clear();
+        if (!pendingAppend) {
+            pendingUris.clear();
+        }
         if (data.getClipData() != null) {
             int count = data.getClipData().getItemCount();
             for (int i = 0; i < count; i++) pendingUris.add(data.getClipData().getItemAt(i).getUri());
