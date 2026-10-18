@@ -124,7 +124,7 @@ public class Uploader {
             OldSendService.getContext().sendBroadcast(new Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
     }
 
-    static boolean uploadFile(String url, File file, final long baseSent, final long totalSize, final ProgressCallback cb) throws Exception {
+    static boolean uploadFile(String url, File file, final long baseSent, final long finalTotalSize, final ProgressCallback cb) throws Exception {
         long size = file.length();
         HttpURLConnection c = (HttpURLConnection) new URL(url).openConnection();
         c.setConnectTimeout(15000); c.setReadTimeout(300000);
