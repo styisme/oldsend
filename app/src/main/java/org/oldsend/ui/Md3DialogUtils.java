@@ -53,7 +53,7 @@ public class Md3DialogUtils {
         dialog.setContentView(R.layout.dialog_md3_base);
         setupWindow(ctx, dialog);
 
-        View root = dialog.findViewById(R.id.dlg_content_container).getParent().getParent();
+        View root = dialog.findViewById(R.id.dlg_root);
         applyTheme(ctx, dialog, root);
 
         TextView tvTitle = (TextView) dialog.findViewById(R.id.dlg_title);
@@ -149,7 +149,7 @@ public class Md3DialogUtils {
         dialog.setContentView(R.layout.dialog_md3_list);
         setupWindow(ctx, dialog);
 
-        View root = dialog.findViewById(R.id.dlg_list).getParent().getParent();
+        View root = dialog.findViewById(R.id.dlg_root);
         applyTheme(ctx, dialog, root);
 
         ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
