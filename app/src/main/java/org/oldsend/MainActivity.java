@@ -269,7 +269,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tvName = (TextView) findViewById(R.id.tv_setting_name);
         tvPort = (TextView) findViewById(R.id.tv_port_value);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
-        etPinValue = null; // 修复: 布局中无 R.id.et_pin_value
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));
@@ -284,7 +283,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         
         if (tvPort != null) tvPort.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317)));
         if (tvTimeout != null) tvTimeout.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("timeout", 500)));
-        if (etPinValue != null) etPinValue.setText(getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
 
         if (cbAutoSave != null) cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
         if (cbSaveAlbum != null) cbSaveAlbum.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_album", c); } });
@@ -304,10 +302,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                         tvPin.setText(I18nManager.get("pin_on") + pin);
                         tvPin.setVisibility(View.VISIBLE);
                     }
-                    if (etPinValue != null) etPinValue.setVisibility(View.VISIBLE);
                 } else {
                     if (tvPin != null) tvPin.setVisibility(View.GONE);
-                    if (etPinValue != null) etPinValue.setVisibility(View.GONE);
                 }
                 if (running) {
                     stopService(new Intent(MainActivity.this, OldSendService.class));
@@ -316,15 +312,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             } 
         });
         
-        if (etPinValue != null) {
-            etPinValue.addTextChangedListener(new android.text.TextWatcher() {
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                public void afterTextChanged(android.text.Editable s) {
-                    String val = s.toString().trim();
-                    if (val.length() > 0) {
-                        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", val).commit();
-                    }
                 }
             });
         }
