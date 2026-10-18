@@ -4,26 +4,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F4F6F8"
-    android:padding="20dp">
+    android:background="#F4F6F8">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:gravity="center_vertical">
+    <!-- 顶栏 -->
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:gravity="center_vertical" android:padding="8dp">
         <Button android:id="@+id/btn_cn_back" android:layout_width="40dp" android:layout_height="40dp" android:text="←" android:textColor="#1C1B1F" android:textSize="20sp" android:background="@android:color/transparent"/>
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="跨网传输" android:textSize="20sp" android:textStyle="bold" android:textColor="#1C1B1F" android:layout_marginLeft="8dp"/>
     </LinearLayout>
 
-    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="无需连接同一Wi-Fi，输入6位一次性密码即可跨网收发文件。" android:textColor="#666666" android:textSize="14sp" android:layout_marginTop="20dp" android:layout_marginBottom="40dp" android:gravity="center"/>
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="24dp" android:gravity="center" android:layout_marginBottom="20dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="我要发送文件" android:textColor="#1C1B1F" android:textSize="18sp" android:textStyle="bold"/>
-        <Button android:id="@+id/btn_cn_generate" android:layout_width="match_parent" android:layout_height="52dp" android:text="生成 6 位密码并选择文件" android:textColor="#FFFFFF" android:background="@drawable/btn_accept" android:layout_marginTop="16dp"/>
-    </LinearLayout>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="无需连接同一Wi-Fi，极客通道直连。" android:textColor="#666666" android:textSize="14sp" android:layout_marginBottom="20dp" android:gravity="center"/>
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="24dp" android:gravity="center">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="我要接收文件" android:textColor="#1C1B1F" android:textSize="18sp" android:textStyle="bold"/>
-        <EditText android:id="@+id/et_cn_pin" android:layout_width="match_parent" android:layout_height="52dp" android:hint="请输入对方提供的 6 位密码" android:inputType="number" android:gravity="center" android:textSize="20sp" android:background="@drawable/bg_md3_edittext" android:layout_marginTop="16dp"/>
-        <Button android:id="@+id/btn_cn_receive" android:layout_width="match_parent" android:layout_height="52dp" android:text="连接并接收" android:textColor="#1C1B1F" android:background="@drawable/btn_md3_secondary" android:layout_marginTop="12dp"/>
-    </LinearLayout>
+            <!-- 发送模块 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="20dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="我要发送文件" android:textColor="#1C1B1F" android:textSize="18sp" android:textStyle="bold"/>
+                
+                <!-- 选择文件卡片 (默认隐藏) -->
+                <LinearLayout android:id="@+id/layout_cn_selected_files" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="12dp" android:background="@drawable/bg_md3_edittext" android:padding="12dp">
+                    <TextView android:id="@+id/tv_cn_file_info" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#388E3C"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="end" android:layout_marginTop="8dp">
+                        <Button android:id="@+id/btn_cn_edit_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="编辑" android:textSize="12sp" android:textColor="#49454F" android:background="@android:color/transparent" android:minHeight="0dp"/>
+                        <Button android:id="@+id/btn_cn_add_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="+ 添加" android:textSize="12sp" android:textColor="#FFFFFF" android:background="@drawable/btn_md3_primary" android:minHeight="0dp" android:layout_marginLeft="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
 
-    <TextView android:id="@+id/tv_cn_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#388E3C" android:textSize="14sp" android:layout_marginTop="20dp" android:gravity="center"/>
+                <Button android:id="@+id/btn_cn_generate" android:layout_width="match_parent" android:layout_height="52dp" android:text="选择文件并生成 6 位密码" android:textColor="#FFFFFF" android:background="@drawable/btn_accept" android:layout_marginTop="16dp"/>
+                <TextView android:id="@+id/tv_cn_pin_display" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#388E3C" android:textSize="24sp" android:textStyle="bold" android:gravity="center" android:layout_marginTop="12dp" android:visibility="gone"/>
+            </LinearLayout>
+
+            <!-- 接收模块 -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="16dp">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="我要接收文件" android:textColor="#1C1B1F" android:textSize="18sp" android:textStyle="bold"/>
+                <EditText android:id="@+id/et_cn_pin" android:layout_width="match_parent" android:layout_height="52dp" android:hint="输入对方提供的 6 位密码" android:inputType="number" android:gravity="center" android:textSize="20sp" android:background="@drawable/bg_md3_edittext" android:layout_marginTop="16dp"/>
+                <Button android:id="@+id/btn_cn_receive" android:layout_width="match_parent" android:layout_height="52dp" android:text="连接并接收" android:textColor="#1C1B1F" android:background="@drawable/btn_md3_secondary" android:layout_marginTop="12dp"/>
+            </LinearLayout>
+
+            <TextView android:id="@+id/tv_cn_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#388E3C" android:textSize="14sp" android:layout_marginTop="20dp" android:gravity="center"/>
+            
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
