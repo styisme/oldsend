@@ -160,7 +160,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         handleIntent(getIntent());
         checkAndRequestPermission();
         applyI18n();
-        ThemeUtils.applyTheme(this);
+        ThemeUtils.applyTheme(MainActivity.this);
     }
 
     private String getFirstChar(String str) {
@@ -431,7 +431,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         if (index == 1) refreshHistory();
         applyI18n();
-        ThemeUtils.applyTheme(this);
+        ThemeUtils.applyTheme(MainActivity.this);
     }
 
     
@@ -654,7 +654,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
                             initSettingsUI();
                             applyI18n();
-        ThemeUtils.applyTheme(this);
+        ThemeUtils.applyTheme(MainActivity.this);
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
@@ -672,7 +672,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         }
         updateStatus();
         applyI18n();
-        ThemeUtils.applyTheme(this);
+        ThemeUtils.applyTheme(MainActivity.this);
     }
 
     private void updateStatus() {
