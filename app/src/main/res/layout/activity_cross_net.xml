@@ -19,6 +19,7 @@
 
             <!-- 发送模块 -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+            <Button android:id="@+id/btn_upnp_punch" android:layout_width="wrap_content" android:layout_height="36dp" android:text="一键自动穿透(UPnP)" android:textSize="12sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:layout_marginLeft="8dp" android:minHeight="0dp"/>
             <CheckBox android:id="@+id/cb_use_direct" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="启用极速直连 (公网IP/穿透)" android:textColor="#1C1B1F" />
         </LinearLayout>
         

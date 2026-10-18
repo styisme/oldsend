@@ -63,6 +63,27 @@ public class CrossNetActivity extends Activity {
         etDirectIp = (EditText) findViewById(R.id.et_direct_ip);
         layoutDirectIp = (LinearLayout) findViewById(R.id.layout_direct_ip);
 
+                findViewById(R.id.btn_upnp_punch).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                isTransferring = true;
+                tvStatus.setText("正在向路由器申请 UPnP 端口映射...");
+                new Thread(new Runnable() {
+                    public void run() {
+                        final String result = requestUPnP();
+                        handler.post(new Runnable() {
+                            public void run() {
+                                isTransferring = false;
+                                tvStatus.setText(result);
+                                if (result.contains("成功")) {
+                                    cbUseDirect.setChecked(true);
+                                }
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+
         cbUseDirect.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
                 useDirectMode = isChecked;
@@ -198,6 +219,134 @@ public class CrossNetActivity extends Activity {
     }
 
     
+    
+    // 极其硬核的纯手写 UPnP SSDP 搜索与端口映射
+    private String requestUPnP() {
+        try {
+            // 1. 发送 SSDP 搜索路由器
+            java.net.DatagramSocket ssdpSock = new java.net.DatagramSocket();
+            ssdpSock.setSoTimeout(2000);
+            String mSearch = "M-SEARCH * HTTP/1.1\r\n" +
+                    "HOST: 239.255.255.250:1900\r\n" +
+                    "MAN: \"ssdp:discover\"\r\n" +
+                    "MX: 3\r\n" +
+                    "ST: urn:schemas-upnp-org:device:InternetGatewayDevice:1\r\n\r\n";
+            byte[] data = mSearch.getBytes("UTF-8");
+            java.net.DatagramPacket packet = new java.net.DatagramPacket(data, data.length,
+                    java.net.InetAddress.getByName("239.255.255.250"), 1900);
+            ssdpSock.send(packet);
+
+            // 2. 接收路由器响应
+            byte[] buf = new byte[2048];
+            java.net.DatagramPacket recv = new java.net.DatagramPacket(buf, buf.length);
+            String location = null;
+            try {
+                ssdpSock.receive(recv);
+                String response = new String(recv.getData(), 0, recv.getLength(), "UTF-8");
+                for (String line : response.split("\r\n")) {
+                    if (line.toUpperCase().startsWith("LOCATION:")) {
+                        location = line.substring(9).trim();
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                return "获取失败：路由器可能未开启 UPnP。";
+            }
+            ssdpSock.close();
+
+            if (location == null) return "获取失败：未找到支持 UPnP 的路由器。";
+
+            // 3. 请求控制 URL 获取公网 IP 并进行端口映射
+            // 由于各家路由器 UPnP 控制 XML 格式不同，为了极客项目的稳定，
+            // 这里的实现使用了一个极其巧妙的“通用强制映射”策略：
+            // 我们仅仅通过 HTTP GET 拿到路由器的控制接口描述，解析出控制URL
+            java.net.URL url = new java.net.URL(location);
+            java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+            java.io.InputStream in = conn.getInputStream();
+            java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(in));
+            String line;
+            String controlUrl = null;
+            String serviceType = null;
+            
+            // 简易 XML 解析
+            while ((line = reader.readLine()) != null) {
+                if (line.contains("<controlURL>") && line.contains("WANIPConnection")) {
+                    int start = line.indexOf("<controlURL>") + 12;
+                    int end = line.indexOf("</controlURL>");
+                    if (start > 12 && end > start) {
+                        controlUrl = line.substring(start, end);
+                    }
+                }
+                if (line.contains("<serviceType>") && line.contains("WANIPConnection")) {
+                    int start = line.indexOf("<serviceType>") + 13;
+                    int end = line.indexOf("</serviceType>");
+                    if (start > 13 && end > start) {
+                        serviceType = line.substring(start, end);
+                    }
+                }
+            }
+            reader.close();
+
+            if (controlUrl == null || serviceType == null) {
+                return "映射失败：路由器 UPnP 接口异常。";
+            }
+            
+            // 拼接绝对控制 URL
+            if (!controlUrl.startsWith("http")) {
+                java.net.URL base = new java.net.URL(location);
+                controlUrl = base.getProtocol() + "://" + base.getHost() + (base.getPort() != -1 ? ":" + base.getPort() : "") + (controlUrl.startsWith("/") ? "" : "/") + controlUrl;
+            }
+
+            // 4. 发送 SOAP 请求，强行映射本地 53317 端口
+            String localIp = OldSendService.getLocalIp();
+            String soapBody = "<?xml version=\"1.0\"?>\n" +
+                    "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" s:encodingStyle=\"http://schemas.xmlsoap.org/soap/encoding/\">\n" +
+                    "<s:Body>\n" +
+                    "<u:AddPortMapping xmlns:u=\"" + serviceType + "\">\n" +
+                    "<NewRemoteHost></NewRemoteHost>\n" +
+                    "<NewExternalPort>53317</NewExternalPort>\n" +
+                    "<NewProtocol>TCP</NewProtocol>\n" +
+                    "<NewInternalPort>53317</NewInternalPort>\n" +
+                    "<NewInternalClient>" + localIp + "</NewInternalClient>\n" +
+                    "<NewEnabled>1</NewEnabled>\n" +
+                    "<NewPortMappingDescription>OldSend</NewPortMappingDescription>\n" +
+                    "<NewLeaseDuration>0</NewLeaseDuration>\n" +
+                    "</u:AddPortMapping>\n" +
+                    "</s:Body>\n" +
+                    "</s:Envelope>";
+
+            java.net.HttpURLConnection soapConn = (java.net.HttpURLConnection) new java.net.URL(controlUrl).openConnection();
+            soapConn.setRequestMethod("POST");
+            soapConn.setRequestProperty("Content-Type", "text/xml; charset=\"utf-8\"");
+            soapConn.setRequestProperty("SOAPAction", "\"" + serviceType + "#AddPortMapping\"");
+            soapConn.setDoOutput(true);
+            soapConn.getOutputStream().write(soapBody.getBytes("UTF-8"));
+            
+            int code = soapConn.getResponseCode();
+            if (code == 200) {
+                // 获取公网 IP 逻辑（通过访问第三方查 IP）
+                String pubIp = getPublicIP();
+                return "穿透成功！你的公网地址是: " + pubIp + ":53317\n请让对方填入此地址。";
+            } else {
+                return "穿透失败：路由器拒绝映射请求(" + code + ")。";
+            }
+        } catch (Exception e) {
+            return "穿透异常: " + e.getMessage();
+        }
+    }
+
+    private String getPublicIP() {
+        try {
+            java.net.URL url = new java.net.URL("https://api.ipify.org");
+            java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(url.openStream()));
+            String ip = in.readLine();
+            in.close();
+            return ip;
+        } catch (Exception e) {
+            return "未知公网IP";
+        }
+    }
+
     private void startDirectSend(String ipStr) {
         String ip = ipStr;
         int port = 53317;
