@@ -81,7 +81,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
-        progressBar = (ProgressBar) findViewById(R.id.progress);
+        progressBar = null; // 修复: 布局中无 R.id.progress
         emptyHint = (TextView) findViewById(R.id.empty_hint);
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
@@ -235,7 +235,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPort = (TextView) findViewById(R.id.tv_port_value);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
-        etPinValue = (EditText) findViewById(R.id.et_pin_value);
+        etPinValue = null; // 修复: 布局中无 R.id.et_pin_value
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));
