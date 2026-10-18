@@ -40,7 +40,7 @@ public class ThemeUtils {
         if (view instanceof TextView) {
             int textColor = ((TextView) view).getCurrentTextColor();
             // 把深色文字替换为亮色
-            if (textColor == Color.parseColor("#1C1B1F") || textColor == Color.parseColor("#333333") || textColor == Color.BLACK) {
+            if (textColor == Color.parseColor("#1C1B1F") || textColor == Color.parseColor("#333333") || textColor == Color.parseColor("#222222") || textColor == Color.BLACK) {
                 ((TextView) view).setTextColor(Color.parseColor("#E0E0E0"));
             } else if (textColor == Color.parseColor("#666666") || textColor == Color.parseColor("#49454F") || textColor == Color.parseColor("#888888")) {
                 ((TextView) view).setTextColor(Color.parseColor("#AAAAAA"));

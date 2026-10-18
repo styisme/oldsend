@@ -465,10 +465,21 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
     private void showLogDialog() {
         if (logDialog != null && logDialog.isShowing()) return;
         dialogLogView = new TextView(this);
-        dialogLogView.setTextSize(11); dialogLogView.setTextColor(0xFF333333); dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
-        dialogLogView.setPadding(16, 16, 16, 16); dialogLogView.setText(logCache.toString());
+        dialogLogView.setTextSize(11); 
+        dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
+        dialogLogView.setPadding(16, 16, 16, 16); 
+        dialogLogView.setText(logCache.toString());
 
-        ScrollView scroll = new ScrollView(this); scroll.addView(dialogLogView); scroll.setBackgroundColor(0xFFF5F5F5);
+        ScrollView scroll = new ScrollView(this); 
+        scroll.addView(dialogLogView); 
+        
+        if (ThemeUtils.isDarkMode(this)) {
+            dialogLogView.setTextColor(0xFFAAAAAA);
+            scroll.setBackgroundColor(0xFF1E1E1E);
+        } else {
+            dialogLogView.setTextColor(0xFF333333);
+            scroll.setBackgroundColor(0xFFF5F5F5);
+        }
 
         logDialog = Md3DialogUtils.createBaseDialog(this, I18nManager.get("log"), scroll, I18nManager.get("close"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int w) { dialogLogView = null; }

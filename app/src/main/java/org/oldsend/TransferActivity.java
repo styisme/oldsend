@@ -63,6 +63,11 @@ public class TransferActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfer);
         ThemeUtils.applyTheme(this);
+        
+        // 强制兜底：如果是深色模式，直接改根布局背景
+        if (ThemeUtils.isDarkMode(this)) {
+            findViewById(android.R.id.content).setBackgroundColor(0xFF121212);
+        }
 
         layoutConfirm = (LinearLayout) findViewById(R.id.layout_confirm);
         layoutProgress = (LinearLayout) findViewById(R.id.layout_progress);
