@@ -37,14 +37,33 @@ public class PrepareUploadHandler implements Router.Handler {
         if (files == null) files = new JSONObject();
 
         String senderAlias = "未知设备";
+        String senderFingerprint = req.remoteAddress.getHostAddress(); // 默认用 IP 兜底
+
         JSONObject info = o.optJSONObject("info");
-        if (info != null) senderAlias = info.optString("alias", "未知设备");
+        if (info != null) {
+            senderAlias = info.optString("alias", "未知设备");
+            String f = info.optString("fingerprint", "");
+            if (!f.isEmpty()) senderFingerprint = f;
+        }
+        
+        String blacklist = OldSendService.getPrefStringGlobal("blacklist", "");
+        if (blacklist.contains(senderFingerprint)) {
+            OldSendService.log("黑名单拦截: " + senderAlias);
+            return HttpResponse.status(403);
+        }
 
         int fileCount = files.length();
         OldSendService.log("收到请求: " + senderAlias + " 请求发送 " + fileCount + " 个文件");
 
         // 2. 检查是否开启了自动保存 (跳过弹窗)
         boolean autoSave = OldSendService.getPrefBooleanGlobal("auto_save", false);
+        boolean autoWhitelist = OldSendService.getPrefBooleanGlobal("auto_accept_whitelist", false);
+        String whitelist = OldSendService.getPrefStringGlobal("whitelist", "");
+        
+        if (!autoSave && autoWhitelist && whitelist.contains(senderFingerprint)) {
+            autoSave = true;
+            OldSendService.log("白名单自动放行: " + senderAlias);
+        }
         boolean accepted = true;
         if (!autoSave) {
             accepted = ReceiveManager.askUser(senderAlias, fileCount);

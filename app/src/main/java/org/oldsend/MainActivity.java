@@ -134,6 +134,17 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { startActivity(new Intent(MainActivity.this, SelectListActivity.class)); } });
         if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
         
+        
+        CheckBox cbAutoWhitelist = (CheckBox) findViewById(R.id.cb_auto_whitelist);
+        if (cbAutoWhitelist != null) {
+            cbAutoWhitelist.setChecked(OldSendService.getPrefBooleanGlobal("auto_accept_whitelist", false));
+            cbAutoWhitelist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton v, boolean c) {
+                    savePref("auto_accept_whitelist", c);
+                }
+            });
+        }
+        
         initSettingsUI();
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -155,6 +166,31 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                                 doSend(finalTarget, files);
                             }
                         });
+
+        deviceList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int pos, long id) {
+                final Device target = adapter.getItem(pos);
+                final String fp = (target.fingerprint != null && !target.fingerprint.isEmpty()) ? target.fingerprint : target.ip;
+                
+                String wl = OldSendService.getPrefStringGlobal("whitelist", "");
+                String bl = OldSendService.getPrefStringGlobal("blacklist", "");
+                boolean isWl = wl.contains(fp);
+                boolean isBl = bl.contains(fp);
+
+                final String[] items = new String[]{
+                    isWl ? "移除白名单" : "⭐ 加入白名单",
+                    isBl ? "移除黑名单" : "🚫 加入黑名单"
+                };
+                Md3DialogUtils.showList(MainActivity.this, target.alias, items, new Md3DialogUtils.OnItemSelectListener() {
+                    public void onItemSelect(int p) {
+                        if (p == 0) toggleList("whitelist", fp, isWl);
+                        else toggleList("blacklist", fp, isBl);
+                    }
+                }).show();
+                return true;
+            }
+        });
+        
                     }
                 }).start();
             }
@@ -399,6 +435,18 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         });
     }
 
+    
+    private void toggleList(String key, String fp, boolean exists) {
+        String current = OldSendService.getPrefStringGlobal(key, "");
+        if (exists) {
+            current = current.replace(fp + ",", "").replace(fp, "");
+        } else {
+            current += fp + ",";
+        }
+        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString(key, current).commit();
+        Toast.makeText(this, exists ? "已移出名单" : "已加入名单", Toast.LENGTH_SHORT).show();
+    }
+    
     private void savePref(String key, boolean val) { getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit(); }
 
     private void switchTab(int index) {
@@ -625,7 +673,18 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                             }
                             editor.commit();
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
-                            initSettingsUI(); applyI18n();
+                            
+        CheckBox cbAutoWhitelist = (CheckBox) findViewById(R.id.cb_auto_whitelist);
+        if (cbAutoWhitelist != null) {
+            cbAutoWhitelist.setChecked(OldSendService.getPrefBooleanGlobal("auto_accept_whitelist", false));
+            cbAutoWhitelist.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton v, boolean c) {
+                    savePref("auto_accept_whitelist", c);
+                }
+            });
+        }
+        
+        initSettingsUI(); applyI18n();
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
