@@ -16,6 +16,14 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
 
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="无需连接同一Wi-Fi，极客通道直连。" android:textColor="#666666" android:textSize="14sp" android:layout_marginBottom="20dp" android:gravity="center"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="20dp">
+            <TextView android:id="@+id/tv_ipv6_info" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="本机 IPv6: 加载中..." android:textSize="13sp" android:textColor="#388E3C" android:layout_marginBottom="6dp"/>
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView android:id="@+id/tv_stun_info" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="NAT公网地址: 点击右侧探测" android:textSize="13sp" android:textColor="#666"/>
+                <Button android:id="@+id/btn_stun_probe" android:layout_width="wrap_content" android:layout_height="32dp" android:text="STUN探测" android:textSize="12sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:minHeight="0dp"/>
+            </LinearLayout>
+        </LinearLayout>
+        
 
             <!-- 发送模块 -->
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
@@ -54,5 +62,7 @@
             <TextView android:id="@+id/tv_cn_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#388E3C" android:textSize="14sp" android:layout_marginTop="20dp" android:gravity="center"/>
             
         </LinearLayout>
-    </ScrollView>
+    
+            <TextView android:id="@+id/tv_advanced_tip" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="高级玩法..." android:textSize="12sp" android:textColor="#888" android:layout_marginTop="16dp" android:lineSpacingExtra="4dp"/>
+        </ScrollView>
 </LinearLayout>

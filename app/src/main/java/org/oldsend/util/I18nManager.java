@@ -71,6 +71,15 @@ public class I18nManager {
         zh.put("connect_recv_btn", "连接并接收");
         zh.put("author", "作者");
         zh.put("contributors", "贡献者");
+        
+        zh.put("ipv6_local", "本机公网 IPv6: [%s]:53317 (可用直连)");
+        zh.put("ipv6_none", "本机 IPv6: 未获取到公网 IPv6，仅限内网或穿透");
+        zh.put("stun_wait", "STUN 探测中...");
+        zh.put("stun_fail", "NAT 穿透失败 (对称型NAT)");
+        zh.put("stun_ok", "NAT公网地址: ");
+        zh.put("stun_probe", "STUN探测");
+        zh.put("stun_tip", "NAT公网地址: 点击右侧探测");
+        zh.put("advanced_tip", "高级玩法：可配合 FRP/Ngrok 或 ZeroTier 组网后，将生成的公网地址填入下方极速直连。");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============

@@ -59,6 +59,40 @@ public class CrossNetActivity extends Activity {
 
         tvStatus = (TextView) findViewById(R.id.tv_cn_status);
 
+        String localIp = OldSendService.getLocalIp();
+        TextView tvIpv6 = (TextView) findViewById(R.id.tv_ipv6_info);
+        if (localIp.contains(":")) {
+            tvIpv6.setText(String.format(org.oldsend.util.I18nManager.get("ipv6_local"), localIp));
+        } else {
+            tvIpv6.setText(org.oldsend.util.I18nManager.get("ipv6_none"));
+        }
+
+        findViewById(R.id.btn_stun_probe).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final TextView tvStun = (TextView) findViewById(R.id.tv_stun_info);
+                tvStun.setText(org.oldsend.util.I18nManager.get("stun_wait"));
+                new Thread(new Runnable() {
+                    public void run() {
+                        final String result = org.oldsend.util.StunClient.getPublicAddress();
+                        handler.post(new Runnable() {
+                            public void run() {
+                                if (result.contains("失败") || result.contains("未知")) {
+                                    tvStun.setText(org.oldsend.util.I18nManager.get("stun_fail"));
+                                    tvStun.setTextColor(0xFFD32F2F);
+                                } else {
+                                    tvStun.setText(org.oldsend.util.I18nManager.get("stun_ok") + result);
+                                    tvStun.setTextColor(0xFF388E3C);
+                                    // 自动帮用户填入直连框
+                                    etDirectIp.setText(result);
+                                }
+                            }
+                        });
+                    }
+                }).start();
+            }
+        });
+        
+
         ((TextView)findViewById(R.id.tv_cross_net_title)).setText(I18nManager.get("cross_net_title"));
         ((TextView)findViewById(R.id.tv_cross_net_desc)).setText(I18nManager.get("cross_net_desc"));
         ((TextView)findViewById(R.id.tv_send_title)).setText(I18nManager.get("send_file_title"));

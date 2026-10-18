@@ -103,12 +103,22 @@ public class OldSendService extends Service {
 
     public static String getLocalIp() {
         try {
+            String ipv4 = null;
+            String ipv6 = null;
             for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 if (ni.isLoopback() || !ni.isUp()) continue;
                 for (InetAddress a : Collections.list(ni.getInetAddresses())) {
-                    if (!a.isLoopbackAddress() && a.getHostAddress().indexOf(':') < 0) return a.getHostAddress();
+                    if (a.isLoopbackAddress()) continue;
+                    String ip = a.getHostAddress();
+                    if (ip.indexOf(':') >= 0) {
+                        if (!ip.startsWith("fe80")) ipv6 = ip; // 优先保留非链路本地 IPv6
+                    } else {
+                        if (ipv4 == null) ipv4 = ip;
+                    }
                 }
             }
+            if (ipv6 != null) return ipv6;
+            if (ipv4 != null) return ipv4;
         } catch (Exception ignored) {}
         return "0.0.0.0";
     }
