@@ -20,6 +20,7 @@ import org.oldsend.discovery.MulticastListener;
 import org.oldsend.http.HttpServer;
 import org.oldsend.http.Router;
 import org.oldsend.protocol.Identity;
+import org.oldsend.model.HistoryStore;
 
 public class OldSendService extends Service {
     public interface LogSink { void log(String msg); }
@@ -45,7 +46,7 @@ public class OldSendService extends Service {
 
     private static Context appContext;
     public static Context getContext() { return appContext; }
-    @Override public void onCreate() { super.onCreate(); appContext = this; Identity.init(getApplicationContext()); startForegroundNotification(); }
+    @Override public void onCreate() { super.onCreate(); appContext = this; Identity.init(getApplicationContext()); HistoryStore.get().init(this); startForegroundNotification(); }
     
     public static void showReceiveNotification(String alias, int count) {
         Context ctx = getContext();

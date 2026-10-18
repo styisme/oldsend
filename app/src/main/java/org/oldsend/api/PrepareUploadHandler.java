@@ -64,6 +64,11 @@ public class PrepareUploadHandler implements Router.Handler {
             String fileId = (String) it.next();
             JSONObject f = files.getJSONObject(fileId);
             String fileName = f.optString("fileName", fileId);
+            String lower = fileName.toLowerCase();
+            if (lower.endsWith(".exe") || lower.endsWith(".bat") || lower.endsWith(".cmd") || lower.endsWith(".vbs") || lower.endsWith(".sh")) {
+                OldSendService.log("拦截危险文件: " + fileName);
+                return HttpResponse.status(403);
+            }
             long size = f.optLong("size", -1);
             String token = Long.toHexString(System.nanoTime() ^ (long) (Math.random() * 1e18));
             session.addFile(fileId, fileName, size, token);

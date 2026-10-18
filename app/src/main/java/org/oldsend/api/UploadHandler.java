@@ -2,6 +2,7 @@ package org.oldsend.api;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.io.InputStream;
 import java.util.Map;
 
@@ -36,8 +37,17 @@ public class UploadHandler implements Router.Handler {
         OldSendService.log("上传: " + entry.fileName + " -> " + target.getAbsolutePath());
 
         long written = 0;
-        FileOutputStream fos = new FileOutputStream(target);
+        long existingSize = 0;
+        if (target.exists()) existingSize = target.length();
+        
+        // 如果存在并且大小小于总大小，则断点续传（追加模式）
+        FileOutputStream fos = new FileOutputStream(target, existingSize > 0);
         try {
+            if (existingSize > 0) {
+                OldSendService.log("断点续传追加: 已存在 " + existingSize + " 字节");
+                written = existingSize;
+                if (req.body != null) req.body.skip(existingSize); // 跳过已接收的部分
+            }
             InputStream in = req.body;
             byte[] buf = new byte[65536];
             long remaining = req.contentLength > 0 ? req.contentLength : entry.size;
@@ -64,7 +74,7 @@ public class UploadHandler implements Router.Handler {
         String timeStr = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());
         boolean saveHistory = OldSendService.getPrefBooleanGlobal("save_history", true);
         if (saveHistory) {
-            HistoryStore.get().add(new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
+            HistoryStore.get().add(OldSendService.getContext(), new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
         }
 
         // 如果是纯文本且小于 10KB，自动复制到剪贴板
