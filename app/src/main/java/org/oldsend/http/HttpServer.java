@@ -5,8 +5,8 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import javax.net.ssl.SSLContext;
 import java.net.Socket;
 
 import org.oldsend.OldSendService;
@@ -14,23 +14,21 @@ import org.oldsend.OldSendService;
 public class HttpServer {
     private final int port;
     private final Router router;
-    private final SSLContext sslContext;
     private ServerSocket server;
     private volatile boolean running;
 
-    public HttpServer(int port, Router router, SSLContext sslContext) {
+    public HttpServer(int port, Router router) {
         this.port = port;
         this.router = router;
-        this.sslContext = sslContext;
     }
 
     public void start() throws IOException {
         running = true;
-        if (sslContext != null) {
-            server = sslContext.getServerSocketFactory().createServerSocket(port);
-        } else {
-            server = new ServerSocket(port);
-        }
+        server = new ServerSocket();
+        // 关键：允许重用处于 TIME_WAIT 状态的端口
+        server.setReuseAddress(true);
+        server.bind(new InetSocketAddress(port));
+
         Thread t = new Thread(new Runnable() {
             public void run() {
                 while (running) {
@@ -62,11 +60,6 @@ public class HttpServer {
             out.flush();
         } catch (Exception e) {
             OldSendService.log("conn error: " + e);
-            try {
-                OutputStream o = s.getOutputStream();
-                o.write("HTTP/1.1 500 Internal Server Error\r\nContent-Length: 0\r\nConnection: close\r\n\r\n".getBytes("UTF-8"));
-                o.flush();
-            } catch (Exception ignored) {}
         } finally {
             try { s.close(); } catch (Exception ignored) {}
         }

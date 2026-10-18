@@ -135,7 +135,10 @@ public class OldSendService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (httpServer != null) return START_STICKY;
+        if (httpServer != null && multicastListener != null) {
+            log("服务已在运行中");
+            return START_STICKY;
+        }
         try {
             if (Build.VERSION.SDK_INT >= 12) {
                 try {

@@ -2,6 +2,7 @@ package org.oldsend.discovery;
 
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 
 import org.json.JSONObject;
@@ -22,8 +23,11 @@ public class MulticastListener {
     }
 
     public void start() throws Exception {
-        socket = new MulticastSocket(port);
+        socket = new MulticastSocket(null);
+        // 关键：允许重用端口
         socket.setReuseAddress(true);
+        socket.bind(new InetSocketAddress(port));
+
         InetAddress group = InetAddress.getByName(Protocol.MULTICAST_GROUP);
         socket.joinGroup(group);
         running = true;
@@ -69,6 +73,6 @@ public class MulticastListener {
     public void stop() {
         running = false;
         try { socket.leaveGroup(InetAddress.getByName(Protocol.MULTICAST_GROUP)); } catch (Exception ignored) {}
-        try { socket.close(); } catch (Exception ignored) {}
+        try { if (socket != null) socket.close(); } catch (Exception ignored) {}
     }
 }
