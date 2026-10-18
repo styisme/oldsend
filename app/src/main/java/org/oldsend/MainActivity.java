@@ -759,17 +759,24 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
             if (layoutSelectedFiles != null) layoutSelectedFiles.setVisibility(View.VISIBLE);
             long totalSize = 0;
             for (Uri u : pendingUris) {
+                long fileSize = 0;
                 try {
                     android.database.Cursor cursor = getContentResolver().query(u, null, null, null, null);
                     if (cursor != null && cursor.moveToFirst()) {
                         int sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE);
-                        if (sizeIndex != -1) totalSize += cursor.getLong(sizeIndex);
+                        if (sizeIndex != -1) fileSize = cursor.getLong(sizeIndex);
                         cursor.close();
                     }
                 } catch (Exception ignored) {}
+                
+                if (fileSize <= 0 && "file".equals(u.getScheme())) {
+                    String p = u.getPath();
+                    if (p != null) fileSize = new File(p).length();
+                }
+                totalSize += (fileSize > 0 ? fileSize : 0);
             }
             String sizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
-            if (selectedFileText != null) selectedFileText.setText("文件: " + pendingUris.size() + "\n大小: " + sizeStr);
+            if (selectedFileText != null) selectedFileText.setText("文件: " + pendingUris.size() + "\n大小: " + (totalSize > 0 ? sizeStr : "未知"));
         }
     }
 

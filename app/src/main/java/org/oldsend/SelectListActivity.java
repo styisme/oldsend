@@ -7,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,15 +29,6 @@ public class SelectListActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_select_list);
         ThemeUtils.applyTheme(this);
-        if (ThemeUtils.isDarkMode(this)) {
-            findViewById(R.id.root_layout).setBackgroundColor(0xFF121212);
-            ((TextView)findViewById(R.id.btn_back)).setTextColor(0xFFE0E0E0);
-            ((TextView)findViewById(R.id.tv_file_count)).setTextColor(0xFFE0E0E0);
-            ((TextView)findViewById(R.id.tv_total_size)).setTextColor(0xFFAAAAAA);
-            // 标题文字
-            ViewGroup topBar = (ViewGroup) findViewById(R.id.btn_back).getParent();
-            ((TextView)topBar.getChildAt(1)).setTextColor(0xFFE0E0E0);
-        }
 
         listContainer = (LinearLayout) findViewById(R.id.list_container);
         tvFileCount = (TextView) findViewById(R.id.tv_file_count);
@@ -65,7 +55,7 @@ public class SelectListActivity extends Activity {
         listContainer.removeAllViews();
         List<Uri> uris = MainActivity.pendingUris;
         
-        if (uris.isEmpty()) {
+        if (uris == null || uris.isEmpty()) {
             finish(); // 空了就自动返回主界面
             return;
         }
@@ -84,47 +74,79 @@ public class SelectListActivity extends Activity {
                 Cursor cursor = resolver.query(uri, null, null, null, null);
                 if (cursor != null && cursor.moveToFirst()) {
                     int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                    if (nameIndex != -1) name = cursor.getString(nameIndex);
+                    if (nameIndex != -1) {
+                        String n = cursor.getString(nameIndex);
+                        if (n != null) name = n;
+                    }
                     int sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE);
-                    if (sizeIndex != -1) size = cursor.getLong(sizeIndex);
+                    if (sizeIndex != -1) {
+                        size = cursor.getLong(sizeIndex);
+                    }
                     cursor.close();
                 }
             } catch (Exception ignored) {}
             
-            if (size == 0 && "file".equals(uri.getScheme())) {
-                File f = new File(uri.getPath());
-                if (f.exists()) { name = f.getName(); size = f.length(); }
+            // 保底：如果是本地文件且上面没读到大小
+            if (size <= 0 && "file".equals(uri.getScheme())) {
+                String path = uri.getPath();
+                if (path != null) {
+                    File f = new File(path);
+                    if (f.exists()) {
+                        if ("未知文件".equals(name)) name = f.getName();
+                        size = f.length();
+                    }
+                }
             }
 
-            totalSize += size;
+            totalSize += (size > 0 ? size : 0);
             String sizeStr = size > 1024*1024 ? String.format("%.1f MB", size/1024.0/1024.0) : String.format("%.1f KB", size/1024.0);
 
             // 动态生成条目 View
             View itemView = getLayoutInflater().inflate(R.layout.item_selected_file, null);
+            TextView tvIcon = (TextView) itemView.findViewById(R.id.item_icon);
             TextView itemName = (TextView) itemView.findViewById(R.id.item_name);
             TextView itemSize = (TextView) itemView.findViewById(R.id.item_size);
             ImageView btnDelete = (ImageView) itemView.findViewById(R.id.btn_item_delete);
 
-            itemName.setText(name);
-            itemSize.setText(sizeStr);
-            if (ThemeUtils.isDarkMode(this)) {
-                itemName.setTextColor(0xFFE0E0E0);
-                itemSize.setTextColor(0xFFAAAAAA);
-            }
-            itemSize.setText(sizeStr);
-            
-            btnDelete.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    MainActivity.pendingUris.remove(index);
-                    refreshList();
+            // 防止 XML 没找到 ID 导致空指针崩溃
+            if (tvIcon != null) {
+                String lowerName = name.toLowerCase();
+                if (lowerName.endsWith(".jpg") || lowerName.endsWith(".png") || lowerName.endsWith(".jpeg")) tvIcon.setText("🖼️");
+                else if (lowerName.endsWith(".mp4") || lowerName.endsWith(".mkv")) tvIcon.setText("🎬");
+                else if (lowerName.endsWith(".mp3") || lowerName.endsWith(".wav")) tvIcon.setText("🎵");
+                else if (lowerName.endsWith(".zip") || lowerName.endsWith(".rar")) tvIcon.setText("📦");
+                else if (lowerName.endsWith(".apk")) tvIcon.setText("🤖");
+                else tvIcon.setText("📄");
+                
+                if (ThemeUtils.isDarkMode(this)) {
+                    tvIcon.setTextColor(0xFFE0E0E0);
                 }
-            });
+            }
+            
+            if (itemName != null) {
+                itemName.setText(name);
+                if (ThemeUtils.isDarkMode(this)) itemName.setTextColor(0xFFE0E0E0);
+            }
+            
+            if (itemSize != null) {
+                itemSize.setText(size > 0 ? sizeStr : "未知大小");
+                if (ThemeUtils.isDarkMode(this)) itemSize.setTextColor(0xFFAAAAAA);
+            }
+            
+            if (btnDelete != null) {
+                btnDelete.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        MainActivity.pendingUris.remove(index);
+                        refreshList();
+                    }
+                });
+            }
 
             listContainer.addView(itemView);
         }
 
-        tvFileCount.setText("文件: " + uris.size());
+        if (tvFileCount != null) tvFileCount.setText("文件: " + uris.size());
         String totalSizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
-        tvTotalSize.setText("大小: " + totalSizeStr);
+        if (tvTotalSize != null) tvTotalSize.setText("大小: " + (totalSize > 0 ? totalSizeStr : "未知"));
     }
 }
