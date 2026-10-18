@@ -49,6 +49,7 @@
             <action android:name="org.oldsend.REJECT" />
         </intent-filter>
     </receiver>
-        <activity android:name=".TransferActivity" android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity android:name=".TransferActivity"
+            android:launchMode="singleTop" android:theme="@android:style/Theme.Light.NoTitleBar" />
     </application>
 </manifest>

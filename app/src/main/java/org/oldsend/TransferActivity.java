@@ -31,16 +31,18 @@ public class TransferActivity extends Activity {
     private ProgressBar pbFile, pbTotal;
     private Button btnAccept, btnReject, btnCancel, btnDone;
 
-    private int mode; // 0 = SEND, 1 = RECEIVE
+    private int mode;
     private Device targetDevice;
     private ArrayList<String> filePaths;
     private long totalSize = 0;
     private long startTime;
+    private boolean isDone = false;
     private Handler handler = new Handler();
 
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            if (isDone) return;
             if (ACTION_UPDATE_PROGRESS.equals(intent.getAction())) {
                 long current = intent.getLongExtra("current", 0);
                 long total = intent.getLongExtra("total", 1);
@@ -61,7 +63,6 @@ public class TransferActivity extends Activity {
         layoutConfirm = (LinearLayout) findViewById(R.id.layout_confirm);
         layoutProgress = (LinearLayout) findViewById(R.id.layout_progress);
         tvSenderName = (TextView) findViewById(R.id.tv_sender_name);
-        tvSenderType = (TextView) findViewById(R.id.tv_sender_type);
         tvTitle = (TextView) findViewById(R.id.tv_title);
         tvSaveDir = (TextView) findViewById(R.id.tv_save_dir);
         tvFileName = (TextView) findViewById(R.id.tv_file_name);
@@ -76,12 +77,25 @@ public class TransferActivity extends Activity {
         btnDone = (Button) findViewById(R.id.btn_done);
 
         Intent intent = getIntent();
+        handleIntent(intent);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
         mode = intent.getIntExtra("mode", 0);
+        isDone = false; // 重置状态
 
         if (mode == 1) {
             String senderName = intent.getStringExtra("senderName");
             tvSenderName.setText(senderName);
             layoutConfirm.setVisibility(View.VISIBLE);
+            layoutProgress.setVisibility(View.GONE);
             
             btnAccept.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
@@ -100,11 +114,6 @@ public class TransferActivity extends Activity {
                     finish();
                 }
             });
-
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) { finish(); }
-            });
-            
         } else {
             layoutConfirm.setVisibility(View.GONE);
             layoutProgress.setVisibility(View.VISIBLE);
@@ -112,14 +121,12 @@ public class TransferActivity extends Activity {
             
             targetDevice = (Device) intent.getSerializableExtra("device");
             filePaths = intent.getStringArrayListExtra("files");
-            
             startUpload();
-            
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) { finish(); }
-            });
         }
         
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { finish(); }
+        });
         btnDone.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { finish(); }
         });
@@ -141,10 +148,12 @@ public class TransferActivity extends Activity {
                 try {
                     Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
-                            // 这里的进度其实底层已经发了广播，但如果底层没发，这里可以补发
+                            // 接收端由广播处理，这里不做事
                         }
                         public void onDone(final boolean ok, String msg) {
-                            handler.post(new Runnable() { public void run() { transferDone(ok); } });
+                            handler.post(new Runnable() { public void run() { 
+                                if (!isDone) transferDone(ok); 
+                            }});
                         }
                     });
                 } catch (Exception e) {
@@ -166,16 +175,13 @@ public class TransferActivity extends Activity {
         tvFileName.setText(fileName);
         
         if (total > 0) {
-            // 有明确的总大小
             int pct = (int) (current * 100 / total);
-            if (pct > 100) pct = 100; // 防止溢出
+            if (pct > 100) pct = 100;
             pbTotal.setProgress(pct);
             pbFile.setProgress(pct);
             tvTotalTitle.setText("总进度 (" + pct + "%)");
             tvSpeedInfo.setText("大小: " + formatSize(current) + " / " + formatSize(total) + "\n速度: " + speedStr);
         } else {
-            // 对方没有传总大小 (total = -1)
-            // 使用不确定进度条模式，或者展示已接收大小
             pbTotal.setProgress(0);
             pbFile.setProgress(0);
             tvTotalTitle.setText("正在接收...");
@@ -184,6 +190,9 @@ public class TransferActivity extends Activity {
     }
 
     private void transferDone(boolean ok) {
+        if (isDone) return;
+        isDone = true;
+
         btnCancel.setVisibility(View.GONE);
         btnDone.setVisibility(View.VISIBLE);
         tvTotalTitle.setText(ok ? "已完成" : "已失败");

@@ -62,7 +62,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabSendText, tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private BroadcastReceiver progressReceiver;
     private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
 
     @Override
@@ -289,17 +288,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void initSettingsUI() {
-        progressReceiver = new BroadcastReceiver() {
-            public void onReceive(Context context, Intent intent) {
-                if (TransferActivity.ACTION_UPDATE_PROGRESS.equals(intent.getAction())) {
-                    sendBroadcast(intent);
-                } else if (TransferActivity.ACTION_TRANSFER_DONE.equals(intent.getAction())) {
-                    sendBroadcast(intent);
-                }
-            }
-        };
-        registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_UPDATE_PROGRESS));
-        registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_TRANSFER_DONE));
 
         cbAutoSave = (CheckBox) findViewById(R.id.cb_auto_save);
         cbSaveAlbum = (CheckBox) findViewById(R.id.cb_save_album);
