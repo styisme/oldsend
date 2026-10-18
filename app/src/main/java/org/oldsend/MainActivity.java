@@ -412,9 +412,9 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         // 实时更新深色模式下的下拉框背景
         if (index == 2) {
             int bgDropdown = isDark ? R.drawable.bg_md3_dropdown_dark : R.drawable.bg_md3_dropdown;
-            findViewById(R.id.tv_lang_value).getParent().setBackgroundResource(bgDropdown);
-            findViewById(R.id.tv_name).getParent().setBackgroundResource(bgDropdown);
-            findViewById(R.id.tv_pin_value).getParent().setBackgroundResource(bgDropdown);
+            ((View) findViewById(R.id.tv_lang_value).getParent()).setBackgroundResource(bgDropdown);
+            ((View) findViewById(R.id.tv_name).getParent()).setBackgroundResource(bgDropdown);
+            ((View) findViewById(R.id.tv_pin_value).getParent()).setBackgroundResource(bgDropdown);
             
             if (isDark) {
                 ((TextView)findViewById(R.id.tv_lang_value)).setTextColor(0xFF81C784);
