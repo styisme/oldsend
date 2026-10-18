@@ -29,7 +29,11 @@ public class Device implements java.io.Serializable {
     }
 
     public String url(String path) {
-        return (https ? "https" : "http") + "://" + ip + ":" + port + path;
+        String formatIp = ip;
+        if (ip != null && ip.contains(":")) {
+            formatIp = "[" + ip + "]"; // IPv6 必须加中括号
+        }
+        return (https ? "https" : "http") + "://" + formatIp + ":" + port + path;
     }
 
     @Override

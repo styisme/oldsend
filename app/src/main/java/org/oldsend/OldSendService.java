@@ -102,6 +102,15 @@ public class OldSendService extends Service {
     }
 
     public static String getLocalIp() {
+        // 默认优先返回 IPv4 用于局域网组播
+        String v4 = getIpv4();
+        if (v4 != null) return v4;
+        String v6 = getIpv6();
+        if (v6 != null) return v6;
+        return "0.0.0.0";
+    }
+
+    public static String getIpv4() {
         try {
             for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 if (ni.isLoopback() || !ni.isUp()) continue;
@@ -110,7 +119,22 @@ public class OldSendService extends Service {
                 }
             }
         } catch (Exception ignored) {}
-        return "0.0.0.0";
+        return null;
+    }
+
+    public static String getIpv6() {
+        try {
+            for (NetworkInterface ni : Collections.list(NetworkInterface.getNetworkInterfaces())) {
+                if (ni.isLoopback() || !ni.isUp()) continue;
+                for (InetAddress a : Collections.list(ni.getInetAddresses())) {
+                    if (!a.isLoopbackAddress() && a.getHostAddress().indexOf(':') >= 0) {
+                        String ip = a.getHostAddress();
+                        if (!ip.startsWith("fe80")) return ip;
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
+        return null;
     }
 
     @Override public IBinder onBind(Intent intent) { return null; }

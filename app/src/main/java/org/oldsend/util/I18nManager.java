@@ -31,7 +31,7 @@ public class I18nManager {
         zh.put("backup_import", "从剪贴板导入设置");
         zh.put("dark_mode", "深色模式");
         zh.put("https_enable", "开启 HTTPS 加密");
-        zh.put("about_desc", "OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。");
+        zh.put("about_desc", "OldSend 是一款打破常规的极客级文件传输工具。\n1. 完美兼容 LocalSend 局域网协议，最低支持 Android 2.3。\n2. 独创 6 位密码跨网传输，突破局域网限制。\n3. 支持公网 P2P 极速直连，速度与安全尽在掌控。\n无需服务器，全平台通用。\n\nAI 辅助生成，开源协议: MIT License。");
         zh.put("about_credits", "作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)");
         zh.put("device_mobile", "手机");
         zh.put("device_desktop", "电脑");
@@ -54,6 +54,32 @@ public class I18nManager {
         zh.put("pin_incorrect", "PIN 码错误，请重试");
         zh.put("modify_pin", "修改 PIN 码");
         zh.put("pin_code", "PIN 码");
+        
+        zh.put("add_ip", "加IP");
+        zh.put("cross_net", "跨网");
+        zh.put("auto_whitelist", "自动接收白名单文件");
+        zh.put("filter_ext_title", "拦截危险后缀");
+        zh.put("manage_acl", "管理白/黑名单");
+        zh.put("cross_net_title", "跨网传输");
+        zh.put("cross_net_desc", "无需连接同一Wi-Fi，极客通道直连。");
+        zh.put("upnp_punch", "一键自动穿透");
+        zh.put("direct_mode", "启用极速直连");
+        zh.put("send_file_title", "我要发送文件");
+        zh.put("recv_file_title", "我要接收文件");
+        zh.put("gen_pin_btn", "选择文件并生成6位密码");
+        zh.put("input_pin_hint", "输入6位密码");
+        zh.put("connect_recv_btn", "连接并接收");
+        zh.put("author", "作者");
+        zh.put("contributors", "贡献者");
+        
+        zh.put("ipv6_local", "本机公网 IPv6: [%s]:53317 (可用直连)");
+        zh.put("ipv6_none", "本机 IPv6: 未获取到公网 IPv6，仅限内网或穿透");
+        zh.put("stun_wait", "STUN 探测中...");
+        zh.put("stun_fail", "NAT 穿透失败 (对称型NAT)");
+        zh.put("stun_ok", "NAT公网地址: ");
+        zh.put("stun_probe", "STUN探测");
+        zh.put("stun_tip", "NAT公网地址: 点击右侧探测");
+        zh.put("advanced_tip", "高级玩法：可配合 FRP/Ngrok 或 ZeroTier 组网后，将生成的公网地址填入下方极速直连。");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -95,7 +121,7 @@ public class I18nManager {
         en.put("backup_import", "Import from Clipboard");
         en.put("dark_mode", "Dark Mode");
         en.put("https_enable", "Enable HTTPS");
-        en.put("about_desc", "OldSend is a minimalist, lightweight LAN file transfer tool. Fully compatible with LocalSend protocol, supports Android 2.3+. No internet required, secure and fast.\n\nAI-assisted generation, open source: MIT License.");
+        en.put("about_desc", "OldSend is a geek-level file transfer tool that breaks conventions.\n1. Fully compatible with LocalSend LAN protocol, supporting Android 2.3+.\n2. Original 6-digit password cross-network transfer, breaking LAN limits.\n3. Supports public P2P direct connection, speed and security in your hands.\nNo server needed, cross-platform.\n\nAI-assisted generation, open source: MIT License.");
         en.put("about_credits", "Author\nstyisme\n\nContributors\nAI Assistant (LLM)");
         en.put("device_mobile", "Mobile");
         en.put("device_desktop", "PC");
