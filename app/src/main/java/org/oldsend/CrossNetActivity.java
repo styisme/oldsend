@@ -341,10 +341,34 @@ public class CrossNetActivity extends Activity {
     private void startDirectSend(String ipStr) {
         String ip = ipStr;
         int port = 53317;
-        if (ipStr.contains(":")) {
-            String[] parts = ipStr.split(":");
-            ip = parts[0];
-            try { port = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
+        
+        // 清理输入两端可能误带的空格
+        ip = ip.trim();
+        
+        // 判断是否包含方括号 (例如 [2409:xxx]:53317)
+        if (ip.startsWith("[")) {
+            int endBracket = ip.indexOf("]");
+            if (endBracket != -1) {
+                // 提取方括号内的纯 IPv6 地址
+                String ipv6Raw = ip.substring(1, endBracket);
+                // 检查后面有没有带端口
+                if (ip.length() > endBracket + 1 && ip.charAt(endBracket + 1) == ':') {
+                    try {
+                        port = Integer.parseInt(ip.substring(endBracket + 2));
+                    } catch (Exception ignored) {}
+                }
+                ip = ipv6Raw;
+            }
+        } else {
+            // 没有方括号，看冒号数量
+            int colonCount = ip.length() - ip.replace(":", "").length();
+            if (colonCount == 1) {
+                // 只有一个冒号，说明是 IPv4:Port
+                String[] parts = ip.split(":");
+                ip = parts[0];
+                try { port = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
+            }
+            // 如果有多个冒号且没有方括号，说明是纯 IPv6 地址，直接用默认端口 53317
         }
         
         final org.oldsend.model.Device target = new org.oldsend.model.Device();

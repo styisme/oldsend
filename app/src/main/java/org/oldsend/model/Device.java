@@ -30,8 +30,15 @@ public class Device implements java.io.Serializable {
 
     public String url(String path) {
         String formatIp = ip;
-        if (ip != null && ip.contains(":")) {
-            formatIp = "[" + ip + "]"; // IPv6 必须加中括号
+        if (formatIp == null) formatIp = "";
+        
+        // 去除可能已经带有的方括号
+        if (formatIp.startsWith("[")) formatIp = formatIp.substring(1);
+        if (formatIp.endsWith("]")) formatIp = formatIp.substring(0, formatIp.length() - 1);
+
+        // 如果包含冒号，说明是 IPv6，必须用方括号包裹
+        if (formatIp.contains(":")) {
+            formatIp = "[" + formatIp + "]";
         }
         return (https ? "https" : "http") + "://" + formatIp + ":" + port + path;
     }
