@@ -15,8 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.oldsend.model.Device;
-import org.oldsend.util.ThemeUtils;
 import org.oldsend.transfer.Uploader;
+import org.oldsend.util.I18nManager;
+import org.oldsend.util.ThemeUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class TransferActivity extends Activity {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isDone || mode == 0) return; // 发送模式依靠回调，不依靠广播
+            if (isDone) return;
             if (ACTION_UPDATE_PROGRESS.equals(intent.getAction())) {
                 long current = intent.getLongExtra("current", 0);
                 long total = intent.getLongExtra("total", 1);
@@ -104,7 +105,7 @@ public class TransferActivity extends Activity {
                     sendBroadcast(new Intent(ReceiveManager.ACTION_ACCEPT));
                     layoutConfirm.setVisibility(View.GONE);
                     layoutProgress.setVisibility(View.VISIBLE);
-                    tvTitle.setText("正在接收文件");
+                    tvTitle.setText(I18nManager.get("receiving_title"));
                     tvSaveDir.setVisibility(View.VISIBLE);
                     startTime = System.currentTimeMillis();
                 }
@@ -119,7 +120,7 @@ public class TransferActivity extends Activity {
         } else {
             layoutConfirm.setVisibility(View.GONE);
             layoutProgress.setVisibility(View.VISIBLE);
-            tvTitle.setText("正在发送文件");
+            tvTitle.setText(I18nManager.get("sending_title"));
             
             targetDevice = (Device) intent.getSerializableExtra("device");
             filePaths = intent.getStringArrayListExtra("files");
@@ -163,7 +164,7 @@ public class TransferActivity extends Activity {
                 } catch (Exception e) {
                     final String errMsg = e.getMessage();
                     handler.post(new Runnable() { public void run() {
-                        Toast.makeText(TransferActivity.this, "发送失败: " + errMsg, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
                         finish();
                     }});
                 }
@@ -178,18 +179,23 @@ public class TransferActivity extends Activity {
         
         tvFileName.setText(fileName);
         
+        String sizeLabel = I18nManager.get("size");
+        String speedLabel = I18nManager.get("speed");
+        String progressLabel = I18nManager.get("total_progress");
+        String receivedLabel = I18nManager.get("received");
+
         if (total > 0) {
             int pct = (int) (current * 100 / total);
             if (pct > 100) pct = 100;
             pbTotal.setProgress(pct);
             pbFile.setProgress(pct);
-            tvTotalTitle.setText("总进度 (" + pct + "%)");
-            tvSpeedInfo.setText("大小: " + formatSize(current) + " / " + formatSize(total) + "\n速度: " + speedStr);
+            tvTotalTitle.setText(progressLabel + " (" + pct + "%)");
+            tvSpeedInfo.setText(sizeLabel + ": " + formatSize(current) + " / " + formatSize(total) + "\n" + speedLabel + ": " + speedStr);
         } else {
             pbTotal.setProgress(0);
             pbFile.setProgress(0);
-            tvTotalTitle.setText("正在传输...");
-            tvSpeedInfo.setText("已处理: " + formatSize(current) + "\n速度: " + speedStr);
+            tvTotalTitle.setText(progressLabel + "...");
+            tvSpeedInfo.setText(receivedLabel + ": " + formatSize(current) + "\n" + speedLabel + ": " + speedStr);
         }
     }
 
@@ -199,11 +205,20 @@ public class TransferActivity extends Activity {
 
         btnCancel.setVisibility(View.GONE);
         btnDone.setVisibility(View.VISIBLE);
-        tvTotalTitle.setText(ok ? "已完成" : "已失败");
-        pbTotal.setProgress(100);
-        pbFile.setProgress(100);
-        if (ok && mode == 1) {
-            tvFileName.setText("已保存到相册/下载目录");
+        
+        if (ok) {
+            tvTitle.setText(I18nManager.get("completed"));
+            tvTotalTitle.setText(I18nManager.get("completed"));
+            pbTotal.setProgress(100);
+            pbFile.setProgress(100);
+            if (mode == 1) {
+                tvFileName.setText(I18nManager.get("save_to_dir"));
+            }
+        } else {
+            tvTitle.setText(I18nManager.get("failed"));
+            tvTotalTitle.setText(I18nManager.get("failed"));
+            pbTotal.setProgress(0);
+            pbFile.setProgress(0);
         }
     }
 

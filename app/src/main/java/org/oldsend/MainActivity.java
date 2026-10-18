@@ -228,6 +228,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         safeSetText(R.id.tv_receive_title, I18nManager.get("receive_history"));
         safeSetText(R.id.tv_set_rx, I18nManager.get("receive"));
+        safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
+        safeSetText(R.id.tv_https_title, I18nManager.get("https_enable"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));
@@ -258,6 +260,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_set_name, I18nManager.get("set_name"));
         safeSetText(R.id.tv_backup, I18nManager.get("backup"));
         safeSetText(R.id.tv_about, I18nManager.get("about"));
+        safeSetText(R.id.tv_about_desc, I18nManager.get("about_desc"));
+        safeSetText(R.id.tv_about_credits, I18nManager.get("about_credits"));
 
         if (tvPin != null) {
             if (cbPin != null && cbPin.isChecked()) {

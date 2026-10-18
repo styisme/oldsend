@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.oldsend.R;
 import org.oldsend.model.Device;
+import org.oldsend.util.I18nManager;
 
 public class DeviceAdapter extends BaseAdapter {
     private final Context ctx;
@@ -32,13 +33,14 @@ public class DeviceAdapter extends BaseAdapter {
         } else { h = (ViewHolder) cv.getTag(); }
         Device d = data.get(pos);
         
-        String icon = "[设备]";
-        if ("mobile".equals(d.deviceType)) icon = "[手机]";
-        else if ("desktop".equals(d.deviceType)) icon = "[电脑]";
-        else if ("web".equals(d.deviceType)) icon = "[网页]";
-        else if ("headless".equals(d.deviceType)) icon = "[服务]";
+        String icon = "[Mobile]";
+        if ("mobile".equals(d.deviceType)) icon = "[" + I18nManager.get("device_mobile") + "]";
+        else if ("desktop".equals(d.deviceType)) icon = "[" + I18nManager.get("device_desktop") + "]";
+        else if ("web".equals(d.deviceType)) icon = "[" + I18nManager.get("device_web") + "]";
+        else if ("headless".equals(d.deviceType)) icon = "[" + I18nManager.get("device_headless") + "]";
+        else if ("server".equals(d.deviceType)) icon = "[" + I18nManager.get("device_server") + "]";
 
-        h.alias.setText(icon + " " + d.alias + (d.https ? " [加密]" : ""));
+        h.alias.setText(icon + " " + d.alias + (d.https ? " [TLS]" : ""));
         h.info.setText(d.ip + ":" + d.port + "  v" + d.version);
         return cv;
     }

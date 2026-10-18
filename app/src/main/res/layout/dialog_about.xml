@@ -41,7 +41,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。"
+        android:id="@+id/tv_about_desc"
+            android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。"
         android:textSize="13sp"
         android:textColor="#333333"
         android:layout_marginTop="12dp"
@@ -50,7 +51,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)"
+        android:id="@+id/tv_about_credits"
+            android:text="作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)"
         android:textSize="13sp"
         android:textColor="#666666"
         android:layout_marginTop="12dp"

@@ -29,6 +29,27 @@ public class I18nManager {
         zh.put("backup_title", "备份与恢复");
         zh.put("backup_export", "导出设置到剪贴板");
         zh.put("backup_import", "从剪贴板导入设置");
+        zh.put("dark_mode", "深色模式");
+        zh.put("https_enable", "开启 HTTPS 加密");
+        zh.put("about_desc", "OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。");
+        zh.put("about_credits", "作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)");
+        zh.put("device_mobile", "手机");
+        zh.put("device_desktop", "电脑");
+        zh.put("device_web", "网页");
+        zh.put("device_headless", "服务");
+        zh.put("device_server", "服务端");
+        zh.put("sending", "正在发送文件");
+        zh.put("send_failed", "发送失败");
+        zh.put("send_success", "发送完成");
+        zh.put("sending_title", "正在发送文件");
+        zh.put("receiving_title", "正在接收文件");
+        zh.put("total_progress", "总进度");
+        zh.put("size", "大小");
+        zh.put("speed", "速度");
+        zh.put("received", "已接收");
+        zh.put("completed", "已完成");
+        zh.put("failed", "已失败");
+        zh.put("save_to_dir", "已保存到相册/下载目录");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -68,6 +89,27 @@ public class I18nManager {
         en.put("backup_title", "Backup & Restore");
         en.put("backup_export", "Export to Clipboard");
         en.put("backup_import", "Import from Clipboard");
+        en.put("dark_mode", "Dark Mode");
+        en.put("https_enable", "Enable HTTPS");
+        en.put("about_desc", "OldSend is a minimalist, lightweight LAN file transfer tool. Fully compatible with LocalSend protocol, supports Android 2.3+. No internet required, secure and fast.\n\nAI-assisted generation, open source: MIT License.");
+        en.put("about_credits", "Author\nstyisme\n\nContributors\nAI Assistant (LLM)");
+        en.put("device_mobile", "Mobile");
+        en.put("device_desktop", "PC");
+        en.put("device_web", "Web");
+        en.put("device_headless", "Service");
+        en.put("device_server", "Server");
+        en.put("sending", "Sending...");
+        en.put("send_failed", "Send Failed");
+        en.put("send_success", "Sent");
+        en.put("sending_title", "Sending File");
+        en.put("receiving_title", "Receiving File");
+        en.put("total_progress", "Progress");
+        en.put("size", "Size");
+        en.put("speed", "Speed");
+        en.put("received", "Received");
+        en.put("completed", "Completed");
+        en.put("failed", "Failed");
+        en.put("save_to_dir", "Saved to Album/Downloads");
         dict.put("en", en);
 
         // ============ 日语 (ja) ============
@@ -89,6 +131,27 @@ public class I18nManager {
         ja.put("backup_title", "バックアップと復元");
         ja.put("backup_export", "クリップボードにエクスポート");
         ja.put("backup_import", "クリップボードからインポート");
+        ja.put("dark_mode", "ダークモード");
+        ja.put("https_enable", "HTTPSを有効化");
+        ja.put("about_desc", "OldSendは、シンプルで軽量なLANファイル転送ツールです。LocalSendプロトコルと完全互換で、Android 2.3以上をサポートしています。インターネット接続不要で、安全かつ高速です。\n\nAIによる生成、オープンソース: MIT License。");
+        ja.put("about_credits", "作者\nstyisme\n\n貢献者\nAIアシスタント (大規模言語モデル)");
+        ja.put("device_mobile", "スマホ");
+        ja.put("device_desktop", "PC");
+        ja.put("device_web", "ウェブ");
+        ja.put("device_headless", "サービス");
+        ja.put("device_server", "サーバー");
+        ja.put("sending", "送信中...");
+        ja.put("send_failed", "送信失敗");
+        ja.put("send_success", "送信完了");
+        ja.put("sending_title", "ファイルを送信中");
+        ja.put("receiving_title", "ファイルを受信中");
+        ja.put("total_progress", "進捗");
+        ja.put("size", "サイズ");
+        ja.put("speed", "速度");
+        ja.put("received", "受信済み");
+        ja.put("completed", "完了");
+        ja.put("failed", "失敗");
+        ja.put("save_to_dir", "アルバム/ダウンロードに保存しました");
         dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
@@ -110,6 +173,27 @@ public class I18nManager {
         ko.put("backup_title", "백업 및 복원");
         ko.put("backup_export", "클립보드로 내보내기");
         ko.put("backup_import", "클립보드에서 가져오기");
+        ko.put("dark_mode", "다크 모드");
+        ko.put("https_enable", "HTTPS 활성화");
+        ko.put("about_desc", "OldSend는 미니멀하고 가벼운 LAN 파일 전송 도구입니다. LocalSend 프로토콜과 완벽하게 호환되며 Android 2.3 이상을 지원합니다. 인터넷 연결이 필요 없으며 안전하고 빠릅니다.\n\nAI 지원 생성, 오픈 소스: MIT License.");
+        ko.put("about_credits", "제작자\nstyisme\n\n기여자\nAI 어시스턴트 (LLM)");
+        ko.put("device_mobile", "휴대폰");
+        ko.put("device_desktop", "PC");
+        ko.put("device_web", "웹");
+        ko.put("device_headless", "서비스");
+        ko.put("device_server", "서버");
+        ko.put("sending", "보내는 중...");
+        ko.put("send_failed", "전송 실패");
+        ko.put("send_success", "전송 완료");
+        ko.put("sending_title", "파일 보내는 중");
+        ko.put("receiving_title", "파일 받는 중");
+        ko.put("total_progress", "진행률");
+        ko.put("size", "크기");
+        ko.put("speed", "속도");
+        ko.put("received", "받음");
+        ko.put("completed", "완료됨");
+        ko.put("failed", "실패함");
+        ko.put("save_to_dir", "앨범/다운로드에 저장됨");
         dict.put("ko", ko);
 
         // ============ 德语 (de) ============
@@ -131,6 +215,27 @@ public class I18nManager {
         de.put("backup_title", "Sicherung & Wiederherstellung");
         de.put("backup_export", "In Zwischenablage exportieren");
         de.put("backup_import", "Aus Zwischenablage importieren");
+        de.put("dark_mode", "Dunkelmodus");
+        de.put("https_enable", "HTTPS aktivieren");
+        de.put("about_desc", "OldSend ist ein minimalistisches, leichtgewichtiges LAN-Dateiübertragungstool. Vollständig kompatibel mit dem LocalSend-Protokoll, unterstützt Android 2.3+. Kein Internet erforderlich, sicher und schnell.\n\nKI-unterstützte Generierung, Open Source: MIT License.");
+        de.put("about_credits", "Autor\nstyisme\n\nMitwirkende\nKI-Assistent (LLM)");
+        de.put("device_mobile", "Handy");
+        de.put("device_desktop", "PC");
+        de.put("device_web", "Web");
+        de.put("device_headless", "Dienst");
+        de.put("device_server", "Server");
+        de.put("sending", "Senden...");
+        de.put("send_failed", "Senden fehlgeschlagen");
+        de.put("send_success", "Gesendet");
+        de.put("sending_title", "Datei senden");
+        de.put("receiving_title", "Datei empfangen");
+        de.put("total_progress", "Fortschritt");
+        de.put("size", "Größe");
+        de.put("speed", "Geschwindigkeit");
+        de.put("received", "Empfangen");
+        de.put("completed", "Abgeschlossen");
+        de.put("failed", "Fehlgeschlagen");
+        de.put("save_to_dir", "In Album/Downloads gespeichert");
         dict.put("de", de);
 
         // ============ 法语 (fr) ============
@@ -152,6 +257,27 @@ public class I18nManager {
         fr.put("backup_title", "Sauvegarde & Restauration");
         fr.put("backup_export", "Exporter vers le presse-papiers");
         fr.put("backup_import", "Importer depuis le presse-papiers");
+        fr.put("dark_mode", "Mode sombre");
+        fr.put("https_enable", "Activer HTTPS");
+        fr.put("about_desc", "OldSend est un outil de transfert de fichiers LAN minimaliste et léger. Entièrement compatible avec le protocole LocalSend, prend en charge Android 2.3+. Pas besoin d'Internet, sécurisé et rapide.\n\nGénération assistée par IA, open source : MIT License.");
+        fr.put("about_credits", "Auteur\nstyisme\n\nContributeurs\nAssistant IA (LLM)");
+        fr.put("device_mobile", "Mobile");
+        fr.put("device_desktop", "PC");
+        fr.put("device_web", "Web");
+        fr.put("device_headless", "Service");
+        fr.put("device_server", "Serveur");
+        fr.put("sending", "Envoi...");
+        fr.put("send_failed", "Échec de l'envoi");
+        fr.put("send_success", "Envoyé");
+        fr.put("sending_title", "Envoi du fichier");
+        fr.put("receiving_title", "Réception du fichier");
+        fr.put("total_progress", "Progression");
+        fr.put("size", "Taille");
+        fr.put("speed", "Vitesse");
+        fr.put("received", "Reçu");
+        fr.put("completed", "Terminé");
+        fr.put("failed", "Échoué");
+        fr.put("save_to_dir", "Enregistré dans l'album/téléchargements");
         dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
@@ -173,6 +299,27 @@ public class I18nManager {
         es.put("backup_title", "Copia de seguridad y restauración");
         es.put("backup_export", "Exportar al portapapeles");
         es.put("backup_import", "Importar desde el portapapeles");
+        es.put("dark_mode", "Modo oscuro");
+        es.put("https_enable", "Activar HTTPS");
+        es.put("about_desc", "OldSend es una herramienta de transferencia de archivos LAN minimalista y ligera. Totalmente compatible con el protocolo LocalSend, compatible con Android 2.3+. No requiere internet, seguro y rápido.\n\nGeneración asistida por IA, código abierto: MIT License.");
+        es.put("about_credits", "Autor\nstyisme\n\nColaboradores\nAsistente de IA (LLM)");
+        es.put("device_mobile", "Móvil");
+        es.put("device_desktop", "PC");
+        es.put("device_web", "Web");
+        es.put("device_headless", "Servicio");
+        es.put("device_server", "Servidor");
+        es.put("sending", "Enviando...");
+        es.put("send_failed", "Error al enviar");
+        es.put("send_success", "Enviado");
+        es.put("sending_title", "Enviando archivo");
+        es.put("receiving_title", "Recibiendo archivo");
+        es.put("total_progress", "Progreso");
+        es.put("size", "Tamaño");
+        es.put("speed", "Velocidad");
+        es.put("received", "Recibido");
+        es.put("completed", "Completado");
+        es.put("failed", "Fallido");
+        es.put("save_to_dir", "Guardado en álbum/descargas");
         dict.put("es", es);
 
         // ============ 俄语 (ru) ============
@@ -194,6 +341,27 @@ public class I18nManager {
         ru.put("backup_title", "Резервное копирование");
         ru.put("backup_export", "Экспорт в буфер обмена");
         ru.put("backup_import", "Импорт из буфера обмена");
+        ru.put("dark_mode", "Тёмная тема");
+        ru.put("https_enable", "Включить HTTPS");
+        ru.put("about_desc", "OldSend — это минималистичный и легкий инструмент для передачи файлов по локальной сети. Полностью совместим с протоколом LocalSend, поддерживает Android 2.3+. Интернет не требуется, безопасно и быстро.\n\nСоздано с помощью ИИ, открытый исходный код: MIT License.");
+        ru.put("about_credits", "Автор\nstyisme\n\nУчастники\nИИ-ассистент (LLM)");
+        ru.put("device_mobile", "Телефон");
+        ru.put("device_desktop", "ПК");
+        ru.put("device_web", "Веб");
+        ru.put("device_headless", "Служба");
+        ru.put("device_server", "Сервер");
+        ru.put("sending", "Отправка...");
+        ru.put("send_failed", "Ошибка отправки");
+        ru.put("send_success", "Отправлено");
+        ru.put("sending_title", "Отправка файла");
+        ru.put("receiving_title", "Получение файла");
+        ru.put("total_progress", "Прогресс");
+        ru.put("size", "Размер");
+        ru.put("speed", "Скорость");
+        ru.put("received", "Получено");
+        ru.put("completed", "Завершено");
+        ru.put("failed", "Ошибка");
+        ru.put("save_to_dir", "Сохранено в альбом/загрузки");
         dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
@@ -215,6 +383,27 @@ public class I18nManager {
         pt.put("backup_title", "Backup e Restauração");
         pt.put("backup_export", "Exportar para a área de transferência");
         pt.put("backup_import", "Importar da área de transferência");
+        pt.put("dark_mode", "Modo escuro");
+        pt.put("https_enable", "Ativar HTTPS");
+        pt.put("about_desc", "OldSend é uma ferramenta de transferência de arquivos LAN minimalista e leve. Totalmente compatível com o protocolo LocalSend, suporta Android 2.3+. Não requer internet, seguro e rápido.\n\nGeração assistida por IA, código aberto: MIT License.");
+        pt.put("about_credits", "Autor\nstyisme\n\nColaboradores\nAssistente de IA (LLM)");
+        pt.put("device_mobile", "Celular");
+        pt.put("device_desktop", "PC");
+        pt.put("device_web", "Web");
+        pt.put("device_headless", "Serviço");
+        pt.put("device_server", "Servidor");
+        pt.put("sending", "Enviando...");
+        pt.put("send_failed", "Falha no envio");
+        pt.put("send_success", "Enviado");
+        pt.put("sending_title", "Enviando arquivo");
+        pt.put("receiving_title", "Recebendo arquivo");
+        pt.put("total_progress", "Progresso");
+        pt.put("size", "Tamanho");
+        pt.put("speed", "Velocidade");
+        pt.put("received", "Recebido");
+        pt.put("completed", "Concluído");
+        pt.put("failed", "Falhou");
+        pt.put("save_to_dir", "Salvo no álbum/downloads");
         dict.put("pt", pt);
     }
 
