@@ -76,7 +76,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
-        progressBar = (ProgressBar) findViewById(R.id.progress);
+        
         emptyHint = (TextView) findViewById(R.id.empty_hint);
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
@@ -705,26 +705,13 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void doSend(final Device device, final List<File> files) {
-        if (progressBar != null) progressBar.setVisibility(View.VISIBLE);
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Uploader.uploadFiles(device, files, new Uploader.ProgressCallback() {
-                        public void onProgress(final String stage, final long sent, final long total) {
-                            handler.post(new Runnable() { public void run() { 
-                                if (progressBar != null) progressBar.setProgress(total > 0 ? (int)(sent * 100 / total) : 0); 
-                            } });
-                        }
-                        public void onDone(boolean ok, String msg) {
-                            log("[" + device.alias + "] " + (ok ? "Success" : "Failed") + ": " + msg);
-                            handler.post(new Runnable() { public void run() { 
-                                if (progressBar != null) progressBar.setVisibility(View.GONE); 
-                            } });
-                        }
-                    });
-                } catch (Exception e) { log("Send error"); }
-            }
-        }).start();
+        Intent intent = new Intent(this, TransferActivity.class);
+        intent.putExtra("mode", 0);
+        intent.putExtra("device", device);
+        ArrayList<String> paths = new ArrayList<>();
+        for (File f : files) paths.add(f.getAbsolutePath());
+        intent.putStringArrayListExtra("files", paths);
+        startActivity(intent);
     }
 
     private String queryDisplayName(Uri uri) {

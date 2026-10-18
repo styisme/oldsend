@@ -27,7 +27,7 @@ public class TransferActivity extends Activity {
     public static final String ACTION_TRANSFER_DONE = "org.oldsend.TRANSFER_DONE";
 
     private LinearLayout layoutConfirm, layoutProgress;
-    private TextView tvSenderName, tvSenderType, tvTitle, tvSaveDir, tvFileName, tvTotalTitle, tvSpeedInfo;
+    private TextView tvSenderName, tvTitle, tvSaveDir, tvFileName, tvTotalTitle, tvSpeedInfo;
     private ProgressBar pbFile, pbTotal;
     private Button btnAccept, btnReject, btnCancel, btnDone;
 
@@ -42,7 +42,7 @@ public class TransferActivity extends Activity {
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (isDone) return;
+            if (isDone || mode == 0) return; // 发送模式依靠回调，不依靠广播
             if (ACTION_UPDATE_PROGRESS.equals(intent.getAction())) {
                 long current = intent.getLongExtra("current", 0);
                 long total = intent.getLongExtra("total", 1);
@@ -89,7 +89,7 @@ public class TransferActivity extends Activity {
 
     private void handleIntent(Intent intent) {
         mode = intent.getIntExtra("mode", 0);
-        isDone = false; // 重置状态
+        isDone = false;
 
         if (mode == 1) {
             String senderName = intent.getStringExtra("senderName");
@@ -148,7 +148,9 @@ public class TransferActivity extends Activity {
                 try {
                     Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
-                            // 接收端由广播处理，这里不做事
+                            handler.post(new Runnable() { public void run() {
+                                if (!isDone) updateProgress(sent, total, files.get(0).getName());
+                            }});
                         }
                         public void onDone(final boolean ok, String msg) {
                             handler.post(new Runnable() { public void run() { 
@@ -184,8 +186,8 @@ public class TransferActivity extends Activity {
         } else {
             pbTotal.setProgress(0);
             pbFile.setProgress(0);
-            tvTotalTitle.setText("正在接收...");
-            tvSpeedInfo.setText("已接收: " + formatSize(current) + "\n速度: " + speedStr);
+            tvTotalTitle.setText("正在传输...");
+            tvSpeedInfo.setText("已处理: " + formatSize(current) + "\n速度: " + speedStr);
         }
     }
 
