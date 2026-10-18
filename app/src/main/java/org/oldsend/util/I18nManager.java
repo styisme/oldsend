@@ -31,7 +31,7 @@ public class I18nManager {
         zh.put("backup_import", "从剪贴板导入设置");
         zh.put("dark_mode", "深色模式");
         zh.put("https_enable", "开启 HTTPS 加密");
-        zh.put("about_desc", "OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。");
+        zh.put("about_desc", "OldSend 是一款打破常规的极客级文件传输工具。\n1. 完美兼容 LocalSend 局域网协议，最低支持 Android 2.3。\n2. 独创 6 位密码跨网传输，突破局域网限制。\n3. 支持公网 P2P 极速直连，速度与安全尽在掌控。\n无需服务器，全平台通用。\n\nAI 辅助生成，开源协议: MIT License。");
         zh.put("about_credits", "作者\nstyisme\n\n贡献者\nAI 助手 (大语言模型)");
         zh.put("device_mobile", "手机");
         zh.put("device_desktop", "电脑");
@@ -95,7 +95,7 @@ public class I18nManager {
         en.put("backup_import", "Import from Clipboard");
         en.put("dark_mode", "Dark Mode");
         en.put("https_enable", "Enable HTTPS");
-        en.put("about_desc", "OldSend is a minimalist, lightweight LAN file transfer tool. Fully compatible with LocalSend protocol, supports Android 2.3+. No internet required, secure and fast.\n\nAI-assisted generation, open source: MIT License.");
+        en.put("about_desc", "OldSend is a geek-level file transfer tool that breaks conventions.\n1. Fully compatible with LocalSend LAN protocol, supporting Android 2.3+.\n2. Original 6-digit password cross-network transfer, breaking LAN limits.\n3. Supports public P2P direct connection, speed and security in your hands.\nNo server needed, cross-platform.\n\nAI-assisted generation, open source: MIT License.");
         en.put("about_credits", "Author\nstyisme\n\nContributors\nAI Assistant (LLM)");
         en.put("device_mobile", "Mobile");
         en.put("device_desktop", "PC");

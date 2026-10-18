@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/tv_about_desc"
-            android:text="OldSend 是一款极简、极轻量的局域网文件传输工具。完美兼容 LocalSend 协议，最低支持 Android 2.3。无需互联网连接，安全快捷。\n\nAI 辅助生成，开源协议: MIT License。"
+            android:text="OldSend 是一款打破常规的极客级文件传输工具。\n完美兼容 LocalSend 局域网协议；独创 6 位密码跨网传输；支持公网 P2P 极速直连。无惧距离，速度与安全尽在掌控。\n\nAI 辅助生成，开源协议: MIT License。"
         android:textSize="13sp"
         android:textColor="#333333"
         android:layout_marginTop="12dp"

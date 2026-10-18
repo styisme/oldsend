@@ -41,6 +41,10 @@ public class CrossNetActivity extends Activity {
     private List<Uri> pendingUris = new ArrayList<Uri>();
     private boolean pendingAppend = false;
     private String currentPin = null;
+    private boolean useDirectMode = false;
+    private EditText etDirectIp;
+    private android.widget.CheckBox cbUseDirect;
+    private LinearLayout layoutDirectIp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,25 @@ public class CrossNetActivity extends Activity {
         }
 
         tvStatus = (TextView) findViewById(R.id.tv_cn_status);
+
+        cbUseDirect = (android.widget.CheckBox) findViewById(R.id.cb_use_direct);
+        etDirectIp = (EditText) findViewById(R.id.et_direct_ip);
+        layoutDirectIp = (LinearLayout) findViewById(R.id.layout_direct_ip);
+
+        cbUseDirect.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
+                useDirectMode = isChecked;
+                layoutDirectIp.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+                if (isChecked) {
+                    // 直连模式下，重置原有的pin相关UI
+                    tvPinDisplay.setVisibility(View.GONE);
+                    findViewById(R.id.btn_cn_generate).setText("直连发送已选文件");
+                } else {
+                    findViewById(R.id.btn_cn_generate).setText("生成密码并开始发送");
+                }
+            }
+        });
+        
         tvPinDisplay = (TextView) findViewById(R.id.tv_cn_pin_display);
         tvFileInfo = (TextView) findViewById(R.id.tv_cn_file_info);
         etPin = (EditText) findViewById(R.id.et_cn_pin);
@@ -85,7 +108,16 @@ public class CrossNetActivity extends Activity {
                     pendingAppend = false;
                     pickFile();
                 } else {
-                    generatePinAndSend();
+                    if (useDirectMode) {
+                        String ipStr = etDirectIp.getText().toString().trim();
+                        if (ipStr.isEmpty()) {
+                            Toast.makeText(CrossNetActivity.this, "请输入对方公网IP和端口", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        startDirectSend(ipStr);
+                    } else {
+                        generatePinAndSend();
+                    }
                 }
             }
         });
@@ -165,6 +197,59 @@ public class CrossNetActivity extends Activity {
         startSend(currentPin);
     }
 
+    
+    private void startDirectSend(String ipStr) {
+        String ip = ipStr;
+        int port = 53317;
+        if (ipStr.contains(":")) {
+            String[] parts = ipStr.split(":");
+            ip = parts[0];
+            try { port = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
+        }
+        
+        org.oldsend.model.Device target = new org.oldsend.model.Device();
+        target.alias = "公网设备";
+        target.ip = ip;
+        target.port = port;
+        target.https = false;
+
+        final List<File> files = new ArrayList<File>();
+        try {
+            for (Uri uri : pendingUris) {
+                // 这里为了简单，直接通过流写入缓存文件
+                File out = new File(getCacheDir(), queryDisplayName(uri));
+                InputStream is = getContentResolver().openInputStream(uri);
+                FileOutputStream fos = new FileOutputStream(out);
+                byte[] buf = new byte[8192];
+                int n;
+                while ((n = is.read(buf)) > 0) fos.write(buf, 0, n);
+                is.close(); fos.close();
+                files.add(out);
+            }
+        } catch (Exception e) {
+            Toast.makeText(this, "读取文件失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isTransferring = true;
+        tvStatus.setText("正在通过公网直连发送...");
+
+        org.oldsend.transfer.Uploader.uploadFiles(target, files, new org.oldsend.transfer.Uploader.ProgressCallback() {
+            public void onProgress(final String stage, final long sent, final long total) {
+                handler.post(new Runnable() { public void run() {
+                    if (total > 0) {
+                        int pct = (int)(sent * 100 / total);
+                        tvStatus.setText("极速发送中... " + pct + "% (" + (sent/1024) + "/" + (total/1024) + " KB)");
+                    }
+                }});
+            }
+            public void onDone(boolean ok, String msg) {
+                isTransferring = false;
+                tvStatus.setText(ok ? "公网极速直连发送完成！" : "直连失败: " + msg);
+            }
+        });
+    }
+        
     private void startSend(final String pin) {
         isTransferring = true;
         tvStatus.setText("正在打包文件...");

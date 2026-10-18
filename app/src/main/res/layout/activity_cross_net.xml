@@ -18,6 +18,15 @@
             <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="无需连接同一Wi-Fi，极客通道直连。" android:textColor="#666666" android:textSize="14sp" android:layout_marginBottom="20dp" android:gravity="center"/>
 
             <!-- 发送模块 -->
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+            <CheckBox android:id="@+id/cb_use_direct" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="启用极速直连 (公网IP/穿透)" android:textColor="#1C1B1F" />
+        </LinearLayout>
+        
+        <LinearLayout android:id="@+id/layout_direct_ip" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginBottom="20dp">
+            <EditText android:id="@+id/et_direct_ip" android:layout_width="match_parent" android:layout_height="52dp" android:hint="输入对方公网 IP (例如: 1.2.3.4:53317)" android:inputType="text" android:background="@drawable/bg_md3_edittext" android:padding="12dp"/>
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="注意：需确保对方已将 53317 端口映射至公网" android:textColor="#888" android:textSize="12sp" android:layout_marginTop="4dp"/>
+        </LinearLayout>
+        
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:orientation="vertical" android:padding="16dp" android:layout_marginBottom="20dp">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="我要发送文件" android:textColor="#1C1B1F" android:textSize="18sp" android:textStyle="bold"/>
                 
