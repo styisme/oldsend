@@ -7,6 +7,13 @@
 
 ## [Unreleased]
 
+### Planned
+- 发送端与接收端文件进度独立显示
+- 支持拖拽排序发送队列
+- 网页端支持多文件并发上传
+
+---
+
 ## [1.1.0] - 2026-10-18
 
 本次更新是一次极具里程碑意义的重大升级，带来了完全重构的传输 UI 和多项底层修复。
@@ -24,14 +31,9 @@
 - **端口占用与设备重复**：修复了组播重启时的 `EADDRINUSE` 报错，并强制按 IP 指纹过滤重复设备。
 - **全屏进度溢出**：修复了部分设备在未获取到 `Content-Length` 时，进度计算出现天文数字的问题。
 
----
-
-
-
-### Planned
-- 发送端与接收端文件进度独立显示
-- 支持拖拽排序发送队列
-- 网页端支持多文件并发上传
+### Known Issues
+- 极个别设备（特别是小屏穿戴设备）可能无法弹出 PIN 输入框。
+- 开启深色模式后，系统文件选择器依然为亮色。
 
 ---
 
@@ -65,3 +67,11 @@
 - 基础 LocalSend 协议实现（`register`、`prepare-upload`、`upload`）。
 - 基础设备组播发现。
 - 文件与文本发送。
+
+---
+
+## 版本对比链接
+
+[Unreleased]: https://github.com/styisme/oldsend/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/styisme/oldsend/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/styisme/oldsend/releases/tag/v1.0.0
