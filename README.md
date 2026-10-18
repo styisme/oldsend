@@ -3,7 +3,7 @@
 > 极简、轻量、高兼容的局域网文件传输工具，完美兼容 LocalSend 协议。
 
 [![Build Android APK](https://github.com/styisme/oldsend/actions/workflows/android.yml/badge.svg)](https://github.com/styisme/oldsend/actions/workflows/android.yml)
-[![Version](https://img.shields.io/badge/version-1.0.0-512BD4)]()
+[![Version](https://img.shields.io/badge/version-1.1.0-512BD4)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Made with AI](https://img.shields.io/badge/made%20with-AI-FF6B6B)](docs/AI_DISCLOSURE.md)
 [![Platform](https://img.shields.io/badge/platform-Android%202.3%2B-brightgreen)]()
@@ -26,7 +26,7 @@
 
 ## 📦 最新版本
 
-当前版本：**v1.0.0**
+当前版本：**v1.1.0**
 
 完整版本历史请见 [CHANGELOG.md](CHANGELOG.md)。
 
