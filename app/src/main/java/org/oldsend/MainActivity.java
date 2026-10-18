@@ -550,17 +550,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                             }
                             editor.commit();
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
-                            
-        layoutSelectedFiles = (LinearLayout) findViewById(R.id.layout_selected_files);
-        btnAddFilesMore = (Button) findViewById(R.id.btn_add_files_more);
-        btnEditFiles = (Button) findViewById(R.id.btn_edit_files);
-        btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
-
-        if (btnAddFilesMore != null) btnAddFilesMore.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAddFilesDialog(); } });
-        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); } });
-        if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
-        
-        initSettingsUI(); applyI18n();
+                            initSettingsUI(); applyI18n();
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
@@ -620,6 +610,12 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_manual_ip);
+        if (ThemeUtils.isDarkMode(this)) {
+            findViewById(R.id.dlg_root).setBackgroundResource(R.drawable.bg_md3_card_dark);
+            ((TextView)dialog.findViewById(R.id.et_ip_address)).setTextColor(0xFFE0E0E0);
+            ((TextView)dialog.findViewById(R.id.et_ip_address)).setHintTextColor(0xFF888888);
+            ((TextView)dialog.findViewById(R.id.et_ip_address)).setBackgroundColor(0xFF2C2C2C);
+        }
         Window window = dialog.getWindow();
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
