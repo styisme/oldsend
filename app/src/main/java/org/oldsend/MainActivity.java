@@ -264,7 +264,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_filter_title, I18nManager.get("filter_ext_title"));
-        safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist"));
+        // safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist")); // UI 缺失，跳过
         safeSetText(R.id.tv_manage_acl_title, I18nManager.get("manage_acl"));
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));

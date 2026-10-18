@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -93,10 +94,10 @@ public class CrossNetActivity extends Activity {
         });
         
 
-        ((TextView)findViewById(R.id.tv_cross_net_title)).setText(I18nManager.get("cross_net_title"));
-        ((TextView)findViewById(R.id.tv_cross_net_desc)).setText(I18nManager.get("cross_net_desc"));
-        ((TextView)findViewById(R.id.tv_send_title)).setText(I18nManager.get("send_file_title"));
-        ((TextView)findViewById(R.id.tv_recv_title)).setText(I18nManager.get("recv_file_title"));
+        TextView tvTitle = (TextView) findViewById(R.id.tv_cross_net_title); if(tvTitle != null) tvTitle.setText(I18nManager.get("cross_net_title"));
+        TextView tvDesc = (TextView) findViewById(R.id.tv_cross_net_desc); if(tvDesc != null) tvDesc.setText(I18nManager.get("cross_net_desc"));
+        TextView tvSend = (TextView) findViewById(R.id.tv_send_title); if(tvSend != null) tvSend.setText(I18nManager.get("send_file_title"));
+        TextView tvRecv = (TextView) findViewById(R.id.tv_recv_title); if(tvRecv != null) tvRecv.setText(I18nManager.get("recv_file_title"));
         ((Button)findViewById(R.id.btn_cn_generate)).setText(I18nManager.get("gen_pin_btn"));
         ((Button)findViewById(R.id.btn_cn_receive)).setText(I18nManager.get("connect_recv_btn"));
         etPin.setHint(I18nManager.get("input_pin_hint"));
