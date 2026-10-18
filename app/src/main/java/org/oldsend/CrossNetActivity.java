@@ -58,7 +58,16 @@ public class CrossNetActivity extends Activity {
             ((TextView)findViewById(R.id.btn_cn_back)).setTextColor(0xFFE0E0E0);
         }
 
-        tvStatus = (TextView) findViewById(R.id.tv_cn_status);
+                tvStatus = (TextView) findViewById(R.id.tv_cn_status);
+        TextView tvTitle = (TextView) findViewById(R.id.tv_cross_net_title); if(tvTitle != null) tvTitle.setText(I18nManager.get("cross_net_title"));
+        TextView tvDesc = (TextView) findViewById(R.id.tv_cross_net_desc); if(tvDesc != null) tvDesc.setText(I18nManager.get("cross_net_desc"));
+        TextView tvSend = (TextView) findViewById(R.id.tv_send_title); if(tvSend != null) tvSend.setText(I18nManager.get("send_file_title"));
+        TextView tvRecv = (TextView) findViewById(R.id.tv_recv_title); if(tvRecv != null) tvRecv.setText(I18nManager.get("recv_file_title"));
+        Button btnGen = (Button) findViewById(R.id.btn_cn_generate); if(btnGen != null) btnGen.setText(I18nManager.get("gen_pin_btn"));
+        Button btnRecv = (Button) findViewById(R.id.btn_cn_receive); if(btnRecv != null) btnRecv.setText(I18nManager.get("connect_recv_btn"));
+        if(etPin != null) etPin.setHint(I18nManager.get("input_pin_hint"));
+        CheckBox cbDirect = (CheckBox) findViewById(R.id.cb_use_direct); if(cbDirect != null) cbDirect.setText(I18nManager.get("direct_mode"));
+        Button btnUpnp = (Button) findViewById(R.id.btn_upnp_punch); if(btnUpnp != null) btnUpnp.setText(I18nManager.get("upnp_punch"));
 
         String localIp = OldSendService.getLocalIp();
         TextView tvIpv6 = (TextView) findViewById(R.id.tv_ipv6_info);
@@ -109,7 +118,7 @@ public class CrossNetActivity extends Activity {
         etDirectIp = (EditText) findViewById(R.id.et_direct_ip);
         layoutDirectIp = (LinearLayout) findViewById(R.id.layout_direct_ip);
 
-                findViewById(R.id.btn_upnp_punch).setOnClickListener(new View.OnClickListener() {
+                View btnUpnpPunch = findViewById(R.id.btn_upnp_punch); if (btnUpnpPunch != null) btnUpnpPunch.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 isTransferring = true;
                 tvStatus.setText("正在向路由器申请 UPnP 端口映射...");
@@ -121,7 +130,7 @@ public class CrossNetActivity extends Activity {
                                 isTransferring = false;
                                 tvStatus.setText(result);
                                 if (result.contains("成功")) {
-                                    cbUseDirect.setChecked(true);
+                                    if (cbUseDirect != null) cbUseDirect.setChecked(true);
                                 }
                             }
                         });
@@ -130,7 +139,7 @@ public class CrossNetActivity extends Activity {
             }
         });
 
-        cbUseDirect.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
+        if (cbUseDirect != null) cbUseDirect.setOnCheckedChangeListener(new android.widget.CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(android.widget.CompoundButton buttonView, boolean isChecked) {
                 useDirectMode = isChecked;
                 layoutDirectIp.setVisibility(isChecked ? View.VISIBLE : View.GONE);
@@ -153,14 +162,14 @@ public class CrossNetActivity extends Activity {
             public void onClick(View v) { finish(); }
         });
 
-        findViewById(R.id.btn_cn_add_files).setOnClickListener(new View.OnClickListener() {
+        View btnAdd = findViewById(R.id.btn_cn_add_files); if (btnAdd != null) btnAdd.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 pendingAppend = true;
                 pickFile();
             }
         });
 
-        findViewById(R.id.btn_cn_edit_files).setOnClickListener(new View.OnClickListener() {
+        View btnEdit = findViewById(R.id.btn_cn_edit_files); if (btnEdit != null) btnEdit.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // 通过全局静态变量把数据传给管理页
                 MainActivity.pendingUris = pendingUris;
@@ -176,7 +185,7 @@ public class CrossNetActivity extends Activity {
                     pickFile();
                 } else {
                     if (useDirectMode) {
-                        String ipStr = etDirectIp.getText().toString().trim();
+                        String ipStr = (etDirectIp != null) ? etDirectIp.getText().toString().trim() : "";
                         if (ipStr.isEmpty()) {
                             Toast.makeText(CrossNetActivity.this, "请输入对方公网IP和端口", Toast.LENGTH_SHORT).show();
                             return;
