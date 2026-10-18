@@ -151,11 +151,20 @@ public class OldSendService extends Service {
             String alias = getAlias(this);
             SessionStore store = new SessionStore();
             Router router = new Router();
+            // 兼容 V2
             router.register(Protocol.V2_PREFIX + "/info", new InfoHandler(alias));
             router.register(Protocol.V2_PREFIX + "/register", new RegisterHandler(alias));
             router.register(Protocol.V2_PREFIX + "/prepare-upload", new PrepareUploadHandler(store));
             router.register(Protocol.V2_PREFIX + "/upload", new UploadHandler(store));
             router.register(Protocol.V2_PREFIX + "/cancel", new CancelHandler(store));
+            
+            // 兼容老设备 V1
+            String V1_PREFIX = "/api/localsend/v1";
+            router.register(V1_PREFIX + "/info", new InfoHandler(alias));
+            router.register(V1_PREFIX + "/register", new RegisterHandler(alias));
+            router.register(V1_PREFIX + "/prepare-upload", new PrepareUploadHandler(store));
+            router.register(V1_PREFIX + "/upload", new UploadHandler(store));
+            router.register(V1_PREFIX + "/cancel", new CancelHandler(store));
             router.register("/", new WebShareHandler());
             router.register("/index.html", new WebShareHandler());
             router.register("/web-upload", new WebShareHandler());

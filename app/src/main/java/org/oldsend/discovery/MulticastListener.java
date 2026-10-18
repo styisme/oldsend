@@ -57,9 +57,15 @@ public class MulticastListener {
             if (body.length() == 0 || body.startsWith("[")) return;
             JSONObject o = new JSONObject(body);
             String peerIp = p.getAddress().getHostAddress();
+            
+            // 防止收到自己的组播导致死循环
+            if (peerIp.equals(OldSendService.getLocalIp()) || peerIp.equals("127.0.0.1")) {
+                return;
+            }
+            
             Device d = Device.fromJson(o, peerIp);
             DeviceStore.get().addDevice(d);
-            OldSendService.log("multicast from " + peerIp + " (" + d.alias + ")");
+            if (System.currentTimeMillis() % 5000 < 500) OldSendService.log("multicast from " + peerIp + " (" + d.alias + ")");
 
             JSONObject self = new JSONObject(InfoHandler.buildSelfJson(alias));
             byte[] data = self.toString().getBytes("UTF-8");
