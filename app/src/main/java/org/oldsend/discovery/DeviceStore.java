@@ -24,34 +24,33 @@ public class DeviceStore {
     public void setListener(Listener l) { listener = l; }
 
     public void addDevice(Device d) {
-        // 过滤掉 172.17.x.x 这种虚拟网卡 IP，避免发送失败
+        // 过滤虚拟网卡
         if (d.ip != null && d.ip.startsWith("172.17.")) {
             return;
         }
+        
+        boolean changed = false;
         synchronized (devices) {
-            for (Iterator<Device> it = devices.iterator(); it.hasNext();) {
+            Iterator<Device> it = devices.iterator();
+            while (it.hasNext()) {
                 Device e = it.next();
-                boolean same = false;
-                if (d.fingerprint != null && d.fingerprint.length() > 0
-                        && d.fingerprint.equals(e.fingerprint)) {
-                    // 如果是同一个设备（指纹相同），但新 IP 是 192.168 等真实局域网段，则更新
-                    if (d.ip != null && (d.ip.startsWith("192.168.") || d.ip.startsWith("10."))) {
-                        same = true;
-                        break;
-                    }
-                } else if (d.ip != null && d.ip.equals(e.ip)) {
-                    same = true;
-                    break;
-                }
-                if (same) {
+                boolean sameIp = d.ip != null && d.ip.equals(e.ip) && d.port == e.port;
+                boolean sameFp = d.fingerprint != null && d.fingerprint.length() > 0 && d.fingerprint.equals(e.fingerprint);
+                
+                // 只要 IP 端口相同，或者指纹相同，就认为是同一个设备，直接移除旧记录
+                if (sameIp || sameFp) {
                     it.remove();
-                    break;
+                    changed = true;
                 }
             }
             devices.add(d);
-            if (devices.size() > 50) devices.remove(0);
+            if (devices.size() > 50) {
+                devices.remove(0);
+            }
+            changed = true;
         }
-        notifyChanged();
+        
+        if (changed) notifyChanged();
     }
 
     public List<Device> snapshot() {
