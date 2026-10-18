@@ -312,9 +312,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             } 
         });
         
-                }
-            });
-        }
 
         findViewById(R.id.row_language).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
