@@ -62,8 +62,7 @@ public class Md3Switch extends CheckBox {
 
     @Override
     public boolean performClick() {
-        toggle();
-        return true;
+        return super.performClick();
     }
 
     @Override

@@ -61,8 +61,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabSendText, tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
-    private EditText etPinValue;
+    private CheckBox cbDark, cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
+    
 
     private BroadcastReceiver progressReceiver;
 
@@ -222,6 +222,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
     private void initSettingsUI() {
         cbAutoSave = (CheckBox) findViewById(R.id.cb_auto_save);
+
+        cbDark = (CheckBox) findViewById(R.id.cb_dark_mode);
+        if (cbDark != null) {
+            cbDark.setChecked(getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("dark_mode", false));
+            cbDark.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                public void onCheckedChanged(CompoundButton v, boolean c) {
+                    savePref("dark_mode", c);
+                    recreate(); // 重启 Activity 生效
+                }
+            });
+        }
+        
         cbSaveAlbum = (CheckBox) findViewById(R.id.cb_save_album);
         cbSaveHistory = (CheckBox) findViewById(R.id.cb_save_history);
         cbPin = (CheckBox) findViewById(R.id.cb_pin);
@@ -311,7 +323,24 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             }
         });
 
-        findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
+        
+        findViewById(R.id.row_pin_code).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String currentPin = getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000");
+                Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("modify_pin"), currentPin, new Md3DialogUtils.OnInputListener() {
+                    public void onInput(String text) {
+                        if (text != null && text.length() > 0) {
+                            getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", text).commit();
+                            if (cbPin != null && cbPin.isChecked()) {
+                                tvPin.setText(I18nManager.get("pin_on") + text);
+                            }
+                        }
+                    }
+                }).show();
+            }
+        });
+        
+findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
         findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
         findViewById(R.id.row_backup).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
         findViewById(R.id.row_port).setOnClickListener(new View.OnClickListener() {
