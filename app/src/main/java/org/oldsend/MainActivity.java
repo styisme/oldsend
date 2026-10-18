@@ -117,6 +117,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         findViewById(R.id.card_app).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickApp(false); } });
 
         toggleBtn.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { toggleService(); } });
+        ((Button)findViewById(R.id.btn_cross_net)).setText(I18nManager.get("cross_net"));
+        ((Button)findViewById(R.id.btn_manual_ip)).setText(I18nManager.get("add_ip"));
         findViewById(R.id.btn_cross_net).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { startActivity(new Intent(MainActivity.this, CrossNetActivity.class)); } });
         findViewById(R.id.scan).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { doScan(); } });
         findViewById(R.id.btn_log).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showLogDialog(); } });
@@ -261,8 +263,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_set_rx, I18nManager.get("receive"));
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
-        safeSetText(R.id.tv_filter_title, "拦截危险后缀");
-        safeSetText(R.id.tv_manage_acl_title, "管理白/黑名单");
+        safeSetText(R.id.tv_filter_title, I18nManager.get("filter_ext_title"));
+        safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist"));
+        safeSetText(R.id.tv_manage_acl_title, I18nManager.get("manage_acl"));
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));
         safeSetText(R.id.tv_use_pin, I18nManager.get("use_pin"));

@@ -59,6 +59,17 @@ public class CrossNetActivity extends Activity {
 
         tvStatus = (TextView) findViewById(R.id.tv_cn_status);
 
+        ((TextView)findViewById(R.id.tv_cross_net_title)).setText(I18nManager.get("cross_net_title"));
+        ((TextView)findViewById(R.id.tv_cross_net_desc)).setText(I18nManager.get("cross_net_desc"));
+        ((TextView)findViewById(R.id.tv_send_title)).setText(I18nManager.get("send_file_title"));
+        ((TextView)findViewById(R.id.tv_recv_title)).setText(I18nManager.get("recv_file_title"));
+        ((Button)findViewById(R.id.btn_cn_generate)).setText(I18nManager.get("gen_pin_btn"));
+        ((Button)findViewById(R.id.btn_cn_receive)).setText(I18nManager.get("connect_recv_btn"));
+        etPin.setHint(I18nManager.get("input_pin_hint"));
+        ((CheckBox)findViewById(R.id.cb_use_direct)).setText(I18nManager.get("direct_mode"));
+        ((Button)findViewById(R.id.btn_upnp_punch)).setText(I18nManager.get("upnp_punch"));
+    
+
         cbUseDirect = (android.widget.CheckBox) findViewById(R.id.cb_use_direct);
         etDirectIp = (EditText) findViewById(R.id.et_direct_ip);
         layoutDirectIp = (LinearLayout) findViewById(R.id.layout_direct_ip);

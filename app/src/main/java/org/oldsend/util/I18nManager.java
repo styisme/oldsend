@@ -54,6 +54,23 @@ public class I18nManager {
         zh.put("pin_incorrect", "PIN 码错误，请重试");
         zh.put("modify_pin", "修改 PIN 码");
         zh.put("pin_code", "PIN 码");
+        
+        zh.put("add_ip", "加IP");
+        zh.put("cross_net", "跨网");
+        zh.put("auto_whitelist", "自动接收白名单文件");
+        zh.put("filter_ext_title", "拦截危险后缀");
+        zh.put("manage_acl", "管理白/黑名单");
+        zh.put("cross_net_title", "跨网传输");
+        zh.put("cross_net_desc", "无需连接同一Wi-Fi，极客通道直连。");
+        zh.put("upnp_punch", "一键自动穿透");
+        zh.put("direct_mode", "启用极速直连");
+        zh.put("send_file_title", "我要发送文件");
+        zh.put("recv_file_title", "我要接收文件");
+        zh.put("gen_pin_btn", "选择文件并生成6位密码");
+        zh.put("input_pin_hint", "输入6位密码");
+        zh.put("connect_recv_btn", "连接并接收");
+        zh.put("author", "作者");
+        zh.put("contributors", "贡献者");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
