@@ -2,13 +2,13 @@ package org.oldsend;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
-import android.content.BroadcastReceiver;
-import android.content.IntentFilter;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -19,9 +19,6 @@ import android.os.Handler;
 import android.view.View;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
-import android.view.animation.ScaleAnimation;
-import android.view.animation.Animation;
-import android.view.MotionEvent;
 import android.widget.*;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,12 +37,13 @@ import org.oldsend.ui.DeviceAdapter;
 import org.oldsend.ui.Md3DialogUtils;
 import org.oldsend.util.I18nManager;
 import org.oldsend.util.ThemeUtils;
+import org.oldsend.util.FileLogger;
 
 public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener, ReceiveManager.DialogListener {
     private static final int REQ_FILE = 1001;
     private static final int REQ_MEDIA = 1002;
 
-    private TextView status, selectedFileText, tvPin, tvPinValue, tvName, tvPort, tvTimeout, emptyHint;
+    private TextView status, selectedFileText, tvPin, tvName, tvPort, tvTimeout, emptyHint;
     private TextView dialogLogView;
     private Dialog logDialog;
     private StringBuilder logCache = new StringBuilder();
@@ -63,8 +61,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabSendText, tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
-    private CheckBox cbDarkMode;
     private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
+    private EditText etPinValue;
+
+    private BroadcastReceiver progressReceiver;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,20 +72,22 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
+        ThemeUtils.applyTheme(this);
+
+        FileLogger.log("MainActivity", "onCreate started");
 
         status = (TextView) findViewById(R.id.status);
         selectedFileText = (TextView) findViewById(R.id.tv_selected_file);
         toggleBtn = (Button) findViewById(R.id.toggle);
         deviceList = (ListView) findViewById(R.id.devices);
         historyList = (ListView) findViewById(R.id.history_list);
-        
+        progressBar = (ProgressBar) findViewById(R.id.progress);
         emptyHint = (TextView) findViewById(R.id.empty_hint);
         
         tabSend = (LinearLayout) findViewById(R.id.tab_send);
         tabReceive = (LinearLayout) findViewById(R.id.tab_receive);
         tabSettings = (LinearLayout) findViewById(R.id.tab_settings);
         
-        // 修正获取方式，防止强转崩溃
         tabSendText = (TextView) findViewById(R.id.tab_send_text);
         tabReceiveText = (TextView) findViewById(R.id.tab_receive_text);
         tabSettingsText = (TextView) findViewById(R.id.tab_settings_text);
@@ -103,7 +105,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         DeviceStore.get().setListener(this);
         ReceiveManager.setListener(this);
 
-        // 绑定快捷卡片
         findViewById(R.id.card_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(false); } });
         findViewById(R.id.card_media).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(true); } });
         findViewById(R.id.card_text).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSendTextDialog(); } });
@@ -118,10 +119,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tabSend.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(0); } });
         tabReceive.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(1); } });
         tabSettings.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(2); } });
-
-        applyTabPressAnimation(tabSend);
-        applyTabPressAnimation(tabReceive);
-        applyTabPressAnimation(tabSettings);
 
         initSettingsUI();
 
@@ -153,6 +150,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             }
         });
 
+        progressReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                if (TransferActivity.ACTION_UPDATE_PROGRESS.equals(intent.getAction())) {
+                    sendBroadcast(intent);
+                } else if (TransferActivity.ACTION_TRANSFER_DONE.equals(intent.getAction())) {
+                    sendBroadcast(intent);
+                }
+            }
+        };
+        registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_UPDATE_PROGRESS));
+        registerReceiver(progressReceiver, new IntentFilter(TransferActivity.ACTION_TRANSFER_DONE));
+
         updateStatus();
         refreshHistory();
         log("OldSend MD3 Ready");
@@ -160,146 +169,59 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         handleIntent(getIntent());
         checkAndRequestPermission();
         applyI18n();
-        ThemeUtils.applyTheme(MainActivity.this);
-    }
-
-    private String getFirstChar(String str) {
-        if (str != null && str.length() > 0) return str.substring(0, 1).toUpperCase();
-        return "?";
-    }
-
-    // 添加安全设置文字方法
-    private void safeSetText(int id, String text) {
-        View v = findViewById(id);
-        if (v != null && v instanceof TextView) {
-            ((TextView) v).setText(text);
-        }
     }
 
     private void applyI18n() {
-        if (tabReceiveText != null) tabReceiveText.setText(I18nManager.get("receive"));
-        if (tabSettingsText != null) tabSettingsText.setText(I18nManager.get("settings"));
-        if (tabSendText != null) tabSendText.setText(I18nManager.get("send"));
+        tabReceiveText.setText(I18nManager.get("receive"));
+        tabSettingsText.setText(I18nManager.get("settings"));
+        tabSendText.setText(I18nManager.get("send"));
 
-        if (toggleBtn != null) toggleBtn.setText(running ? I18nManager.get("stop") : I18nManager.get("start"));
-        
-        safeSetText(R.id.btn_log, I18nManager.get("log"));
-        safeSetText(R.id.scan, I18nManager.get("scan"));
-        safeSetText(R.id.tv_select_title, I18nManager.get("select_content"));
-        safeSetText(R.id.tv_nearby_title, I18nManager.get("nearby_devices"));
-        
-        if (emptyHint != null) emptyHint.setText(I18nManager.get("no_device"));
-        if (pendingUris.isEmpty() && selectedFileText != null) selectedFileText.setText(I18nManager.get("not_selected"));
+        toggleBtn.setText(running ? I18nManager.get("stop") : I18nManager.get("start"));
+        ((Button)findViewById(R.id.btn_log)).setText(I18nManager.get("log"));
+        ((Button)findViewById(R.id.scan)).setText(I18nManager.get("scan"));
 
-        safeSetText(R.id.tv_icon, getFirstChar(I18nManager.get("file")));
-        safeSetText(R.id.tv_name, I18nManager.get("file"));
-        
-        // 手动处理 6 个卡片的文字，避免因为 id 冲突导致替换错误
-        View cardFile = findViewById(R.id.card_file);
-        if (cardFile != null) {
-            ((TextView)cardFile.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("file")));
-            ((TextView)cardFile.findViewById(R.id.tv_name)).setText(I18nManager.get("file"));
-        }
-        View cardMedia = findViewById(R.id.card_media);
-        if (cardMedia != null) {
-            ((TextView)cardMedia.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("media")));
-            ((TextView)cardMedia.findViewById(R.id.tv_name)).setText(I18nManager.get("media"));
-        }
-        View cardFolder = findViewById(R.id.card_folder);
-        if (cardFolder != null) {
-            ((TextView)cardFolder.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("folder")));
-            ((TextView)cardFolder.findViewById(R.id.tv_name)).setText(I18nManager.get("folder"));
-        }
-        View cardApp = findViewById(R.id.card_app);
-        if (cardApp != null) {
-            ((TextView)cardApp.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("app")));
-            ((TextView)cardApp.findViewById(R.id.tv_name)).setText(I18nManager.get("app"));
-        }
-        View cardText = findViewById(R.id.card_text);
-        if (cardText != null) {
-            ((TextView)cardText.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("text")));
-            ((TextView)cardText.findViewById(R.id.tv_name)).setText(I18nManager.get("text"));
-        }
-        View cardClip = findViewById(R.id.card_clipboard);
-        if (cardClip != null) {
-            ((TextView)cardClip.findViewById(R.id.tv_icon)).setText(getFirstChar(I18nManager.get("clipboard")));
-            ((TextView)cardClip.findViewById(R.id.tv_name)).setText(I18nManager.get("clipboard"));
-        }
+        ((TextView)findViewById(R.id.tv_select_title)).setText(I18nManager.get("select_content"));
+        ((TextView)findViewById(R.id.tv_nearby_title)).setText(I18nManager.get("nearby_devices"));
+        emptyHint.setText(I18nManager.get("no_device"));
+        if (pendingUris.isEmpty()) selectedFileText.setText(I18nManager.get("not_selected"));
 
-        safeSetText(R.id.tv_receive_title, I18nManager.get("receive_history"));
+        ((TextView)findViewById(R.id.tv_receive_title)).setText(I18nManager.get("receive_history"));
+
         safeSetText(R.id.tv_set_rx, I18nManager.get("receive"));
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
-        safeSetText(R.id.tv_https_title, I18nManager.get("https_enable"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));
         safeSetText(R.id.tv_use_pin, I18nManager.get("use_pin"));
         safeSetText(R.id.tv_net, I18nManager.get("network"));
+        safeSetText(R.id.tv_https_title, I18nManager.get("https_enable"));
         safeSetText(R.id.tv_web, I18nManager.get("web_enable"));
         safeSetText(R.id.tv_boot, I18nManager.get("auto_start"));
         safeSetText(R.id.tv_notif, I18nManager.get("receive_notif"));
         safeSetText(R.id.tv_port_title, I18nManager.get("port"));
         safeSetText(R.id.tv_timeout_title, I18nManager.get("timeout"));
         safeSetText(R.id.tv_pin_title, I18nManager.get("modify_pin"));
-        if (tvPinValue != null) tvPinValue.setText(getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
         safeSetText(R.id.tv_other, I18nManager.get("other"));
         safeSetText(R.id.tv_lang_title, I18nManager.get("language"));
-        
-        String lang = getSharedPreferences("oldsend", MODE_PRIVATE).getString("app_lang", "system");
-        if ("system".equals(lang)) safeSetText(R.id.tv_lang_value, I18nManager.get("follow_system"));
-        else if ("zh".equals(lang)) safeSetText(R.id.tv_lang_value, "简体中文");
-        else if ("zh_TW".equals(lang)) safeSetText(R.id.tv_lang_value, "繁體中文");
-        else if ("en".equals(lang)) safeSetText(R.id.tv_lang_value, "English");
-        else if ("ja".equals(lang)) safeSetText(R.id.tv_lang_value, "日本語");
-        else if ("ko".equals(lang)) safeSetText(R.id.tv_lang_value, "한국어");
-        else if ("de".equals(lang)) safeSetText(R.id.tv_lang_value, "Deutsch");
-        else if ("fr".equals(lang)) safeSetText(R.id.tv_lang_value, "Français");
-        else if ("es".equals(lang)) safeSetText(R.id.tv_lang_value, "Español");
-        else if ("ru".equals(lang)) safeSetText(R.id.tv_lang_value, "Русский");
-        else if ("pt".equals(lang)) safeSetText(R.id.tv_lang_value, "Português");
-
         safeSetText(R.id.tv_anim_title, I18nManager.get("anim"));
         safeSetText(R.id.tv_set_name, I18nManager.get("set_name"));
         safeSetText(R.id.tv_backup, I18nManager.get("backup"));
         safeSetText(R.id.tv_about, I18nManager.get("about"));
-        safeSetText(R.id.tv_about_desc, I18nManager.get("about_desc"));
-        safeSetText(R.id.tv_about_credits, I18nManager.get("about_credits"));
+    }
 
-        if (tvPin != null) {
-            if (cbPin != null && cbPin.isChecked()) {
-                tvPin.setText(I18nManager.get("pin_on") + getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
-            } else {
-                tvPin.setText(I18nManager.get("pin_off"));
-            }
-        }
+    private void safeSetText(int id, String text) {
+        View v = findViewById(id);
+        if (v != null && v instanceof TextView) ((TextView) v).setText(text);
     }
 
     private void checkAndRequestPermission() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{
-                    android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                }, 1001);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == 1001) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                log("Permission granted");
-            } else {
-                log("Permission denied");
-            }
+        if (Build.VERSION.SDK_INT >= 23 && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1001);
         }
     }
 
     private void initSettingsUI() {
-
         cbAutoSave = (CheckBox) findViewById(R.id.cb_auto_save);
-        cbDarkMode = (CheckBox) findViewById(R.id.cb_dark_mode);
         cbSaveAlbum = (CheckBox) findViewById(R.id.cb_save_album);
         cbSaveHistory = (CheckBox) findViewById(R.id.cb_save_history);
         cbPin = (CheckBox) findViewById(R.id.cb_pin);
@@ -308,15 +230,15 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbBoot = (CheckBox) findViewById(R.id.cb_boot);
         cbReceiveNotif = (CheckBox) findViewById(R.id.cb_receive_notif);
         cbHttps = (CheckBox) findViewById(R.id.cb_https);
+        
         tvPin = (TextView) findViewById(R.id.tv_pin);
-        tvPinValue = (TextView) findViewById(R.id.tv_pin_value);
         tvName = (TextView) findViewById(R.id.tv_name);
         tvPort = (TextView) findViewById(R.id.tv_port_value);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
+        etPinValue = (EditText) findViewById(R.id.et_pin_value);
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));
-        if (cbDarkMode != null) cbDarkMode.setChecked(ThemeUtils.isDarkMode(this));
         if (cbSaveAlbum != null) cbSaveAlbum.setChecked(OldSendService.getPrefBooleanGlobal("save_album", true));
         if (cbSaveHistory != null) cbSaveHistory.setChecked(OldSendService.getPrefBooleanGlobal("save_history", true));
         if (cbPin != null) cbPin.setChecked(OldSendService.getPrefBooleanGlobal("use_pin", false));
@@ -328,9 +250,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         
         if (tvPort != null) tvPort.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317)));
         if (tvTimeout != null) tvTimeout.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("timeout", 500)));
+        if (etPinValue != null) etPinValue.setText(getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"));
 
-        if (cbAutoSave != null) if (cbDarkMode != null) cbDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("dark_mode", c); recreate(); } });
-        cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
+        if (cbAutoSave != null) cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
         if (cbSaveAlbum != null) cbSaveAlbum.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_album", c); } });
         if (cbSaveHistory != null) cbSaveHistory.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_history", c); } });
         if (cbAnim != null) cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("use_anim", c); } });
@@ -338,34 +260,20 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (cbBoot != null) cbBoot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_start", c); } });
         if (cbReceiveNotif != null) cbReceiveNotif.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("receive_notif", c); } });
         if (cbHttps != null) cbHttps.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean("use_https", c).commit(); if (running) { stopService(new Intent(MainActivity.this, OldSendService.class)); startService(new Intent(MainActivity.this, OldSendService.class)); } } });
-        
+
         if (cbPin != null) cbPin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { 
             public void onCheckedChanged(CompoundButton v, boolean c) { 
                 savePref("use_pin", c); 
                 if (c) {
-                    String pin = getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", null);
-                    if (pin == null) {
-                        pin = String.format("%04d", (int)(Math.random() * 10000));
-                        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", pin).commit();
-                    }
+                    String pin = getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000");
                     if (tvPin != null) {
                         tvPin.setText(I18nManager.get("pin_on") + pin);
                         tvPin.setVisibility(View.VISIBLE);
                     }
+                    if (etPinValue != null) etPinValue.setVisibility(View.VISIBLE);
                 } else {
                     if (tvPin != null) tvPin.setVisibility(View.GONE);
-        if (tvPin != null) tvPin.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("modify_pin"), getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"), new Md3DialogUtils.OnInputListener() {
-                    public void onInput(String text) {
-                        if (text.length() > 0) {
-                            getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", text).commit();
-                            if (tvPin != null) tvPin.setText(I18nManager.get("pin_on") + text);
-                        }
-                    }
-                }).show();
-            }
-        });
+                    if (etPinValue != null) etPinValue.setVisibility(View.GONE);
                 }
                 if (running) {
                     stopService(new Intent(MainActivity.this, OldSendService.class));
@@ -373,9 +281,21 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 }
             } 
         });
+        
+        if (etPinValue != null) {
+            etPinValue.addTextChangedListener(new android.text.TextWatcher() {
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                public void afterTextChanged(android.text.Editable s) {
+                    String val = s.toString().trim();
+                    if (val.length() > 0) {
+                        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", val).commit();
+                    }
+                }
+            });
+        }
 
-        View rowLang = findViewById(R.id.row_language);
-        if (rowLang != null) rowLang.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.row_language).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 final String[] items = new String[]{I18nManager.get("follow_system"), "简体中文", "繁體中文", "English", "日本語", "한국어", "Deutsch", "Français", "Español", "Русский", "Português"};
                 Md3DialogUtils.showList(MainActivity.this, I18nManager.get("select_lang"), items, new Md3DialogUtils.OnItemSelectListener() {
@@ -391,104 +311,48 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             }
         });
 
-        View rowSetName = findViewById(R.id.row_set_name);
-        if (rowSetName != null) rowSetName.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
-        View rowAbout = findViewById(R.id.row_about);
-        if (rowAbout != null) rowAbout.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
-        View rowBackup = findViewById(R.id.row_backup);
-        if (rowBackup != null) rowBackup.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
-        
-        View rowPort = findViewById(R.id.row_port);
-        if (rowPort != null) rowPort.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
+        findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
+        findViewById(R.id.row_backup).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showBackupDialog(); } });
+        findViewById(R.id.row_port).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("port"), tvPort.getText().toString(), new Md3DialogUtils.OnInputListener() {
                     public void onInput(String text) {
-                        try {
-                            int val = Integer.parseInt(text);
-                            if (val >= 1024 && val <= 65535) {
-                                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("port", val).commit();
-                                tvPort.setText(String.valueOf(val));
-                            }
-                        } catch (Exception e) {}
+                        try { int val = Integer.parseInt(text); getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("port", val).commit(); tvPort.setText(String.valueOf(val)); } catch (Exception e) {}
                     }
                 }).show();
             }
         });
-
-        View rowTimeout = findViewById(R.id.row_timeout);
-        if (rowTimeout != null) rowTimeout.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.row_timeout).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("timeout"), tvTimeout.getText().toString(), new Md3DialogUtils.OnInputListener() {
                     public void onInput(String text) {
-                        try {
-                            int val = Integer.parseInt(text);
-                            getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("timeout", val).commit();
-                            tvTimeout.setText(String.valueOf(val));
-                        } catch (Exception e) {}
+                        try { int val = Integer.parseInt(text); getSharedPreferences("oldsend", MODE_PRIVATE).edit().putInt("timeout", val).commit(); tvTimeout.setText(String.valueOf(val)); } catch (Exception e) {}
                     }
                 }).show();
             }
         });
     }
 
-    private void savePref(String key, boolean val) {
-        getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit();
-    }
+    private void savePref(String key, boolean val) { getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit(); }
 
     private void switchTab(int index) {
         applyAnimation(pageSend, index == 0);
         applyAnimation(pageReceive, index == 1);
         applyAnimation(pageSettings, index == 2);
-
         if (tabSend != null) tabSend.setBackgroundResource(index == 0 ? R.drawable.bg_tab_selected : 0);
         if (tabReceive != null) tabReceive.setBackgroundResource(index == 1 ? R.drawable.bg_tab_selected : 0);
         if (tabSettings != null) tabSettings.setBackgroundResource(index == 2 ? R.drawable.bg_tab_selected : 0);
-
         if (tabSendText != null) tabSendText.setTextColor(index == 0 ? 0xFF2E7D32 : 0xFF49454F);
         if (tabReceiveText != null) tabReceiveText.setTextColor(index == 1 ? 0xFF2E7D32 : 0xFF49454F);
         if (tabSettingsText != null) tabSettingsText.setTextColor(index == 2 ? 0xFF2E7D32 : 0xFF49454F);
-
         if (index == 1) refreshHistory();
-        applyI18n();
-        ThemeUtils.applyTheme(MainActivity.this);
-    }
-
-    
-    private void applyTabPressAnimation(final View view) {
-        view.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
-                    return false; // 如果关了动画，就不执行
-                }
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    ScaleAnimation shrink = new ScaleAnimation(1f, 0.92f, 1f, 0.92f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    shrink.setDuration(100);
-                    shrink.setFillAfter(true);
-                    v.startAnimation(shrink);
-                } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                    ScaleAnimation grow = new ScaleAnimation(0.92f, 1f, 0.92f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                    grow.setDuration(100);
-                    v.startAnimation(grow);
-                }
-                return false;
-            }
-        });
     }
 
     private void applyAnimation(View view, boolean visible) {
         if (view == null) return;
-        if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) {
-            view.setVisibility(visible ? View.VISIBLE : View.GONE);
-            return;
-        }
-        if (visible) {
-            view.setVisibility(View.VISIBLE);
-            AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f);
-            anim.setDuration(250);
-            view.startAnimation(anim);
-        } else {
-            view.setVisibility(View.GONE);
-        }
+        if (!getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_anim", true)) { view.setVisibility(visible ? View.VISIBLE : View.GONE); return; }
+        if (visible) { view.setVisibility(View.VISIBLE); AlphaAnimation anim = new AlphaAnimation(0.0f, 1.0f); anim.setDuration(250); view.startAnimation(anim); } else { view.setVisibility(View.GONE); }
     }
 
     private void sendClipboard() {
@@ -496,82 +360,57 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         ClipData clip = cm.getPrimaryClip();
         if (clip != null && clip.getItemCount() > 0) {
             CharSequence text = clip.getItemAt(0).coerceToText(this);
-            if (text != null && text.length() > 0) {
-                prepareText(text.toString());
-            }
-        } else {
-            Toast.makeText(this, "Clipboard empty", Toast.LENGTH_SHORT).show();
-        }
+            if (text != null && text.length() > 0) prepareText(text.toString());
+        } else { Toast.makeText(this, "Clipboard empty", Toast.LENGTH_SHORT).show(); }
     }
 
     private void showSendTextDialog() {
         Md3DialogUtils.showInput(this, I18nManager.get("input_text"), "", new Md3DialogUtils.OnInputListener() {
-            public void onInput(String text) {
-                if (text.length() > 0) prepareText(text);
-            }
+            public void onInput(String text) { if (text.length() > 0) prepareText(text); }
         }).show();
     }
 
     private void prepareText(String text) {
         try {
             File f = new File(getCacheDir(), "text_" + System.currentTimeMillis() + ".txt");
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(text.getBytes("UTF-8")); fos.close();
+            FileOutputStream fos = new FileOutputStream(f); fos.write(text.getBytes("UTF-8")); fos.close();
             pendingUris.clear(); pendingUris.add(Uri.fromFile(f));
             if (selectedFileText != null) selectedFileText.setText("Text prepared");
             switchTab(0);
         } catch (Exception e) { log("Prepare text failed"); }
     }
 
-    private void pickFolder() {
-        final File root = android.os.Environment.getExternalStorageDirectory();
-        showFolderSelector(root);
-    }
+    private void pickFolder() { showFolderSelector(android.os.Environment.getExternalStorageDirectory()); }
 
     private void showFolderSelector(final File dir) {
         final File[] files = dir.listFiles();
         if (files == null) return;
-
         List<String> folderNames = new ArrayList<String>();
         final List<File> folders = new ArrayList<File>();
         folderNames.add(">> [Send this folder] <<");
-        
-        for (File f : files) {
-            if (f.isDirectory() && !f.isHidden()) {
-                folderNames.add("[Folder] " + f.getName());
-                folders.add(f);
-            }
-        }
-
+        for (File f : files) { if (f.isDirectory() && !f.isHidden()) { folderNames.add("[Folder] " + f.getName()); folders.add(f); } }
         String[] items = folderNames.toArray(new String[0]);
         Dialog d = Md3DialogUtils.showList(this, dir.getAbsolutePath(), items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int position) {
                 if (position == 0) {
                     List<File> allFiles = new ArrayList<File>();
                     getAllFiles(dir, allFiles);
-                    if (allFiles.isEmpty()) {
-                        Toast.makeText(MainActivity.this, "Empty folder", Toast.LENGTH_SHORT).show();
-                    } else {
+                    if (allFiles.isEmpty()) { Toast.makeText(MainActivity.this, "Empty folder", Toast.LENGTH_SHORT).show(); }
+                    else {
                         pendingUris.clear();
                         for (File f : allFiles) pendingUris.add(Uri.fromFile(f));
                         if (selectedFileText != null) selectedFileText.setText("Selected folder: " + dir.getName() + " (" + allFiles.size() + " files)");
                         switchTab(0);
                     }
-                } else {
-                    showFolderSelector(folders.get(position - 1));
-                }
+                } else { showFolderSelector(folders.get(position - 1)); }
             }
         });
         d.show();
     }
 
     private void getAllFiles(File dir, List<File> out) {
-        File[] fs = dir.listFiles();
-        if (fs == null) return;
-        for (File f : fs) {
-            if (f.isDirectory()) getAllFiles(f, out);
-            else out.add(f);
-        }
+        File[] fs = dir.listFiles(); if (fs == null) return;
+        for (File f : fs) { if (f.isDirectory()) getAllFiles(f, out); else out.add(f); }
     }
 
     private void pickApp() {
@@ -579,22 +418,12 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         List<PackageInfo> packages = pm.getInstalledPackages(0);
         final List<ApplicationInfo> apps = new ArrayList<ApplicationInfo>();
         List<String> appNames = new ArrayList<String>();
-
-        for (PackageInfo pkg : packages) {
-            ApplicationInfo app = pkg.applicationInfo;
-            if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-                apps.add(app);
-                appNames.add(app.loadLabel(pm).toString());
-            }
-        }
-
+        for (PackageInfo pkg : packages) { ApplicationInfo app = pkg.applicationInfo; if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0) { apps.add(app); appNames.add(app.loadLabel(pm).toString()); } }
         String[] items = appNames.toArray(new String[0]);
         Dialog d = Md3DialogUtils.showList(this, "Select App (APK)", items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int position) {
-                ApplicationInfo app = apps.get(position);
-                String apkPath = app.sourceDir;
-                pendingUris.clear();
-                pendingUris.add(Uri.fromFile(new File(apkPath)));
+                ApplicationInfo app = apps.get(position); String apkPath = app.sourceDir;
+                pendingUris.clear(); pendingUris.add(Uri.fromFile(new File(apkPath)));
                 if (selectedFileText != null) selectedFileText.setText("App: " + app.loadLabel(getPackageManager()));
                 switchTab(0);
             }
@@ -605,32 +434,33 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private void showLogDialog() {
         if (logDialog != null && logDialog.isShowing()) return;
         dialogLogView = new TextView(this);
-        dialogLogView.setTextSize(11);
-        dialogLogView.setTextColor(0xFF333333);
-        dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
-        dialogLogView.setPadding(16, 16, 16, 16);
-        dialogLogView.setText(logCache.toString());
+        dialogLogView.setTextSize(11); dialogLogView.setTextColor(0xFF333333); dialogLogView.setTypeface(android.graphics.Typeface.MONOSPACE);
+        dialogLogView.setPadding(16, 16, 16, 16); dialogLogView.setText(logCache.toString());
 
-        ScrollView scroll = new ScrollView(this);
-        scroll.addView(dialogLogView);
-        scroll.setBackgroundColor(0xFFF5F5F5);
+        ScrollView scroll = new ScrollView(this); scroll.addView(dialogLogView); scroll.setBackgroundColor(0xFFF5F5F5);
 
         logDialog = Md3DialogUtils.createBaseDialog(this, I18nManager.get("log"), scroll, I18nManager.get("close"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int w) { dialogLogView = null; }
-        }, I18nManager.get("clear"), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int w) { logCache.setLength(0); if (dialogLogView != null) dialogLogView.setText(""); }
+        }, "导出日志", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface d, int w) { shareLogFile(); }
         });
         logDialog.show();
     }
 
+    private void shareLogFile() {
+        File logFile = new File(android.os.Environment.getExternalStorageDirectory(), "Download/OldSend/debug_log.txt");
+        if (!logFile.exists()) { Toast.makeText(this, "Log file not found", Toast.LENGTH_SHORT).show(); return; }
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile));
+            startActivity(Intent.createChooser(intent, "Share Log"));
+        } catch (Exception e) { Toast.makeText(this, "Share failed", Toast.LENGTH_SHORT).show(); }
+    }
+
     private void showSetNameDialog() {
         Md3DialogUtils.showInput(this, I18nManager.get("set_name"), OldSendService.getAlias(this), new Md3DialogUtils.OnInputListener() {
-            public void onInput(String text) {
-                if (text.length() > 0) { 
-                    OldSendService.setAlias(MainActivity.this, text); 
-                    if (tvName != null) tvName.setText(text);
-                }
-            }
+            public void onInput(String text) { if (text.length() > 0) { OldSendService.setAlias(MainActivity.this, text); if (tvName != null) tvName.setText(text); } }
         }).show();
     }
 
@@ -646,11 +476,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 if (pos == 0) {
                     try {
-                        JSONObject json = new JSONObject();
-                        Map<String, ?> all = getSharedPreferences("oldsend", MODE_PRIVATE).getAll();
-                        for (Map.Entry<String, ?> entry : all.entrySet()) {
-                            json.put(entry.getKey(), entry.getValue());
-                        }
+                        JSONObject json = new JSONObject(); Map<String, ?> all = getSharedPreferences("oldsend", MODE_PRIVATE).getAll();
+                        for (Map.Entry<String, ?> entry : all.entrySet()) json.put(entry.getKey(), entry.getValue());
                         cm.setPrimaryClip(ClipData.newPlainText("OldSendBackup", json.toString()));
                         Toast.makeText(MainActivity.this, I18nManager.get("export_ok"), Toast.LENGTH_SHORT).show();
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
@@ -658,22 +485,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                     try {
                         ClipData clip = cm.getPrimaryClip();
                         if (clip != null && clip.getItemCount() > 0) {
-                            String text = clip.getItemAt(0).coerceToText(MainActivity.this).toString();
-                            JSONObject json = new JSONObject(text);
+                            String text = clip.getItemAt(0).coerceToText(MainActivity.this).toString(); JSONObject json = new JSONObject(text);
                             android.content.SharedPreferences.Editor editor = getSharedPreferences("oldsend", MODE_PRIVATE).edit();
                             java.util.Iterator<String> keys = json.keys();
                             while (keys.hasNext()) {
-                                String key = keys.next();
-                                Object val = json.get(key);
+                                String key = keys.next(); Object val = json.get(key);
                                 if (val instanceof Boolean) editor.putBoolean(key, (Boolean) val);
                                 else if (val instanceof Integer) editor.putInt(key, (Integer) val);
                                 else if (val instanceof String) editor.putString(key, (String) val);
                             }
                             editor.commit();
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
-                            initSettingsUI();
-                            applyI18n();
-        ThemeUtils.applyTheme(MainActivity.this);
+                            initSettingsUI(); applyI18n();
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
@@ -682,16 +505,9 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void toggleService() {
-        if (running) {
-            stopService(new Intent(this, OldSendService.class));
-            running = false;
-        } else {
-            startService(new Intent(this, OldSendService.class));
-            running = true;
-        }
-        updateStatus();
-        applyI18n();
-        ThemeUtils.applyTheme(MainActivity.this);
+        if (running) { stopService(new Intent(this, OldSendService.class)); running = false; }
+        else { startService(new Intent(this, OldSendService.class)); running = true; }
+        updateStatus(); applyI18n();
     }
 
     private void updateStatus() {
@@ -701,24 +517,13 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         }
     }
 
-    private void doScan() {
-        log("Scanning...");
-        MulticastScanner.scanAsync(new MulticastScanner.Callback() {
-            public void onDevice(Device d) { DeviceStore.get().addDevice(d); log("Found: " + d.alias); }
-            public void onFinished() { log("Scan finished"); }
-        });
-    }
+    private void doScan() { log("Scanning..."); MulticastScanner.scanAsync(new MulticastScanner.Callback() { public void onDevice(Device d) { DeviceStore.get().addDevice(d); log("Found: " + d.alias); } public void onFinished() { log("Scan finished"); } }); }
 
     private void pickFile(boolean isMedia) {
         Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-        i.addCategory(Intent.CATEGORY_OPENABLE);
-        i.setType("*/*");
-        if (isMedia) {
-            i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
-        }
-        // 强制激活多选
-        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        startActivityForResult(Intent.createChooser(i, "Select Files"), isMedia ? REQ_MEDIA : REQ_FILE);
+        i.setType("*/*"); i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        if (isMedia) i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "video/*", "audio/*"});
+        startActivityForResult(Intent.createChooser(i, "Select"), isMedia ? REQ_MEDIA : REQ_FILE);
     }
 
     @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -765,6 +570,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     public void log(final String msg) {
+        FileLogger.log("UI", msg);
         handler.post(new Runnable() {
             public void run() {
                 logCache.append(msg).append("\n");
@@ -783,75 +589,44 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         });
     }
 
-    public void onChanged() { 
-        if (adapter != null) adapter.setData(DeviceStore.get().snapshot()); 
-        if (emptyHint != null && adapter != null) emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
-        if (deviceList != null) setListViewHeightBasedOnChildren(deviceList);
-        updateStatus(); 
-    }
+    public void onChanged() { if (adapter != null) adapter.setData(DeviceStore.get().snapshot()); if (emptyHint != null && adapter != null) emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE); if (deviceList != null) setListViewHeightBasedOnChildren(deviceList); updateStatus(); }
     
     private void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) return;
+        ListAdapter listAdapter = listView.getAdapter(); if (listAdapter == null) return;
         int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        android.view.ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
+        for (int i = 0; i < listAdapter.getCount(); i++) { View listItem = listAdapter.getView(i, null, listView); listItem.measure(0, 0); totalHeight += listItem.getMeasuredHeight(); }
+        android.view.ViewGroup.LayoutParams params = listView.getLayoutParams(); params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1)); listView.setLayoutParams(params);
     }
 
     @Override
-    public void showConfirmDialog(String senderAlias, int fileCount, final java.util.concurrent.CountDownLatch latch, final boolean[] result) {
-        if (isFinishing()) { latch.countDown(); return; }
-        Md3DialogUtils.showConfirm(this, I18nManager.get("receive"), senderAlias + " (" + fileCount + ")", I18nManager.get("confirm"), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface d, int w) { result[0] = true; latch.countDown(); }
+    public void showConfirmDialog(String senderAlias, int fileCount, final ReceiveManager.Callback callback) {
+        if (isFinishing()) { callback.onResult(false); return; }
+        Md3DialogUtils.showConfirm(this, "接收文件", "设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？", "接收", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                callback.onResult(true);
+            }
         }).show();
     }
 
     private void refreshHistory() {
         List<HistoryStore.Record> list = HistoryStore.get().snapshot();
-        if (historyAdapter != null) {
-            historyAdapter.clear();
-            historyPaths.clear();
-            for (HistoryStore.Record r : list) {
-                String sizeStr = r.size > 1024*1024 ? (r.size/1024/1024)+"MB" : (r.size/1024)+"KB";
-                historyAdapter.add("[" + r.time + "] " + r.fileName + " (" + sizeStr + ")");
-                historyPaths.add(r.path);
-            }
-            historyAdapter.notifyDataSetChanged();
-        }
+        if (historyAdapter != null) { historyAdapter.clear(); historyPaths.clear(); for (HistoryStore.Record r : list) { String sizeStr = r.size > 1024*1024 ? (r.size/1024/1024)+"MB" : (r.size/1024)+"KB"; historyAdapter.add("[" + r.time + "] " + r.fileName + " (" + sizeStr + ")"); historyPaths.add(r.path); } historyAdapter.notifyDataSetChanged(); }
         if (historyList != null) setListViewHeightBasedOnChildren(historyList);
     }
 
-    @Override protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleIntent(intent);
-    }
+    @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); handleIntent(intent); }
 
     private void handleIntent(Intent intent) {
         if (intent == null) return;
         String action = intent.getAction();
         if (Intent.ACTION_SEND.equals(action)) {
             Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            if (uri != null) {
-                pendingUris.clear(); pendingUris.add(uri);
-                if (selectedFileText != null) selectedFileText.setText(queryDisplayName(uri));
-                switchTab(0);
-            }
+            if (uri != null) { pendingUris.clear(); pendingUris.add(uri); if (selectedFileText != null) selectedFileText.setText(queryDisplayName(uri)); switchTab(0); }
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-            if (uris != null) {
-                pendingUris.clear(); pendingUris.addAll(uris);
-                if (selectedFileText != null) selectedFileText.setText(uris.size() + " files shared");
-                switchTab(0);
-            }
+            if (uris != null) { pendingUris.clear(); pendingUris.addAll(uris); if (selectedFileText != null) selectedFileText.setText(uris.size() + " files shared"); switchTab(0); }
         }
     }
 
-    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); super.onDestroy(); }
+    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); if (progressReceiver != null) { try { unregisterReceiver(progressReceiver); } catch (Exception ignored) {} } super.onDestroy(); }
 }

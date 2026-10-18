@@ -1,7 +1,6 @@
 package org.oldsend;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -19,8 +17,8 @@ import android.widget.Toast;
 import org.oldsend.model.Device;
 import org.oldsend.transfer.Uploader;
 import org.oldsend.util.I18nManager;
-import org.oldsend.ui.Md3DialogUtils;
 import org.oldsend.util.ThemeUtils;
+import org.oldsend.ui.Md3DialogUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -82,7 +80,7 @@ public class TransferActivity extends Activity {
         btnCancel = (Button) findViewById(R.id.btn_cancel);
         btnDone = (Button) findViewById(R.id.btn_done);
 
-        btnCancel.setText(I18nManager.get("cancel")); // 确保按钮文字跟随系统
+        btnCancel.setText(I18nManager.get("cancel"));
 
         Intent intent = getIntent();
         handleIntent(intent);
@@ -140,33 +138,70 @@ public class TransferActivity extends Activity {
         });
     }
 
-    
+    private void startUpload() {
+        if (filePaths == null || filePaths.isEmpty()) return;
+        
+        final List<File> files = new ArrayList<File>();
+        for (String path : filePaths) {
+            files.add(new File(path));
+            totalSize += new File(path).length();
+        }
+        
+        startTime = System.currentTimeMillis();
+        
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
+                        public void onProgress(final String stage, final long sent, final long total) {
+                            handler.post(new Runnable() { public void run() {
+                                if (!isDone) {
+                                    long accumulated = 0;
+                                    String currentName = files.get(0).getName();
+                                    for (File f : files) {
+                                        accumulated += f.length();
+                                        if (sent <= accumulated) {
+                                            currentName = f.getName();
+                                            break;
+                                        }
+                                    }
+                                    updateProgress(sent, total, currentName);
+                                }
+                            }});
+                        }
+                        public void onDone(final boolean ok, final String msg) {
+                            handler.post(new Runnable() { public void run() { 
+                                if (!isDone) {
+                                    if (msg != null && msg.contains("PIN_REQUIRED")) {
+                                        showPinDialog();
+                                    } else {
+                                        transferDone(ok); 
+                                    }
+                                }
+                            }});
+                        }
+                    });
+                } catch (Exception e) {
+                    final String errMsg = e.getMessage();
+                    handler.post(new Runnable() { public void run() {
+                        Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }});
+                }
+            }
+        }).start();
+    }
+
     private void showPinDialog() {
-        final Dialog d = new Dialog(this);
-        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-        d.setContentView(R.layout.dialog_md3_input);
-        d.setCancelable(false);
-        d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        d.getWindow().setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.WRAP_CONTENT);
-
-        ((TextView) d.findViewById(R.id.dlg_title)).setText(I18nManager.get("enter_pin"));
-        final EditText input = (EditText) d.findViewById(R.id.dlg_input);
-
-        d.findViewById(R.id.dlg_btn_positive).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String pin = input.getText().toString().trim();
-                d.dismiss();
-                if (pin.length() > 0) startUploadWithPin(pin);
-                else finish();
+        Md3DialogUtils.showInput(this, I18nManager.get("enter_pin"), "", new Md3DialogUtils.OnInputListener() {
+            public void onInput(String pin) {
+                if (pin != null && pin.length() > 0) {
+                    startUploadWithPin(pin);
+                } else {
+                    finish();
+                }
             }
-        });
-        d.findViewById(R.id.dlg_btn_negative).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                d.dismiss();
-                finish();
-            }
-        });
-        d.show();
+        }).show();
     }
 
     private void startUploadWithPin(final String pin) {
@@ -207,61 +242,6 @@ public class TransferActivity extends Activity {
                         Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
                         finish();
                     }});
-                }
-            }
-        }).start();
-    }
-
-    private void startUpload() {
-        if (filePaths == null || filePaths.isEmpty()) return;
-        
-        final List<File> files = new ArrayList<File>();
-        for (String path : filePaths) {
-            files.add(new File(path));
-            totalSize += new File(path).length();
-        }
-        
-        startTime = System.currentTimeMillis();
-        
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
-                        public void onProgress(final String stage, final long sent, final long total) {
-                            handler.post(new Runnable() { public void run() {
-                                if (!isDone) {
-                                    // 根据已发送的字节数，算出当前正在发第几个文件
-                                    long accumulated = 0;
-                                    String currentName = files.get(0).getName();
-                                    for (File f : files) {
-                                        accumulated += f.length();
-                                        if (sent <= accumulated) {
-                                            currentName = f.getName();
-                                            break;
-                                        }
-                                    }
-                                    updateProgress(sent, total, currentName);
-                                }
-                            }});
-                        }
-                        public void onDone(final boolean ok, String msg) {
-                            handler.post(new Runnable() { public void run() { 
-                                if (!isDone) transferDone(ok); 
-                            }});
-                        }
-                    });
-                } catch (Exception e) {
-                    if ("PIN_REQUIRED".equals(e.getMessage())) {
-                        handler.post(new Runnable() { public void run() {
-                            showPinDialog();
-                        }});
-                    } else {
-                        final String errMsg = e.getMessage();
-                        handler.post(new Runnable() { public void run() {
-                            Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
-                            finish();
-                        }});
-                    }
                 }
             }
         }).start();
