@@ -159,18 +159,28 @@ public class TransferActivity extends Activity {
     }
 
     private void updateProgress(long current, long total, String fileName) {
-        if (total <= 0) total = 1;
-        int pct = (int) (current * 100 / total);
-        pbTotal.setProgress(pct);
-        pbFile.setProgress(pct);
-        
         long elapsed = System.currentTimeMillis() - startTime;
         double speed = current / (elapsed / 1000.0 + 0.1);
         String speedStr = speed > 1024 * 1024 ? String.format("%.1f MB/s", speed / 1024 / 1024) : String.format("%.1f KB/s", speed / 1024);
         
-        tvTotalTitle.setText("总进度 (" + pct + "%)");
         tvFileName.setText(fileName);
-        tvSpeedInfo.setText("大小: " + formatSize(current) + " / " + formatSize(total) + "\n速度: " + speedStr);
+        
+        if (total > 0) {
+            // 有明确的总大小
+            int pct = (int) (current * 100 / total);
+            if (pct > 100) pct = 100; // 防止溢出
+            pbTotal.setProgress(pct);
+            pbFile.setProgress(pct);
+            tvTotalTitle.setText("总进度 (" + pct + "%)");
+            tvSpeedInfo.setText("大小: " + formatSize(current) + " / " + formatSize(total) + "\n速度: " + speedStr);
+        } else {
+            // 对方没有传总大小 (total = -1)
+            // 使用不确定进度条模式，或者展示已接收大小
+            pbTotal.setProgress(0);
+            pbFile.setProgress(0);
+            tvTotalTitle.setText("正在接收...");
+            tvSpeedInfo.setText("已接收: " + formatSize(current) + "\n速度: " + speedStr);
+        }
     }
 
     private void transferDone(boolean ok) {

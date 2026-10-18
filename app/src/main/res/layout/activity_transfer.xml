@@ -24,13 +24,17 @@
             <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📄" android:textSize="32sp" android:background="#FFE0E0" android:padding="8dp"/>
             <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginLeft="12dp">
                 <TextView android:id="@+id/tv_file_name" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="测试.wav (39.0 MB)" android:textSize="15sp" android:textColor="#333" />
-                <ProgressBar android:id="@+id/pb_file" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:layout_marginTop="8dp"/>
+                <ProgressBar android:id="@+id/pb_file" style="?android:attr/progressBarStyleHorizontal"
+        android:progressTint="#388E3C"
+        android:progressBackgroundTint="#C8E6C9" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:layout_marginTop="8dp"/>
             </LinearLayout>
         </LinearLayout>
         <View android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:orientation="vertical" android:padding="16dp">
             <TextView android:id="@+id/tv_total_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="总进度 (1:04)" android:textSize="18sp" android:textColor="#333" />
-            <ProgressBar android:id="@+id/pb_total" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:layout_marginTop="12dp"/>
+            <ProgressBar android:id="@+id/pb_total" style="?android:attr/progressBarStyleHorizontal"
+        android:progressTint="#388E3C"
+        android:progressBackgroundTint="#C8E6C9" android:layout_width="match_parent" android:layout_height="wrap_content" android:max="100" android:layout_marginTop="12dp"/>
             <TextView android:id="@+id/tv_speed_info" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="文件: 0 / 1\n大小: 3.7 MB / 39.0 MB\n速度: 730.5 KB/s" android:textSize="13sp" android:textColor="#666" android:layout_marginTop="12dp" android:lineSpacingExtra="4dp"/>
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="end" android:layout_marginTop="16dp">
                 <Button android:id="@+id/btn_cancel" android:layout_width="wrap_content" android:layout_height="40dp" android:text="取消" android:textColor="#B3261E" android:background="@drawable/btn_md3_secondary" android:minHeight="0dp"/>
