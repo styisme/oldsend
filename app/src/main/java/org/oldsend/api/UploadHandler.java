@@ -67,6 +67,22 @@ public class UploadHandler implements Router.Handler {
             HistoryStore.get().add(new HistoryStore.Record(entry.fileName, target.getAbsolutePath(), written, timeStr, true));
         }
 
+        // 如果是纯文本且小于 10KB，自动复制到剪贴板
+        if (entry.fileName.toLowerCase().endsWith(".txt") && written < 10 * 1024) {
+            try {
+                byte[] bytes = new byte[(int) written];
+                java.io.FileInputStream fis = new java.io.FileInputStream(target);
+                fis.read(bytes);
+                fis.close();
+                String text = new String(bytes, "UTF-8");
+                android.content.ClipboardManager cm = (android.content.ClipboardManager) OldSendService.getContext().getSystemService(android.content.Context.CLIPBOARD_SERVICE);
+                cm.setPrimaryClip(android.content.ClipData.newPlainText("OldSend", text));
+                OldSendService.log("文本已自动复制到剪贴板");
+            } catch (Exception e) {
+                OldSendService.log("自动复制失败: " + e);
+            }
+        }
+        
         session.markDone(fileId);
         if (session.allDone()) store.remove(sessionId);
 

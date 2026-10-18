@@ -280,6 +280,10 @@ public class TransferActivity extends Activity {
     }
 
     private void transferDone(boolean ok) {
+        try {
+            android.os.Vibrator v = (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (v != null) v.vibrate(100);
+        } catch (Exception ignored) {}
         if (isDone) return;
         isDone = true;
 

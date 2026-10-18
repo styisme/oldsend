@@ -10,6 +10,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import org.json.JSONObject;
 import org.oldsend.OldSendService;
 import org.oldsend.Protocol;
@@ -67,18 +71,55 @@ public class Uploader {
         JSONObject respFiles = resp.optJSONObject("files");
         if (sessionId == null || respFiles == null) { cb.onDone(false, "响应无效"); return; }
 
-        long totalSent = 0;
+        final AtomicLong totalSent = new AtomicLong(0);
+        ExecutorService pool = Executors.newFixedThreadPool(3); // 3线程并发
+        final boolean[] hasError = new boolean[]{false};
+        
         for (int i = 0; i < files.size(); i++) {
-            File f = files.get(i);
-            String fileId = fileIds[i];
-            String token = respFiles.optString(fileId, null);
+            final File f = files.get(i);
+            final String fileId = fileIds[i];
+            final String token = respFiles.optString(fileId, null);
             if (token == null) continue;
-            String uploadUrl = target.url(Protocol.V2_PREFIX + "/upload") + "?sessionId=" + enc(sessionId) + "&fileId=" + enc(fileId) + "&token=" + enc(token);
-            boolean ok = uploadFile(uploadUrl, f, totalSent, totalSize, cb);
-            if (!ok) { cb.onDone(false, "上传失败"); return; }
-            totalSent += f.length();
+            final String uploadUrl = target.url(Protocol.V2_PREFIX + "/upload") + "?sessionId=" + enc(sessionId) + "&fileId=" + enc(fileId) + "&token=" + enc(token);
+            
+            pool.execute(new Runnable() {
+                public void run() {
+                    try {
+                        long size = f.length();
+                        java.net.HttpURLConnection c = (java.net.HttpURLConnection) new java.net.URL(uploadUrl).openConnection();
+                        c.setConnectTimeout(15000); c.setReadTimeout(300000);
+                        c.setRequestMethod("POST"); c.setDoOutput(true);
+                        c.setRequestProperty("Content-Type", "application/octet-stream");
+                        c.setFixedLengthStreamingMode((int) size);
+                        java.io.OutputStream os = c.getOutputStream();
+                        java.io.FileInputStream fis = new java.io.FileInputStream(f);
+                        byte[] buf = new byte[65536];
+                        int n;
+                        while ((n = fis.read(buf)) > 0) {
+                            os.write(buf, 0, n);
+                            long current = totalSent.addAndGet(n);
+                            if (cb != null) cb.onProgress("发送中", current, totalSize);
+                        }
+                        os.flush(); fis.close(); os.close();
+                        int code = c.getResponseCode();
+                        if (code < 200 || code >= 300) hasError[0] = true;
+                        c.disconnect();
+                    } catch (Exception e) {
+                        hasError[0] = true;
+                    }
+                }
+            });
         }
-        cb.onDone(true, "发送成功");
+        
+        pool.shutdown();
+        pool.awaitTermination(1, TimeUnit.HOURS);
+        
+        if (hasError[0]) {
+            cb.onDone(false, "部分文件上传失败");
+        } else {
+            cb.onDone(true, "发送成功");
+            OldSendService.getContext().sendBroadcast(new android.content.Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
+        }
             OldSendService.getContext().sendBroadcast(new Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
     }
 
