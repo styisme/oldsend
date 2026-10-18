@@ -44,6 +44,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private static final int REQ_MEDIA = 1002;
 
     private TextView status, selectedFileText, tvPin, tvName, tvPort, tvTimeout, emptyHint;
+    private LinearLayout layoutSelectedFiles;
+    private Button btnAddFilesMore, btnEditFiles, btnManualIp;
     private TextView dialogLogView;
     private Dialog logDialog;
     private StringBuilder logCache = new StringBuilder();
@@ -120,6 +122,16 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tabReceive.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(1); } });
         tabSettings.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { switchTab(2); } });
 
+        
+        layoutSelectedFiles = (LinearLayout) findViewById(R.id.layout_selected_files);
+        btnAddFilesMore = (Button) findViewById(R.id.btn_add_files_more);
+        btnEditFiles = (Button) findViewById(R.id.btn_edit_files);
+        btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
+
+        if (btnAddFilesMore != null) btnAddFilesMore.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAddFilesDialog(); } });
+        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); } });
+        if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
+        
         initSettingsUI();
 
         deviceList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -137,7 +149,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 pendingUris.clear();
-                                selectedFileText.setText(I18nManager.get("not_selected"));
+                                updateSelectedFilesUI();
                                 doSend(finalTarget, files);
                             }
                         });
@@ -203,7 +215,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         ((TextView)findViewById(R.id.tv_select_title)).setText(I18nManager.get("select_content"));
         ((TextView)findViewById(R.id.tv_nearby_title)).setText(I18nManager.get("nearby_devices"));
         emptyHint.setText(I18nManager.get("no_device"));
-        if (pendingUris.isEmpty()) selectedFileText.setText(I18nManager.get("not_selected"));
+        if (pendingUris.isEmpty()) updateSelectedFilesUI();
 
         ((TextView)findViewById(R.id.tv_receive_title)).setText(I18nManager.get("receive_history"));
 
@@ -406,7 +418,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
             File f = new File(getCacheDir(), "text_" + System.currentTimeMillis() + ".txt");
             FileOutputStream fos = new FileOutputStream(f); fos.write(text.getBytes("UTF-8")); fos.close();
             pendingUris.clear(); pendingUris.add(Uri.fromFile(f));
-            if (selectedFileText != null) selectedFileText.setText("Text prepared");
+            if (selectedFileText != null) updateSelectedFilesUI();
             switchTab(0);
         } catch (Exception e) { log("Prepare text failed"); }
     }
@@ -430,7 +442,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                     else {
                         pendingUris.clear();
                         for (File f : allFiles) pendingUris.add(Uri.fromFile(f));
-                        if (selectedFileText != null) selectedFileText.setText("Selected folder: " + dir.getName() + " (" + allFiles.size() + " files)");
+                        if (selectedFileText != null) updateSelectedFilesUI();
                         switchTab(0);
                     }
                 } else { showFolderSelector(folders.get(position - 1)); }
@@ -455,7 +467,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
             public void onItemSelect(int position) {
                 ApplicationInfo app = apps.get(position); String apkPath = app.sourceDir;
                 pendingUris.clear(); pendingUris.add(Uri.fromFile(new File(apkPath)));
-                if (selectedFileText != null) selectedFileText.setText("App: " + app.loadLabel(getPackageManager()));
+                if (selectedFileText != null) updateSelectedFilesUI();
                 switchTab(0);
             }
         });
@@ -538,7 +550,17 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                             }
                             editor.commit();
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
-                            initSettingsUI(); applyI18n();
+                            
+        layoutSelectedFiles = (LinearLayout) findViewById(R.id.layout_selected_files);
+        btnAddFilesMore = (Button) findViewById(R.id.btn_add_files_more);
+        btnEditFiles = (Button) findViewById(R.id.btn_edit_files);
+        btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
+
+        if (btnAddFilesMore != null) btnAddFilesMore.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAddFilesDialog(); } });
+        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); } });
+        if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
+        
+        initSettingsUI(); applyI18n();
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
@@ -559,6 +581,78 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         }
     }
 
+    
+    private void updateSelectedFilesUI() {
+        if (pendingUris.isEmpty()) {
+            if (layoutSelectedFiles != null) layoutSelectedFiles.setVisibility(View.GONE);
+            if (selectedFileText != null) selectedFileText.setText(I18nManager.get("not_selected"));
+        } else {
+            if (layoutSelectedFiles != null) layoutSelectedFiles.setVisibility(View.VISIBLE);
+            long totalSize = 0;
+            for (Uri u : pendingUris) {
+                try {
+                    android.database.Cursor cursor = getContentResolver().query(u, null, null, null, null);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        int sizeIndex = cursor.getColumnIndex(android.provider.OpenableColumns.SIZE);
+                        if (sizeIndex != -1) totalSize += cursor.getLong(sizeIndex);
+                        cursor.close();
+                    }
+                } catch (Exception ignored) {}
+            }
+            String sizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
+            if (selectedFileText != null) selectedFileText.setText("文件: " + pendingUris.size() + "\n大小: " + sizeStr);
+        }
+    }
+
+    private void showAddFilesDialog() {
+        final String[] items = new String[]{"文件", "媒体", "应用", "文件夹"};
+        Md3DialogUtils.showList(this, "加入文件", items, new Md3DialogUtils.OnItemSelectListener() {
+            public void onItemSelect(int pos) {
+                if (pos == 0) pickFile(false);
+                else if (pos == 1) pickFile(true);
+                else if (pos == 2) pickApp();
+                else if (pos == 3) pickFolder();
+            }
+        }).show();
+    }
+
+    private void showManualIpDialog() {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_manual_ip);
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            window.setLayout((int) (getResources().getDisplayMetrics().widthPixels * 0.9), WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+
+        final EditText etIp = (EditText) dialog.findViewById(R.id.et_ip_address);
+        final TextView tvError = (TextView) dialog.findViewById(R.id.tv_error_msg);
+        TextView btnCancel = (TextView) dialog.findViewById(R.id.btn_cancel);
+        TextView btnConfirm = (TextView) dialog.findViewById(R.id.btn_confirm);
+
+        btnCancel.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { dialog.dismiss(); } });
+        btnConfirm.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String ip = etIp.getText().toString().trim();
+                if (ip.matches("^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$")) {
+                    tvError.setVisibility(View.GONE);
+                    dialog.dismiss();
+                    Device d = new Device();
+                    d.alias = "手动设备";
+                    d.ip = ip;
+                    d.port = 53317;
+                    d.https = false;
+                    DeviceStore.get().addDevice(d);
+                    log("手动添加 IP: " + ip);
+                } else {
+                    tvError.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        dialog.show();
+    }
+        
     private void doScan() { log("Scanning..."); MulticastScanner.scanAsync(new MulticastScanner.Callback() { public void onDevice(Device d) { DeviceStore.get().addDevice(d); log("Found: " + d.alias); } public void onFinished() { log("Scan finished"); } }); }
 
     private void pickFile(boolean isMedia) {
@@ -574,10 +668,10 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         if (data.getClipData() != null) {
             int count = data.getClipData().getItemCount();
             for (int i = 0; i < count; i++) pendingUris.add(data.getClipData().getItemAt(i).getUri());
-            if (selectedFileText != null) selectedFileText.setText(count + " files selected");
+            if (selectedFileText != null) updateSelectedFilesUI();
         } else if (data.getData() != null) {
             pendingUris.add(data.getData());
-            if (selectedFileText != null) selectedFileText.setText(queryDisplayName(data.getData()));
+            if (selectedFileText != null) updateSelectedFilesUI();
         }
     }
 
@@ -663,10 +757,10 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         String action = intent.getAction();
         if (Intent.ACTION_SEND.equals(action)) {
             Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            if (uri != null) { pendingUris.clear(); pendingUris.add(uri); if (selectedFileText != null) selectedFileText.setText(queryDisplayName(uri)); switchTab(0); }
+            if (uri != null) { pendingUris.clear(); pendingUris.add(uri); if (selectedFileText != null) updateSelectedFilesUI(); switchTab(0); }
         } else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
             ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
-            if (uris != null) { pendingUris.clear(); pendingUris.addAll(uris); if (selectedFileText != null) selectedFileText.setText(uris.size() + " files shared"); switchTab(0); }
+            if (uris != null) { pendingUris.clear(); pendingUris.addAll(uris); if (selectedFileText != null) updateSelectedFilesUI(); switchTab(0); }
         }
     }
 

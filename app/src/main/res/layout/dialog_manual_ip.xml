@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dlg_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_md3_card"
+    android:padding="20dp">
+
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="输入地址" android:textSize="20sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:layout_marginTop="16dp">
+        <TextView android:id="@+id/tab_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="标签" android:padding="8dp" android:textColor="#388E3C" android:textStyle="bold"/>
+        <TextView android:id="@+id/tab_ip" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="IP 地址" android:padding="8dp" android:textColor="#666" android:layout_marginLeft="16dp"/>
+    </LinearLayout>
+
+    <EditText android:id="@+id/et_ip_address" android:layout_width="match_parent" android:layout_height="48dp"
+        android:hint="例如: 192.168.1.100" android:background="@drawable/bg_md3_edittext"
+        android:padding="12dp" android:textSize="14sp" android:singleLine="true" android:layout_marginTop="8dp"/>
+
+    <TextView android:id="@+id/tv_error_msg" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:text="格式错误" android:textColor="#F44336" android:textSize="12sp" android:visibility="gone" android:layout_marginTop="4dp"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="horizontal" android:gravity="end" android:layout_marginTop="16dp">
+        <TextView android:id="@+id/btn_cancel" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="取消" android:textSize="14sp" android:textColor="#666" android:padding="8dp"/>
+        <TextView android:id="@+id/btn_confirm" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="确认" android:textSize="14sp" android:textColor="#388E3C" android:textStyle="bold"
+            android:padding="8dp" android:layout_marginLeft="16dp"/>
+    </LinearLayout>
+</LinearLayout>

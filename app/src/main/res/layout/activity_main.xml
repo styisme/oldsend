@@ -91,10 +91,18 @@
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="12dp" android:layout_marginBottom="6dp">
                     <TextView android:id="@+id/tv_nearby_title" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="附近的设备" android:textSize="13sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
+                    <Button android:id="@+id/btn_manual_ip" android:layout_width="wrap_content" android:layout_height="30dp" android:text="加IP" android:textSize="11sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:minHeight="0dp" android:minWidth="44dp" android:layout_marginRight="6dp"/>
                     <Button android:id="@+id/scan" android:layout_width="wrap_content" android:layout_height="30dp" android:text="扫描" android:textSize="11sp" android:background="@drawable/btn_md3_secondary" android:textColor="#1B5E20" android:minHeight="0dp" android:minWidth="52dp"/>
                 </LinearLayout>
 
-                <TextView android:id="@+id/tv_selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="11sp" android:textColor="#388E3C" android:singleLine="true" android:ellipsize="middle" android:text="未选择文件" android:layout_marginBottom="4dp"/>
+                <LinearLayout android:id="@+id/layout_selected_files" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/bg_md3_card" android:tag="card" android:padding="12dp" android:visibility="gone" android:layout_marginBottom="6dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="选择" android:textSize="14sp" android:textColor="#1C1B1F" android:textStyle="bold"/>
+                    <TextView android:id="@+id/tv_selected_file" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="12sp" android:textColor="#666" android:layout_marginTop="4dp"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="end" android:layout_marginTop="8dp">
+                        <Button android:id="@+id/btn_edit_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="编辑" android:textSize="12sp" android:textColor="#49454F" android:background="@android:color/transparent" android:minHeight="0dp" android:minWidth="48dp"/>
+                        <Button android:id="@+id/btn_add_files_more" android:layout_width="wrap_content" android:layout_height="32dp" android:text="+ 添加" android:textSize="12sp" android:textColor="#FFFFFF" android:background="@drawable/btn_md3_primary" android:minHeight="0dp" android:minWidth="60dp" android:layout_marginLeft="8dp"/>
+                    </LinearLayout>
+                </LinearLayout>
 
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:background="@drawable/bg_md3_card" android:tag="card" android:layout_marginTop="2dp" android:minHeight="180dp">
                     <ListView android:id="@+id/devices" android:layout_width="match_parent" android:layout_height="wrap_content" android:divider="@null" android:dividerHeight="0dp"/>
