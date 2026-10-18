@@ -143,13 +143,14 @@ public class TransferActivity extends Activity {
                         public void onProgress(final String stage, final long sent, final long total) {
                             // 这里的进度其实底层已经发了广播，但如果底层没发，这里可以补发
                         }
-                        public void onDone(boolean ok, String msg) {
+                        public void onDone(final boolean ok, String msg) {
                             handler.post(new Runnable() { public void run() { transferDone(ok); } });
                         }
                     });
                 } catch (Exception e) {
+                    final String errMsg = e.getMessage();
                     handler.post(new Runnable() { public void run() {
-                        Toast.makeText(TransferActivity.this, "发送失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TransferActivity.this, "发送失败: " + errMsg, Toast.LENGTH_SHORT).show();
                         finish();
                     }});
                 }
