@@ -62,7 +62,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private View pageSend, pageReceive, pageSettings;
 
     private CheckBox cbDark, cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
-    
 
     private BroadcastReceiver progressReceiver;
     private BroadcastReceiver receiveConfirmReceiver;
@@ -182,7 +181,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         };
         registerReceiver(receiveConfirmReceiver, new IntentFilter("org.oldsend.MANUAL_ACCEPT"));
         registerReceiver(receiveConfirmReceiver, new IntentFilter("org.oldsend.MANUAL_REJECT"));
-        
 
         updateStatus();
         refreshHistory();
@@ -311,7 +309,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 }
             } 
         });
-        
 
         findViewById(R.id.row_language).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -329,7 +326,6 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             }
         });
 
-        
         findViewById(R.id.row_pin_code).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String currentPin = getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000");
