@@ -1,6 +1,7 @@
 package org.oldsend;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -140,15 +141,31 @@ public class TransferActivity extends Activity {
 
     
     private void showPinDialog() {
-        Md3DialogUtils.showInput(this, I18nManager.get("enter_pin"), "", new Md3DialogUtils.OnInputListener() {
-            public void onInput(String pin) {
-                if (pin != null && pin.length() > 0) {
-                    startUploadWithPin(pin);
-                } else {
-                    finish();
-                }
+        final Dialog d = new Dialog(this);
+        d.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        d.setContentView(R.layout.dialog_md3_input);
+        d.setCancelable(false);
+        d.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        d.getWindow().setLayout(android.view.WindowManager.LayoutParams.MATCH_PARENT, android.view.WindowManager.LayoutParams.WRAP_CONTENT);
+
+        ((TextView) d.findViewById(R.id.dlg_title)).setText(I18nManager.get("enter_pin"));
+        final EditText input = (EditText) d.findViewById(R.id.dlg_input);
+
+        d.findViewById(R.id.dlg_btn_positive).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String pin = input.getText().toString().trim();
+                d.dismiss();
+                if (pin.length() > 0) startUploadWithPin(pin);
+                else finish();
             }
-        }).show();
+        });
+        d.findViewById(R.id.dlg_btn_negative).setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                d.dismiss();
+                finish();
+            }
+        });
+        d.show();
     }
 
     private void startUploadWithPin(final String pin) {
