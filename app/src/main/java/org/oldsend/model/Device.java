@@ -2,7 +2,7 @@ package org.oldsend.model;
 
 import org.json.JSONObject;
 
-public class Device {
+public class Device implements java.io.Serializable {
     public String alias;
     public String version;
     public String deviceModel;
