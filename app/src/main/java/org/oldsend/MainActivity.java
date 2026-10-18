@@ -749,7 +749,11 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
     private void updateStatus() {
         if (status != null) {
-            String s = (running ? I18nManager.get("running") : I18nManager.get("stopped")) + "  IP:" + OldSendService.getLocalIp() + ":53317";
+            String ip = OldSendService.getLocalIp();
+            if (ip.length() > 15) {
+                ip = ip.substring(0, 12) + "..."; // IPv6 太长，截断显示
+            }
+            String s = (running ? I18nManager.get("running") : I18nManager.get("stopped")) + "  IP:" + ip + ":53317";
             status.setText(s);
         }
     }

@@ -86,9 +86,9 @@ public class CrossNetActivity extends Activity {
         cbUseDirect.setText(I18nManager.get("direct_mode"));
         btnUpnpPunch.setText(I18nManager.get("upnp_punch"));
         
-        String localIp = OldSendService.getLocalIp();
-        if (localIp != null && localIp.contains(":")) {
-            tvIpv6Info.setText("本机公网 IPv6: [" + localIp + "]:53317 (可用直连)");
+        String ipv6 = OldSendService.getIpv6();
+        if (ipv6 != null) {
+            tvIpv6Info.setText("本机公网 IPv6: [" + ipv6 + "]:53317 (可用直连)");
         } else {
             tvIpv6Info.setText("本机 IPv6: 未获取到公网 IPv6，仅限内网或穿透");
         }
