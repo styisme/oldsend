@@ -48,11 +48,17 @@ public class UploadHandler implements Router.Handler {
                 if (n < 0) break;
                 fos.write(buf, 0, n);
                 written += n;
+                android.content.Intent intent = new android.content.Intent("org.oldsend.UPDATE_PROGRESS");
+                intent.putExtra("current", written);
+                intent.putExtra("total", req.contentLength);
+                intent.putExtra("fileName", entry.fileName);
+                OldSendService.getContext().sendBroadcast(intent);
                 remaining -= n;
             }
         } finally { try { fos.close(); } catch (Exception ignored) {} }
 
         OldSendService.log("接收完成: " + entry.fileName + " (" + written + " 字节)");
+        OldSendService.getContext().sendBroadcast(new android.content.Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
         
         // 记录到历史
         String timeStr = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date());

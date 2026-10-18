@@ -1,6 +1,7 @@
 package org.oldsend.transfer;
 
 import java.io.File;
+import android.content.Intent;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -73,6 +74,7 @@ public class Uploader {
             totalSent += f.length();
         }
         cb.onDone(true, "发送成功");
+            OldSendService.getContext().sendBroadcast(new Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
     }
 
     static boolean uploadFile(String url, File file, final long baseSent, final long totalSize, final ProgressCallback cb) throws Exception {

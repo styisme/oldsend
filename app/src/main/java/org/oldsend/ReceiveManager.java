@@ -8,6 +8,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class ReceiveManager {
+    public static final String ACTION_ACCEPT = "org.oldsend.RM_ACCEPT";
+    public static final String ACTION_REJECT = "org.oldsend.RM_REJECT";
     public interface DialogListener {
         void showConfirmDialog(String senderAlias, int fileCount, CountDownLatch latch, boolean[] result);
     }
@@ -39,21 +41,7 @@ public class ReceiveManager {
             }
         }
 
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(new Runnable() {
-            public void run() {
-                if (listener != null) {
-                    listener.showConfirmDialog(alias, count, latch, result);
-                } else {
-                    latch.countDown();
-                }
-            }
-        });
-
-        try {
-            // 等待用户点击，最多等 30 秒
-            boolean released = latch.await(30, TimeUnit.SECONDS);
-            return released && result[0];
+        
         } catch (InterruptedException e) {
             return false;
         }
