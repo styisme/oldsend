@@ -230,7 +230,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:orientation="horizontal"
-        android:background="#FFFFFF"
+        android:background="#FFFFFF" android:tag="card"
         android:padding="4dp"
         android:gravity="center">
         <LinearLayout android:id="@+id/tab_receive" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">

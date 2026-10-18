@@ -79,6 +79,8 @@ public class TransferActivity extends Activity {
         btnCancel = (Button) findViewById(R.id.btn_cancel);
         btnDone = (Button) findViewById(R.id.btn_done);
 
+        btnCancel.setText(I18nManager.get("cancel")); // 确保按钮文字跟随系统
+
         Intent intent = getIntent();
         handleIntent(intent);
     }
