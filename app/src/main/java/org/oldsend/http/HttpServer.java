@@ -8,24 +8,30 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import javax.net.ssl.SSLContext;
 
 import org.oldsend.OldSendService;
 
 public class HttpServer {
     private final int port;
     private final Router router;
+    private final SSLContext sslContext;
     private ServerSocket server;
     private volatile boolean running;
 
-    public HttpServer(int port, Router router) {
+    public HttpServer(int port, Router router, SSLContext sslContext) {
         this.port = port;
         this.router = router;
+        this.sslContext = sslContext;
     }
 
     public void start() throws IOException {
         running = true;
-        server = new ServerSocket();
-        // 关键：允许重用处于 TIME_WAIT 状态的端口
+        if (sslContext != null) {
+            server = sslContext.getServerSocketFactory().createServerSocket();
+        } else {
+            server = new ServerSocket();
+        }
         server.setReuseAddress(true);
         server.bind(new InetSocketAddress(port));
 
