@@ -39,6 +39,7 @@ import org.oldsend.transfer.Uploader;
 import org.oldsend.ui.DeviceAdapter;
 import org.oldsend.ui.Md3DialogUtils;
 import org.oldsend.util.I18nManager;
+import org.oldsend.util.ThemeUtils;
 
 public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener, ReceiveManager.DialogListener {
     private static final int REQ_FILE = 1001;
@@ -62,6 +63,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private TextView tabSendText, tabReceiveText, tabSettingsText;
     private View pageSend, pageReceive, pageSettings;
 
+    private CheckBox cbDarkMode;
     private CheckBox cbAutoSave, cbSaveAlbum, cbSaveHistory, cbPin, cbAnim, cbWeb, cbBoot, cbReceiveNotif, cbHttps;
 
     @Override
@@ -158,6 +160,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         handleIntent(getIntent());
         checkAndRequestPermission();
         applyI18n();
+        ThemeUtils.applyTheme(this);
     }
 
     private String getFirstChar(String str) {
@@ -290,6 +293,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private void initSettingsUI() {
 
         cbAutoSave = (CheckBox) findViewById(R.id.cb_auto_save);
+        cbDarkMode = (CheckBox) findViewById(R.id.cb_dark_mode);
         cbSaveAlbum = (CheckBox) findViewById(R.id.cb_save_album);
         cbSaveHistory = (CheckBox) findViewById(R.id.cb_save_history);
         cbPin = (CheckBox) findViewById(R.id.cb_pin);
@@ -305,6 +309,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));
+        if (cbDarkMode != null) cbDarkMode.setChecked(ThemeUtils.isDarkMode(this));
         if (cbSaveAlbum != null) cbSaveAlbum.setChecked(OldSendService.getPrefBooleanGlobal("save_album", true));
         if (cbSaveHistory != null) cbSaveHistory.setChecked(OldSendService.getPrefBooleanGlobal("save_history", true));
         if (cbPin != null) cbPin.setChecked(OldSendService.getPrefBooleanGlobal("use_pin", false));
@@ -317,7 +322,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         if (tvPort != null) tvPort.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("port", 53317)));
         if (tvTimeout != null) tvTimeout.setText(String.valueOf(getSharedPreferences("oldsend", MODE_PRIVATE).getInt("timeout", 500)));
 
-        if (cbAutoSave != null) cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
+        if (cbAutoSave != null) if (cbDarkMode != null) cbDarkMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("dark_mode", c); recreate(); } });
+        cbAutoSave.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("auto_save", c); } });
         if (cbSaveAlbum != null) cbSaveAlbum.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_album", c); } });
         if (cbSaveHistory != null) cbSaveHistory.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("save_history", c); } });
         if (cbAnim != null) cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() { public void onCheckedChanged(CompoundButton v, boolean c) { savePref("use_anim", c); } });
@@ -425,6 +431,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         if (index == 1) refreshHistory();
         applyI18n();
+        ThemeUtils.applyTheme(this);
     }
 
     
@@ -647,6 +654,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                             Toast.makeText(MainActivity.this, I18nManager.get("import_ok"), Toast.LENGTH_SHORT).show();
                             initSettingsUI();
                             applyI18n();
+        ThemeUtils.applyTheme(this);
                         }
                     } catch (Exception e) { Toast.makeText(MainActivity.this, I18nManager.get("err_fail"), Toast.LENGTH_SHORT).show(); }
                 }
@@ -664,6 +672,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         }
         updateStatus();
         applyI18n();
+        ThemeUtils.applyTheme(this);
     }
 
     private void updateStatus() {

@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.oldsend.model.Device;
+import org.oldsend.util.ThemeUtils;
 import org.oldsend.transfer.Uploader;
 
 import java.io.File;
@@ -59,6 +60,7 @@ public class TransferActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transfer);
+        ThemeUtils.applyTheme(this);
 
         layoutConfirm = (LinearLayout) findViewById(R.id.layout_confirm);
         layoutProgress = (LinearLayout) findViewById(R.id.layout_progress);

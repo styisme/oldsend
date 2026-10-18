@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import org.oldsend.R;
 import org.oldsend.util.I18nManager;
+import org.oldsend.util.ThemeUtils;
 
 public class Md3DialogUtils {
 
@@ -59,6 +60,13 @@ public class Md3DialogUtils {
         final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_base);
+        
+        boolean isDark = ThemeUtils.isDarkMode(ctx);
+        if (isDark) {
+            View root = dialog.findViewById(R.id.dlg_title).getRootView();
+            root.setBackgroundResource(R.drawable.bg_md3_card_dark);
+        }
+        
         
         setupWindow(ctx, dialog);
         boolean animEnabled = isAnimEnabled(ctx);
@@ -142,6 +150,13 @@ public class Md3DialogUtils {
         Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_list);
+        
+        boolean isDark = ThemeUtils.isDarkMode(ctx);
+        if (isDark) {
+            View root = dialog.findViewById(R.id.dlg_title).getRootView();
+            root.setBackgroundResource(R.drawable.bg_md3_card_dark);
+        }
+        
         
         setupWindow(ctx, dialog);
         boolean animEnabled = isAnimEnabled(ctx);
