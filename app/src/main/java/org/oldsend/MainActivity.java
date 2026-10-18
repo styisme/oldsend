@@ -232,7 +232,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         cbHttps = (CheckBox) findViewById(R.id.cb_https);
         
         tvPin = (TextView) findViewById(R.id.tv_pin);
-        tvName = (TextView) findViewById(R.id.tv_name);
+        tvName = (TextView) findViewById(R.id.tv_setting_name);
         tvPort = (TextView) findViewById(R.id.tv_port_value);
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
         etPinValue = null; // 修复: 布局中无 R.id.et_pin_value
