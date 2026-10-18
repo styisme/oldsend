@@ -174,8 +174,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 
                 String wl = OldSendService.getPrefStringGlobal("whitelist", "");
                 String bl = OldSendService.getPrefStringGlobal("blacklist", "");
-                boolean isWl = wl.contains(fp);
-                boolean isBl = bl.contains(fp);
+                final boolean isWl = wl.contains(fp);
+                final boolean isBl = bl.contains(fp);
 
                 final String[] items = new String[]{
                     isWl ? "移除白名单" : "⭐ 加入白名单",
