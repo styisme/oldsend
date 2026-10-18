@@ -558,6 +558,23 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
     private void showAboutDialog() {
         View v = getLayoutInflater().inflate(R.layout.dialog_about, null);
+        
+        // 适配深色模式下的文字颜色
+        if (ThemeUtils.isDarkMode(this)) {
+            android.view.ViewGroup group = (android.view.ViewGroup) v;
+            for (int i = 0; i < group.getChildCount(); i++) {
+                View child = group.getChildAt(i);
+                if (child instanceof TextView) {
+                    int color = ((TextView) child).getCurrentTextColor();
+                    if (color == 0xFF333333 || color == 0xFF1C1B1F || color == android.graphics.Color.BLACK) {
+                        ((TextView) child).setTextColor(0xFFE0E0E0);
+                    } else if (color == 0xFF666666) {
+                        ((TextView) child).setTextColor(0xFFAAAAAA);
+                    }
+                }
+            }
+        }
+        
         Md3DialogUtils.showCustom(this, "", v, I18nManager.get("confirm"), null).show();
     }
     
