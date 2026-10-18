@@ -261,6 +261,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_filter_title, "拦截危险后缀");
+        safeSetText(R.id.tv_manage_acl_title, "管理白/黑名单");
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));
         safeSetText(R.id.tv_use_pin, I18nManager.get("use_pin"));
@@ -395,6 +396,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         
 findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showSetNameDialog(); } });
         findViewById(R.id.row_about).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAboutDialog(); } });
+        findViewById(R.id.row_manage_acl).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAclManager(); } });
+        
 
         // 强行绑定拦截后缀点击事件
         TextView tvFilterVal = (TextView) findViewById(R.id.tv_filter_value);
@@ -447,6 +450,48 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         Toast.makeText(this, exists ? "已移出名单" : "已加入名单", Toast.LENGTH_SHORT).show();
     }
     
+    
+    private void showAclManager() {
+        final String[] items = new String[]{"查看/移除 白名单", "查看/移除 黑名单", "清空所有名单"};
+        Md3DialogUtils.showList(this, "名单管理中心", items, new Md3DialogUtils.OnItemSelectListener() {
+            public void onItemSelect(int pos) {
+                if (pos == 2) {
+                    getSharedPreferences("oldsend", MODE_PRIVATE).edit().remove("whitelist").remove("blacklist").commit();
+                    Toast.makeText(MainActivity.this, "已清空所有黑白名单", Toast.LENGTH_SHORT).show();
+                } else {
+                    showSpecificList(pos == 0 ? "whitelist" : "blacklist");
+                }
+            }
+        }).show();
+    }
+
+    private void showSpecificList(final String key) {
+        String listStr = OldSendService.getPrefStringGlobal(key, "");
+        if (listStr.trim().isEmpty()) {
+            Toast.makeText(this, "当前名单为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        // 用逗号分割出所有指纹/IP
+        final String[] arr = listStr.split(",");
+        final String[] displayArr = new String[arr.length];
+        for(int i = 0; i < arr.length; i++) {
+            displayArr[i] = arr[i].length() > 16 ? arr[i].substring(0, 16) + "..." : arr[i];
+        }
+
+        Md3DialogUtils.showList(this, "点击移除设备 (" + arr.length + "个)", displayArr, new Md3DialogUtils.OnItemSelectListener() {
+            public void onItemSelect(int pos) {
+                String target = arr[pos];
+                String current = OldSendService.getPrefStringGlobal(key, "");
+                // 移除并更新
+                current = current.replace(target + ",", "").replace(target, "");
+                getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString(key, current).commit();
+                Toast.makeText(MainActivity.this, "已移除", Toast.LENGTH_SHORT).show();
+                showSpecificList(key); // 递归刷新列表
+            }
+        }).show();
+    }
+        
     private void savePref(String key, boolean val) { getSharedPreferences("oldsend", MODE_PRIVATE).edit().putBoolean(key, val).commit(); }
 
     private void switchTab(int index) {

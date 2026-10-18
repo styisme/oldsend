@@ -191,6 +191,12 @@
                     <TextView android:id="@+id/tv_backup" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="备份 / 恢复设置" android:textSize="13sp" android:textColor="#333"/>
                 </LinearLayout>
 
+                <!-- 名单管理中心 -->
+                <LinearLayout android:id="@+id/row_manage_acl" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:padding="14dp" android:background="@drawable/bg_md3_card" android:tag="card" android:gravity="center_vertical" android:layout_marginTop="6dp">
+                    <TextView android:id="@+id/tv_manage_acl_title" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="管理白/黑名单" android:textSize="13sp" android:textColor="#333"/>
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="管理 >" android:textSize="13sp" android:textColor="#888"/>
+                </LinearLayout>
+
                 <LinearLayout android:id="@+id/row_about" android:layout_width="match_parent" android:layout_height="52dp" android:orientation="horizontal" android:padding="14dp" android:background="@drawable/bg_md3_card" android:tag="card" android:layout_marginBottom="6dp" android:gravity="center_vertical" android:layout_marginTop="6dp">
                     <TextView android:id="@+id/tv_about" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="关于 OldSend" android:textSize="13sp" android:textColor="#333"/>
                 </LinearLayout>
