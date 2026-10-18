@@ -339,42 +339,39 @@ public class CrossNetActivity extends Activity {
     }
 
     private void startDirectSend(String ipStr) {
-        String ip = ipStr;
+        String cleanIp = ipStr.trim();
         int port = 53317;
         
-        // 清理输入两端可能误带的空格
-        ip = ip.trim();
-        
-        // 判断是否包含方括号 (例如 [2409:xxx]:53317)
-        if (ip.startsWith("[")) {
-            int endBracket = ip.indexOf("]");
-            if (endBracket != -1) {
-                // 提取方括号内的纯 IPv6 地址
-                String ipv6Raw = ip.substring(1, endBracket);
-                // 检查后面有没有带端口
-                if (ip.length() > endBracket + 1 && ip.charAt(endBracket + 1) == ':') {
-                    try {
-                        port = Integer.parseInt(ip.substring(endBracket + 2));
-                    } catch (Exception ignored) {}
-                }
-                ip = ipv6Raw;
-            }
-        } else {
-            // 没有方括号，看冒号数量
-            int colonCount = ip.length() - ip.replace(":", "").length();
-            if (colonCount == 1) {
-                // 只有一个冒号，说明是 IPv4:Port
-                String[] parts = ip.split(":");
-                ip = parts[0];
-                try { port = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
-            }
-            // 如果有多个冒号且没有方括号，说明是纯 IPv6 地址，直接用默认端口 53317
+        // 如果用户点了自己头像，或者填了本机 IP，直接拦截
+        if (cleanIp.contains(OldSendService.getLocalIp())) {
+            tvStatus.setText("直连失败: 无法通过公网IP直连本机，请使用另一台设备。");
+            return;
         }
+
+        // 暴力清洗：去除所有可能存在的方括号
+        cleanIp = cleanIp.replace("[", "").replace("]", "");
+
+        // 检查是否带端口 (如果是 IPv6，最后一个冒号后面可能跟着端口)
+        int lastColon = cleanIp.lastIndexOf(':');
+        if (lastColon != -1) {
+            String possiblePort = cleanIp.substring(lastColon + 1);
+            // 如果最后一段是纯数字，且长度小于 6 位，说明是端口
+            if (possiblePort.matches("\\d{1,5}")) {
+                try {
+                    port = Integer.parseInt(possiblePort);
+                    cleanIp = cleanIp.substring(0, lastColon); // 剥离端口
+                } catch (Exception ignored) {}
+            }
+        }
+        
+        // 最终 cleanIp 是纯净的 IP（绝对无括号），port 是合法数字
+        final String ip = cleanIp;
+        final int finalPort = port;
         
         final org.oldsend.model.Device target = new org.oldsend.model.Device();
         target.alias = "公网设备";
         target.ip = ip;
-        target.port = port;
+        target.port = finalPort;
         target.https = false;
 
         isTransferring = true;
