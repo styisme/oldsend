@@ -130,6 +130,8 @@ OldSend 内置了基于 Android 原生 `SSLContext` 的自签名 HTTPS 加密传
 
 本项目使用 [MIT License](LICENSE)。
 
+本项目完美兼容 **LocalSend 协议**。特别感谢开源项目 [LocalSend](https://github.com/localsend/localsend) 提供的优秀协议规范（使用 Apache-2.0 协议授权）。OldSend 为独立从零实现，未直接复制其源码。
+
 **特别声明**：
 - 生成的代码仅供学习与局域网个人使用。
 - 请遵守当地法律法规，**不要**用于传播非法文件。
