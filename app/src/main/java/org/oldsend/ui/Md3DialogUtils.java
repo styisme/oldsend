@@ -24,7 +24,7 @@ public class Md3DialogUtils {
         }
     }
 
-    public static Dialog createBaseDialog(Context ctx, String title, View contentView, String positive, DialogInterface.OnClickListener posListener, String negative, DialogInterface.OnClickListener negListener) {
+    public static Dialog createBaseDialog(Context ctx, String title, View contentView, String positive, final DialogInterface.OnClickListener posListener, String negative, final DialogInterface.OnClickListener negListener) {
         final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_base);
