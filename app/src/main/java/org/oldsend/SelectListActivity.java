@@ -56,7 +56,7 @@ public class SelectListActivity extends Activity {
         List<Uri> uris = MainActivity.pendingUris;
         
         if (uris == null || uris.isEmpty()) {
-            finish(); // 空了就自动返回主界面
+            finish();
             return;
         }
 
@@ -86,7 +86,6 @@ public class SelectListActivity extends Activity {
                 }
             } catch (Exception ignored) {}
             
-            // 保底：如果是本地文件且上面没读到大小
             if (size <= 0 && "file".equals(uri.getScheme())) {
                 String path = uri.getPath();
                 if (path != null) {
@@ -101,14 +100,12 @@ public class SelectListActivity extends Activity {
             totalSize += (size > 0 ? size : 0);
             String sizeStr = size > 1024*1024 ? String.format("%.1f MB", size/1024.0/1024.0) : String.format("%.1f KB", size/1024.0);
 
-            // 动态生成条目 View
             View itemView = getLayoutInflater().inflate(R.layout.item_selected_file, null);
             TextView tvIcon = (TextView) itemView.findViewById(R.id.item_icon);
             TextView itemName = (TextView) itemView.findViewById(R.id.item_name);
             TextView itemSize = (TextView) itemView.findViewById(R.id.item_size);
             ImageView btnDelete = (ImageView) itemView.findViewById(R.id.btn_item_delete);
 
-            // 防止 XML 没找到 ID 导致空指针崩溃
             if (tvIcon != null) {
                 String lowerName = name.toLowerCase();
                 if (lowerName.endsWith(".jpg") || lowerName.endsWith(".png") || lowerName.endsWith(".jpeg")) tvIcon.setText("🖼️");
@@ -118,9 +115,7 @@ public class SelectListActivity extends Activity {
                 else if (lowerName.endsWith(".apk")) tvIcon.setText("🤖");
                 else tvIcon.setText("📄");
                 
-                if (ThemeUtils.isDarkMode(this)) {
-                    tvIcon.setTextColor(0xFFE0E0E0);
-                }
+                if (ThemeUtils.isDarkMode(this)) tvIcon.setTextColor(0xFFE0E0E0);
             }
             
             if (itemName != null) {
