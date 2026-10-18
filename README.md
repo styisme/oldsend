@@ -65,7 +65,7 @@
 ## 📱 使用说明
 
 ### 1. 下载与安装
-前往 [Actions](https://github.com/styisme/oldsend/actions) 页面，下载最新的 `oldsend-debug` 压缩包并安装。
+前往 [Releases](https://github.com/styisme/oldsend/releases) 页面，下载最新的 `app-debug.apk` 并安装。
 
 ### 2. 接收文件
 1. 打开 OldSend，点击**启动**（此时通知栏会有一条常驻通知）。
