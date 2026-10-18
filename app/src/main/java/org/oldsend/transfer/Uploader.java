@@ -39,7 +39,7 @@ public class Uploader {
         }).start();
     }
 
-    static void doUpload(Device target, List<File> files, String pin, ProgressCallback cb) throws Exception {
+    static void doUpload(Device target, List<File> files, String pin, final ProgressCallback cb) throws Exception {
         if (target.https) { cb.onDone(false, "目标开启了HTTPS，请在对方关闭加密"); return; }
         if (files.isEmpty()) return;
 
@@ -73,6 +73,7 @@ public class Uploader {
 
         final AtomicLong totalSent = new AtomicLong(0);
         ExecutorService pool = Executors.newFixedThreadPool(3); // 3线程并发
+        final long finalTotalSize = totalSize;
         final boolean[] hasError = new boolean[]{false};
         
         for (int i = 0; i < files.size(); i++) {
@@ -98,7 +99,7 @@ public class Uploader {
                         while ((n = fis.read(buf)) > 0) {
                             os.write(buf, 0, n);
                             long current = totalSent.addAndGet(n);
-                            if (cb != null) cb.onProgress("发送中", current, totalSize);
+                            if (cb != null) cb.onProgress("发送中", current, finalTotalSize);
                         }
                         os.flush(); fis.close(); os.close();
                         int code = c.getResponseCode();
@@ -138,7 +139,7 @@ public class Uploader {
             long fileSent = 0;
             while ((n = fis.read(buf)) > 0) {
                 os.write(buf, 0, n); fileSent += n;
-                if (cb != null) cb.onProgress("发送中", baseSent + fileSent, totalSize);
+                if (cb != null) cb.onProgress("发送中", baseSent + fileSent, finalTotalSize);
             }
             os.flush(); fis.close(); os.close();
         } catch (Exception e) { c.disconnect(); throw e; }
