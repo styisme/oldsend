@@ -44,13 +44,15 @@ gradle assembleDebug
 oldsend/
 ├── app/
 │   ├── src/main/java/org/oldsend/
-│   │   ├── api/          # HTTP API 处理（prepare-upload, upload 等）
+│   │   ├── api/          # HTTP API 处理（包含 WebShareHandler 等）
 │   │   ├── discovery/    # UDP 组播发现设备
 │   │   ├── http/         # 轻量级 HTTP 客户端与服务端
 │   │   ├── model/        # 数据模型与历史记录
 │   │   ├── transfer/     # 文件保存与上传逻辑
-│   │   ├── ui/           # 自定义控件（如 Md3Switch）与适配器
-│   │   └── util/         # 工具类（多语言引擎等）
+│   │   ├── ui/           # 自定义控件与适配器
+│   │   ├── util/         # 工具类（多语言引擎 I18nManager, 深色主题 ThemeUtils 等）
+│   │   ├── MainActivity.java      # 主界面
+│   │   └── TransferActivity.java  # 全屏传输进度 UI
 │   └── src/main/res/     # 布局、图标、样式
 ```
 
