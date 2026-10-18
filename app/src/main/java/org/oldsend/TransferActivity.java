@@ -17,6 +17,7 @@ import android.widget.Toast;
 import org.oldsend.model.Device;
 import org.oldsend.transfer.Uploader;
 import org.oldsend.util.I18nManager;
+import org.oldsend.ui.Md3DialogUtils;
 import org.oldsend.util.ThemeUtils;
 
 import java.io.File;
@@ -139,23 +140,15 @@ public class TransferActivity extends Activity {
 
     
     private void showPinDialog() {
-        final android.widget.EditText input = new android.widget.EditText(this);
-        input.setHint("PIN");
-        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        new android.app.AlertDialog.Builder(this)
-            .setTitle(I18nManager.get("enter_pin"))
-            .setView(input)
-            .setCancelable(false)
-            .setPositiveButton(I18nManager.get("confirm"), new android.content.DialogInterface.OnClickListener() {
-                public void onClick(android.content.DialogInterface d, int w) {
-                    String pin = input.getText().toString().trim();
+        Md3DialogUtils.showInput(this, I18nManager.get("enter_pin"), "", new Md3DialogUtils.OnInputListener() {
+            public void onInput(String pin) {
+                if (pin != null && pin.length() > 0) {
                     startUploadWithPin(pin);
+                } else {
+                    finish();
                 }
-            })
-            .setNegativeButton(I18nManager.get("cancel"), new android.content.DialogInterface.OnClickListener() {
-                public void onClick(android.content.DialogInterface d, int w) { finish(); }
-            })
-            .show();
+            }
+        }).show();
     }
 
     private void startUploadWithPin(final String pin) {

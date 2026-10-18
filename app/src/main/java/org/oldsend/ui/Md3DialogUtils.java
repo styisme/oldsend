@@ -124,23 +124,38 @@ public class Md3DialogUtils {
     }
 
     public static Dialog showInput(final Context ctx, String title, String defaultValue, final OnInputListener listener) {
-        final EditText input = new EditText(ctx);
-        input.setText(defaultValue);
-        input.setGravity(android.view.Gravity.CENTER_VERTICAL);
-        input.setPadding(20, 12, 20, 12);
-        input.setTextSize(14);
-        input.setSingleLine(true);
-        input.setBackgroundResource(R.drawable.bg_md3_edittext);
+        final Dialog dialog = new Dialog(ctx);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_md3_input);
         
-        Dialog dialog = createBaseDialog(ctx, title, input, I18nManager.get("confirm"), null, I18nManager.get("cancel"), null);
-        dialog.findViewById(R.id.dlg_btn_positive).setOnClickListener(new View.OnClickListener() {
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setBackgroundDrawableResource(android.R.color.transparent);
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        }
+
+        ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
+        final EditText input = (EditText) dialog.findViewById(R.id.dlg_input);
+        input.setText(defaultValue);
+        input.setSelection(input.getText().length()); // 光标移到末尾
+
+        TextView btnPos = (TextView) dialog.findViewById(R.id.dlg_btn_positive);
+        TextView btnNeg = (TextView) dialog.findViewById(R.id.dlg_btn_negative);
+        
+        btnPos.setText(I18nManager.get("confirm"));
+        btnNeg.setText(I18nManager.get("cancel"));
+
+        btnPos.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (listener != null) listener.onInput(input.getText().toString());
-                ((Dialog) v.getTag()).dismiss();
+                dialog.dismiss();
             }
         });
-        // 动态绑定 tag 以关闭
-        dialog.findViewById(R.id.dlg_btn_positive).setTag(dialog);
+        
+        btnNeg.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) { dialog.dismiss(); }
+        });
+
         return dialog;
     }
 
