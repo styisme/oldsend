@@ -51,5 +51,6 @@
     </receiver>
         <activity android:name=".TransferActivity"
             android:launchMode="singleTop" android:theme="@android:style/Theme.Light.NoTitleBar" />
+        <activity android:name=".SelectListActivity" android:theme="@android:style/Theme.NoTitleBar" />
     </application>
 </manifest>

@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     private ArrayAdapter<String> historyAdapter;
     private Handler handler = new Handler();
     private boolean running = false;
-    private List<Uri> pendingUris = new ArrayList<Uri>();
+    public static List<Uri> pendingUris = new ArrayList<Uri>();
     private List<String> historyPaths = new ArrayList<String>();
     private boolean pendingAppend = false;
 
@@ -131,7 +131,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
 
         if (btnAddFilesMore != null) btnAddFilesMore.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showAddFilesDialog(); } });
-        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pendingUris.clear(); updateSelectedFilesUI(); Toast.makeText(MainActivity.this, "已清空选择", Toast.LENGTH_SHORT).show(); } });
+        if (btnEditFiles != null) btnEditFiles.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { startActivity(new Intent(MainActivity.this, SelectListActivity.class)); } });
         if (btnManualIp != null) btnManualIp.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { showManualIpDialog(); } });
         
         initSettingsUI();
@@ -751,6 +751,12 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         List<HistoryStore.Record> list = HistoryStore.get().snapshot();
         if (historyAdapter != null) { historyAdapter.clear(); historyPaths.clear(); for (HistoryStore.Record r : list) { String sizeStr = r.size > 1024*1024 ? (r.size/1024/1024)+"MB" : (r.size/1024)+"KB"; historyAdapter.add("[" + r.time + "] " + r.fileName + " (" + sizeStr + ")"); historyPaths.add(r.path); } historyAdapter.notifyDataSetChanged(); }
         if (historyList != null) setListViewHeightBasedOnChildren(historyList);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateSelectedFilesUI();
     }
 
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); setIntent(intent); handleIntent(intent); }
