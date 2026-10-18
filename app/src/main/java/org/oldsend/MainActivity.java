@@ -351,6 +351,18 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                     }
                 } else {
                     if (tvPin != null) tvPin.setVisibility(View.GONE);
+        if (tvPin != null) tvPin.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("modify_pin"), getSharedPreferences("oldsend", MODE_PRIVATE).getString("pin_code", "0000"), new Md3DialogUtils.OnInputListener() {
+                    public void onInput(String text) {
+                        if (text.length() > 0) {
+                            getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("pin_code", text).commit();
+                            if (tvPin != null) tvPin.setText(I18nManager.get("pin_on") + text);
+                        }
+                    }
+                }).show();
+            }
+        });
                 }
                 if (running) {
                     stopService(new Intent(MainActivity.this, OldSendService.class));

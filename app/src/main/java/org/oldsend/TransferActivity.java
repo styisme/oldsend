@@ -137,6 +137,59 @@ public class TransferActivity extends Activity {
         });
     }
 
+    
+    private void showPinDialog() {
+        final android.widget.EditText input = new android.widget.EditText(this);
+        input.setHint("PIN");
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        new android.app.AlertDialog.Builder(this)
+            .setTitle(I18nManager.get("enter_pin"))
+            .setView(input)
+            .setCancelable(false)
+            .setPositiveButton(I18nManager.get("confirm"), new android.content.DialogInterface.OnClickListener() {
+                public void onClick(android.content.DialogInterface d, int w) {
+                    String pin = input.getText().toString().trim();
+                    startUploadWithPin(pin);
+                }
+            })
+            .setNegativeButton(I18nManager.get("cancel"), new android.content.DialogInterface.OnClickListener() {
+                public void onClick(android.content.DialogInterface d, int w) { finish(); }
+            })
+            .show();
+    }
+
+    private void startUploadWithPin(final String pin) {
+        final List<File> files = new ArrayList<File>();
+        for (String path : filePaths) {
+            files.add(new File(path));
+        }
+        startTime = System.currentTimeMillis();
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Uploader.uploadFiles(targetDevice, files, pin, new Uploader.ProgressCallback() {
+                        public void onProgress(final String stage, final long sent, final long total) {
+                            handler.post(new Runnable() { public void run() {
+                                if (!isDone) updateProgress(sent, total, files.get(0).getName());
+                            }});
+                        }
+                        public void onDone(final boolean ok, String msg) {
+                            handler.post(new Runnable() { public void run() { 
+                                if (!isDone) transferDone(ok); 
+                            }});
+                        }
+                    });
+                } catch (Exception e) {
+                    final String errMsg = e.getMessage();
+                    handler.post(new Runnable() { public void run() {
+                        Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
+                        finish();
+                    }});
+                }
+            }
+        }).start();
+    }
+
     private void startUpload() {
         if (filePaths == null || filePaths.isEmpty()) return;
         
@@ -164,11 +217,17 @@ public class TransferActivity extends Activity {
                         }
                     });
                 } catch (Exception e) {
-                    final String errMsg = e.getMessage();
-                    handler.post(new Runnable() { public void run() {
-                        Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
-                        finish();
-                    }});
+                    if ("PIN_REQUIRED".equals(e.getMessage())) {
+                        handler.post(new Runnable() { public void run() {
+                            showPinDialog();
+                        }});
+                    } else {
+                        final String errMsg = e.getMessage();
+                        handler.post(new Runnable() { public void run() {
+                            Toast.makeText(TransferActivity.this, "Error: " + errMsg, Toast.LENGTH_SHORT).show();
+                            finish();
+                        }});
+                    }
                 }
             }
         }).start();

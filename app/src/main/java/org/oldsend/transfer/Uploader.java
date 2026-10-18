@@ -24,14 +24,18 @@ public class Uploader {
     }
 
     public static void uploadFiles(final Device target, final List<File> files, final ProgressCallback cb) {
+        uploadFiles(target, files, null, cb);
+    }
+
+    public static void uploadFiles(final Device target, final List<File> files, final String pin, final ProgressCallback cb) {
         new Thread(new Runnable() {
             public void run() {
-                try { doUpload(target, files, cb); } catch (Exception e) { if (cb != null) cb.onDone(false, e.toString()); }
+                try { doUpload(target, files, pin, cb); } catch (Exception e) { if (cb != null) cb.onDone(false, e.toString()); }
             }
         }).start();
     }
 
-    static void doUpload(Device target, List<File> files, ProgressCallback cb) throws Exception {
+    static void doUpload(Device target, List<File> files, String pin, ProgressCallback cb) throws Exception {
         if (target.https) { cb.onDone(false, "目标开启了HTTPS，请在对方关闭加密"); return; }
         if (files.isEmpty()) return;
 
@@ -56,6 +60,7 @@ public class Uploader {
 
         cb.onProgress("准备上传", 0, totalSize);
         String prepareUrl = target.url(Protocol.V2_PREFIX + "/prepare-upload");
+        if (pin != null && pin.length() > 0) prepareUrl += "?pin=" + pin;
         JSONObject resp = HttpClient.postJson(prepareUrl, prepareBody, 15000);
         if (resp == null) { cb.onDone(false, "对方拒绝接收"); return; }
         String sessionId = resp.optString("sessionId", null);

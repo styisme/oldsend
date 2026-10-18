@@ -45,6 +45,7 @@ public class HttpClient {
         c.setRequestMethod("GET");
         try {
             int code = c.getResponseCode();
+            if (code == 401) throw new Exception("PIN_REQUIRED");
             if (code < 200 || code >= 300) return null;
             InputStream in = c.getInputStream();
             String s = readAll(in);
@@ -75,6 +76,7 @@ public class HttpClient {
         }
         try {
             int code = c.getResponseCode();
+            if (code == 401) throw new Exception("PIN_REQUIRED");
             if (code < 200 || code >= 300) return null;
             InputStream in = c.getInputStream();
             String s = readAll(in);

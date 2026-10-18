@@ -50,6 +50,9 @@ public class I18nManager {
         zh.put("completed", "已完成");
         zh.put("failed", "已失败");
         zh.put("save_to_dir", "已保存到相册/下载目录");
+        zh.put("enter_pin", "请输入接收方 PIN 码");
+        zh.put("pin_incorrect", "PIN 码错误，请重试");
+        zh.put("modify_pin", "修改 PIN 码");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -110,6 +113,9 @@ public class I18nManager {
         en.put("completed", "Completed");
         en.put("failed", "Failed");
         en.put("save_to_dir", "Saved to Album/Downloads");
+        en.put("enter_pin", "Enter Receiver PIN");
+        en.put("pin_incorrect", "Incorrect PIN, try again");
+        en.put("modify_pin", "Modify PIN");
         dict.put("en", en);
 
         // ============ 日语 (ja) ============
@@ -152,6 +158,9 @@ public class I18nManager {
         ja.put("completed", "完了");
         ja.put("failed", "失敗");
         ja.put("save_to_dir", "アルバム/ダウンロードに保存しました");
+        ja.put("enter_pin", "受信者のPINを入力");
+        ja.put("pin_incorrect", "PINが違います。再試行してください");
+        ja.put("modify_pin", "PINを変更");
         dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
@@ -194,6 +203,9 @@ public class I18nManager {
         ko.put("completed", "완료됨");
         ko.put("failed", "실패함");
         ko.put("save_to_dir", "앨범/다운로드에 저장됨");
+        ko.put("enter_pin", "수신자 PIN 입력");
+        ko.put("pin_incorrect", "PIN이 잘못되었습니다. 다시 시도하세요.");
+        ko.put("modify_pin", "PIN 수정");
         dict.put("ko", ko);
 
         // ============ 德语 (de) ============
@@ -236,6 +248,9 @@ public class I18nManager {
         de.put("completed", "Abgeschlossen");
         de.put("failed", "Fehlgeschlagen");
         de.put("save_to_dir", "In Album/Downloads gespeichert");
+        de.put("enter_pin", "Empfänger-PIN eingeben");
+        de.put("pin_incorrect", "Falsche PIN, versuchen Sie es erneut");
+        de.put("modify_pin", "PIN ändern");
         dict.put("de", de);
 
         // ============ 法语 (fr) ============
@@ -278,6 +293,9 @@ public class I18nManager {
         fr.put("completed", "Terminé");
         fr.put("failed", "Échoué");
         fr.put("save_to_dir", "Enregistré dans l'album/téléchargements");
+        fr.put("enter_pin", "Entrez le PIN du récepteur");
+        fr.put("pin_incorrect", "PIN incorrect, réessayez");
+        fr.put("modify_pin", "Modifier le PIN");
         dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
@@ -320,6 +338,9 @@ public class I18nManager {
         es.put("completed", "Completado");
         es.put("failed", "Fallido");
         es.put("save_to_dir", "Guardado en álbum/descargas");
+        es.put("enter_pin", "Ingrese el PIN del receptor");
+        es.put("pin_incorrect", "PIN incorrecto, inténtelo de nuevo");
+        es.put("modify_pin", "Modificar PIN");
         dict.put("es", es);
 
         // ============ 俄语 (ru) ============
@@ -362,6 +383,9 @@ public class I18nManager {
         ru.put("completed", "Завершено");
         ru.put("failed", "Ошибка");
         ru.put("save_to_dir", "Сохранено в альбом/загрузки");
+        ru.put("enter_pin", "Введите PIN получателя");
+        ru.put("pin_incorrect", "Неверный PIN, попробуйте еще раз");
+        ru.put("modify_pin", "Изменить PIN");
         dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
@@ -404,6 +428,9 @@ public class I18nManager {
         pt.put("completed", "Concluído");
         pt.put("failed", "Falhou");
         pt.put("save_to_dir", "Salvo no álbum/downloads");
+        pt.put("enter_pin", "Digite o PIN do receptor");
+        pt.put("pin_incorrect", "PIN incorreto, tente novamente");
+        pt.put("modify_pin", "Modificar PIN");
         dict.put("pt", pt);
     }
 
