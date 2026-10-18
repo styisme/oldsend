@@ -29,6 +29,15 @@ public class SelectListActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_select_list);
         ThemeUtils.applyTheme(this);
+        if (ThemeUtils.isDarkMode(this)) {
+            findViewById(R.id.root_layout).setBackgroundColor(0xFF121212);
+            ((TextView)findViewById(R.id.btn_back)).setTextColor(0xFFE0E0E0);
+            ((TextView)findViewById(R.id.tv_file_count)).setTextColor(0xFFE0E0E0);
+            ((TextView)findViewById(R.id.tv_total_size)).setTextColor(0xFFAAAAAA);
+            // 标题文字
+            ViewGroup topBar = (ViewGroup) findViewById(R.id.btn_back).getParent();
+            ((TextView)topBar.getChildAt(1)).setTextColor(0xFFE0E0E0);
+        }
 
         listContainer = (LinearLayout) findViewById(R.id.list_container);
         tvFileCount = (TextView) findViewById(R.id.tv_file_count);
@@ -96,6 +105,11 @@ public class SelectListActivity extends Activity {
             ImageView btnDelete = (ImageView) itemView.findViewById(R.id.btn_item_delete);
 
             itemName.setText(name);
+            itemSize.setText(sizeStr);
+            if (ThemeUtils.isDarkMode(this)) {
+                itemName.setTextColor(0xFFE0E0E0);
+                itemSize.setTextColor(0xFFAAAAAA);
+            }
             itemSize.setText(sizeStr);
             
             btnDelete.setOnClickListener(new View.OnClickListener() {
