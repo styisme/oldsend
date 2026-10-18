@@ -38,6 +38,12 @@ public class OldSendService extends Service {
         return ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getBoolean(key, def);
     }
     
+    public static String getPrefStringGlobal(String key, String def) {
+        Context ctx = getContext();
+        if (ctx == null) return def;
+        return ctx.getSharedPreferences("oldsend", Context.MODE_PRIVATE).getString(key, def);
+    }
+    
     public static String getPin() {
         Context ctx = getContext();
         if (ctx == null) return "0000";

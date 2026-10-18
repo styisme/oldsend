@@ -70,10 +70,16 @@ public class WebShareHandler implements Router.Handler {
             String fileName = q.get("name");
             if (fileName == null) fileName = "web_" + System.currentTimeMillis();
             
-            String lower = fileName.toLowerCase();
-            if (lower.endsWith(".exe") || lower.endsWith(".bat") || lower.endsWith(".vbs") || lower.endsWith(".sh")) {
-                OldSendService.log("Web拦截高危文件: " + fileName);
-                return HttpResponse.status(403);
+            String filterStr = OldSendService.getPrefStringGlobal("filter_ext", "exe,bat,cmd,vbs,sh");
+            if (filterStr.length() > 0) {
+                String lower = fileName.toLowerCase();
+                String[] exts = filterStr.split(",");
+                for (String ext : exts) {
+                    if (lower.endsWith("." + ext.trim())) {
+                        OldSendService.log("Web拦截自定义后缀: " + fileName);
+                        return HttpResponse.status(403);
+                    }
+                }
             }
 
             File target = FileSaver.createTarget(fileName, OldSendService.getPrefBooleanGlobal("save_album", true));
