@@ -70,9 +70,9 @@ public class CrossNetActivity extends Activity {
                 if (isChecked) {
                     // 直连模式下，重置原有的pin相关UI
                     tvPinDisplay.setVisibility(View.GONE);
-                    findViewById(R.id.btn_cn_generate).setText("直连发送已选文件");
+                    ((Button) findViewById(R.id.btn_cn_generate)).setText("直连发送已选文件");
                 } else {
-                    findViewById(R.id.btn_cn_generate).setText("生成密码并开始发送");
+                    ((Button) findViewById(R.id.btn_cn_generate)).setText("生成密码并开始发送");
                 }
             }
         });
