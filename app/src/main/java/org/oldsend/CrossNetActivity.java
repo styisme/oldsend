@@ -137,7 +137,7 @@ public class CrossNetActivity extends Activity {
     private void updateUI() {
         if (pendingUris.isEmpty()) {
             layoutSelectedFiles.setVisibility(View.GONE);
-            findViewById(R.id.btn_cn_generate).setText("选择文件并生成 6 位密码");
+            ((Button) findViewById(R.id.btn_cn_generate)).setText("选择文件并生成 6 位密码");
         } else {
             layoutSelectedFiles.setVisibility(View.VISIBLE);
             long totalSize = 0;
@@ -153,7 +153,7 @@ public class CrossNetActivity extends Activity {
             }
             String sizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
             tvFileInfo.setText("已选择 " + pendingUris.size() + " 个文件, 总计 " + sizeStr);
-            findViewById(R.id.btn_cn_generate).setText("生成密码并开始发送");
+            ((Button) findViewById(R.id.btn_cn_generate)).setText("生成密码并开始发送");
         }
     }
 
