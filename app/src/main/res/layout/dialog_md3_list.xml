@@ -16,12 +16,21 @@
         android:textStyle="bold"
         android:textColor="#1C1B1F" />
 
-    <ListView
-        android:id="@+id/dlg_list"
+    <!-- 用 ScrollView 包裹，防止高度溢出挤掉底部按钮 -->
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
-        android:maxHeight="300dp" />
+        android:maxHeight="280dp"
+        android:scrollbars="none">
+        
+        <LinearLayout
+            android:id="@+id/dlg_list_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+            
+    </ScrollView>
 
     <TextView
         android:id="@+id/dlg_btn_negative"

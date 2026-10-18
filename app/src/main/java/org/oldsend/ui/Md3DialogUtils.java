@@ -4,7 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -29,17 +29,11 @@ public class Md3DialogUtils {
 
     private static void applyTheme(Context ctx, Dialog dialog, View rootView) {
         if (!ThemeUtils.isDarkMode(ctx)) return;
+        if (rootView != null) rootView.setBackgroundResource(R.drawable.bg_md3_card_dark);
         
-        // 1. 换背景
-        if (rootView != null) {
-            rootView.setBackgroundResource(R.drawable.bg_md3_card_dark);
-        }
-        
-        // 2. 换标题颜色
         TextView title = (TextView) dialog.findViewById(R.id.dlg_title);
         if (title != null) title.setTextColor(Color.parseColor("#E0E0E0"));
         
-        // 3. 换按钮颜色
         TextView btnPos = (TextView) dialog.findViewById(R.id.dlg_btn_positive);
         if (btnPos != null) btnPos.setTextColor(Color.parseColor("#81C784"));
         
@@ -68,21 +62,24 @@ public class Md3DialogUtils {
         if (positive != null) {
             btnPos.setText(positive);
             btnPos.setVisibility(View.VISIBLE);
-            if (posListener != null) {
-                btnPos.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) { posListener.onClick(dialog, 0); }
-                });
-            }
+            // 确保点击事件绝对不丢失
+            btnPos.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (posListener != null) posListener.onClick(dialog, 0);
+                    else dialog.dismiss();
+                }
+            });
         } else btnPos.setVisibility(View.GONE);
 
         if (negative != null) {
             btnNeg.setText(negative);
             btnNeg.setVisibility(View.VISIBLE);
-            if (negListener != null) {
-                btnNeg.setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) { negListener.onClick(dialog, 0); }
-                });
-            }
+            btnNeg.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    if (negListener != null) negListener.onClick(dialog, 0);
+                    else dialog.dismiss();
+                }
+            });
         } else btnNeg.setVisibility(View.GONE);
 
         return dialog;
@@ -93,6 +90,7 @@ public class Md3DialogUtils {
         msg.setText(message);
         msg.setTextSize(14);
         msg.setTextColor(ThemeUtils.isDarkMode(ctx) ? Color.parseColor("#AAAAAA") : Color.parseColor("#49454F"));
+        msg.setLineSpacing(0, 1.2f);
         return createBaseDialog(ctx, title, msg, positive, posListener, I18nManager.get("cancel"), null);
     }
 
@@ -103,12 +101,9 @@ public class Md3DialogUtils {
         input.setTextSize(16);
         input.setPadding(24, 16, 24, 16);
         
-        // 适配输入框
         if (ThemeUtils.isDarkMode(ctx)) {
             input.setBackgroundColor(Color.parseColor("#2C2C2C"));
             input.setTextColor(Color.parseColor("#E0E0E0"));
-            input.setHintTextColor(Color.parseColor("#888888"));
-            // 简单粗暴画个绿边
             android.graphics.drawable.GradientDrawable gd = new android.graphics.drawable.GradientDrawable();
             gd.setColor(Color.parseColor("#2C2C2C"));
             gd.setCornerRadius(16f);
@@ -133,18 +128,15 @@ public class Md3DialogUtils {
                 dialog.dismiss();
             }
         });
-        TextView btnNeg = (TextView) dialog.findViewById(R.id.dlg_btn_negative);
-        btnNeg.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { dialog.dismiss(); }
-        });
         
         return dialog;
     }
     
     public interface OnInputListener { void onInput(String text); }
 
+    // 终极重写：抛弃 ListView，手搓安全列表
     public static Dialog showList(Context ctx, String title, String[] items, final OnItemSelectListener listener) {
-        Dialog dialog = new Dialog(ctx);
+        final Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_md3_list);
         setupWindow(ctx, dialog);
@@ -153,25 +145,46 @@ public class Md3DialogUtils {
         applyTheme(ctx, dialog, root);
 
         ((TextView) dialog.findViewById(R.id.dlg_title)).setText(title);
-        ListView listView = (ListView) dialog.findViewById(R.id.dlg_list);
-        listView.setAdapter(new ArrayAdapter<String>(ctx, android.R.layout.simple_list_item_1, items));
         
-        if (ThemeUtils.isDarkMode(ctx)) {
-            listView.setBackgroundColor(Color.parseColor("#2C2C2C"));
-            // 给 ListView 里的文字加个深色适配稍微麻烦，先不管，大多数系统会自动反色
+        LinearLayout container = (LinearLayout) dialog.findViewById(R.id.dlg_list_container);
+        container.removeAllViews();
+        
+        boolean isDark = ThemeUtils.isDarkMode(ctx);
+
+        for (int i = 0; i < items.length; i++) {
+            final int index = i;
+            TextView tv = new TextView(ctx);
+            tv.setText(items[i]);
+            tv.setTextSize(16);
+            tv.setPadding(32, 32, 32, 32);
+            tv.setTextColor(isDark ? Color.parseColor("#E0E0E0") : Color.parseColor("#333333"));
+            
+            // 添加点击反馈效果（可选）
+            android.util.TypedValue outValue = new android.util.TypedValue();
+            ctx.getTheme().resolveAttribute(android.R.attr.selectableItemBackground, outValue, true);
+            tv.setBackgroundResource(outValue.resourceId);
+            
+            tv.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    dialog.dismiss();
+                    if (listener != null) listener.onItemSelect(index);
+                }
+            });
+            container.addView(tv);
+            
+            // 加个分割线
+            if (i < items.length - 1) {
+                View divider = new View(ctx);
+                divider.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1));
+                divider.setBackgroundColor(isDark ? Color.parseColor("#3E3E3E") : Color.parseColor("#E0E0E0"));
+                container.addView(divider);
+            }
         }
 
-        final Dialog d = dialog;
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                d.dismiss();
-                if (listener != null) listener.onItemSelect(position);
-            }
-        });
-
         dialog.findViewById(R.id.dlg_btn_negative).setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) { d.dismiss(); }
+            public void onClick(View v) { dialog.dismiss(); }
         });
+        
         return dialog;
     }
     
