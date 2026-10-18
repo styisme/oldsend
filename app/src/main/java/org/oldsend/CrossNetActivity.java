@@ -347,46 +347,60 @@ public class CrossNetActivity extends Activity {
             try { port = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
         }
         
-        org.oldsend.model.Device target = new org.oldsend.model.Device();
+        final org.oldsend.model.Device target = new org.oldsend.model.Device();
         target.alias = "公网设备";
         target.ip = ip;
         target.port = port;
         target.https = false;
 
-        final List<File> files = new ArrayList<File>();
-        try {
-            for (Uri uri : pendingUris) {
-                File out = new File(getCacheDir(), queryDisplayName(uri));
-                InputStream is = getContentResolver().openInputStream(uri);
-                FileOutputStream fos = new FileOutputStream(out);
-                byte[] buf = new byte[8192];
-                int n;
-                while ((n = is.read(buf)) > 0) fos.write(buf, 0, n);
-                is.close(); fos.close();
-                files.add(out);
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "读取文件失败", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         isTransferring = true;
-        tvStatus.setText("正在通过公网直连发送...");
+        tvStatus.setText("正在读取文件并准备直连...");
 
-        org.oldsend.transfer.Uploader.uploadFiles(target, files, new org.oldsend.transfer.Uploader.ProgressCallback() {
-            public void onProgress(final String stage, final long sent, final long total) {
-                handler.post(new Runnable() { public void run() {
-                    if (total > 0) {
-                        int pct = (int)(sent * 100 / total);
-                        tvStatus.setText("极速发送中... " + pct + "% (" + (sent/1024) + "/" + (total/1024) + " KB)");
+        new Thread(new Runnable() {
+            public void run() {
+                final List<File> files = new ArrayList<File>();
+                try {
+                    for (Uri uri : pendingUris) {
+                        File out = new File(getCacheDir(), queryDisplayName(uri));
+                        InputStream is = getContentResolver().openInputStream(uri);
+                        FileOutputStream fos = new FileOutputStream(out);
+                        byte[] buf = new byte[8192];
+                        int n;
+                        while ((n = is.read(buf)) > 0) fos.write(buf, 0, n);
+                        is.close(); fos.close();
+                        files.add(out);
                     }
+                } catch (Exception e) {
+                    handler.post(new Runnable() { public void run() {
+                        Toast.makeText(CrossNetActivity.this, "读取文件失败", Toast.LENGTH_SHORT).show();
+                        isTransferring = false;
+                        tvStatus.setText("准备失败");
+                    }});
+                    return;
+                }
+
+                handler.post(new Runnable() { public void run() {
+                    tvStatus.setText("正在通过公网直连发送...");
                 }});
+
+                org.oldsend.transfer.Uploader.uploadFiles(target, files, new org.oldsend.transfer.Uploader.ProgressCallback() {
+                    public void onProgress(final String stage, final long sent, final long total) {
+                        handler.post(new Runnable() { public void run() {
+                            if (total > 0) {
+                                int pct = (int)(sent * 100 / total);
+                                tvStatus.setText("极速发送中... " + pct + "% (" + (sent/1024) + "/" + (total/1024) + " KB)");
+                            }
+                        }});
+                    }
+                    public void onDone(final boolean ok, final String msg) {
+                        handler.post(new Runnable() { public void run() {
+                            isTransferring = false;
+                            tvStatus.setText(ok ? "公网极速直连发送完成！" : "直连失败: " + msg);
+                        }});
+                    }
+                });
             }
-            public void onDone(boolean ok, String msg) {
-                isTransferring = false;
-                tvStatus.setText(ok ? "公网极速直连发送完成！" : "直连失败: " + msg);
-            }
-        });
+        }).start();
     }
 
     private void startReceive(final String pin) {
