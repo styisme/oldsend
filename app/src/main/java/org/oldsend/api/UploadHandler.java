@@ -43,14 +43,20 @@ public class UploadHandler implements Router.Handler {
         // 如果存在并且大小小于总大小，则断点续传（追加模式）
         FileOutputStream fos = new FileOutputStream(target, existingSize > 0);
         try {
-            if (existingSize > 0) {
+            long remaining = req.contentLength > 0 ? req.contentLength : entry.size;
+            if (existingSize > 0 && remaining > 0) {
                 OldSendService.log("断点续传追加: 已存在 " + existingSize + " 字节");
                 written = existingSize;
-                if (req.body != null) req.body.skip(existingSize); // 跳过已接收的部分
+                long toSkip = existingSize;
+                while (toSkip > 0) {
+                    long s = req.body.skip(toSkip);
+                    if (s <= 0) break;
+                    toSkip -= s;
+                }
+                remaining -= existingSize;
             }
             InputStream in = req.body;
             byte[] buf = new byte[65536];
-            long remaining = req.contentLength > 0 ? req.contentLength : entry.size;
             if (remaining <= 0) remaining = Long.MAX_VALUE;
             while (remaining > 0) {
                 int max = (int) Math.min(buf.length, remaining);

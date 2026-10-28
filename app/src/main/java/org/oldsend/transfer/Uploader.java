@@ -119,9 +119,11 @@ public class Uploader {
             cb.onDone(false, "部分文件上传失败");
         } else {
             cb.onDone(true, "发送成功");
-            OldSendService.getContext().sendBroadcast(new android.content.Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
         }
-            OldSendService.getContext().sendBroadcast(new Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
+        if (OldSendService.getContext() != null) {
+            OldSendService.getContext().sendBroadcast(
+                new Intent("org.oldsend.TRANSFER_DONE").putExtra("ok", true));
+        }
     }
 
     static boolean uploadFile(String url, File file, final long baseSent, final long finalTotalSize, final ProgressCallback cb) throws Exception {

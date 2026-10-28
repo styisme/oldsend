@@ -165,7 +165,9 @@ public class TransferActivity extends Activity {
         return "📄";
     }
 
-    private void startUpload() {
+    private void startUpload() { startUpload(null); }
+
+    private void startUpload(final String pin) {
         if (filePaths == null || filePaths.isEmpty()) return;
         
         final List<File> files = new ArrayList<File>();
@@ -179,7 +181,7 @@ public class TransferActivity extends Activity {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Uploader.uploadFiles(targetDevice, files, new Uploader.ProgressCallback() {
+                    Uploader.uploadFiles(targetDevice, files, pin, new Uploader.ProgressCallback() {
                         public void onProgress(final String stage, final long sent, final long total) {
                             handler.post(new Runnable() { public void run() {
                                 if (!isDone) {
@@ -223,7 +225,7 @@ public class TransferActivity extends Activity {
         org.oldsend.ui.Md3DialogUtils.showInput(this, "请输入接收方 PIN 码", "", new org.oldsend.ui.Md3DialogUtils.OnInputListener() {
             public void onInput(String pin) {
                 if (pin != null && pin.length() > 0) {
-                    startUpload(); 
+                    startUpload(pin);
                 } else {
                     finish();
                 }

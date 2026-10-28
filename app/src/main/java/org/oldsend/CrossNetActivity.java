@@ -205,8 +205,8 @@ public class CrossNetActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (pendingUris != MainActivity.pendingUris && MainActivity.pendingUris != null) {
-            pendingUris = MainActivity.pendingUris;
+        if (MainActivity.pendingUris != null && MainActivity.pendingUris != pendingUris) {
+            pendingUris = new ArrayList<Uri>(MainActivity.pendingUris);
         }
         updateUI();
     }

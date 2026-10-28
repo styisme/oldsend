@@ -832,10 +832,14 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_manual_ip);
         if (ThemeUtils.isDarkMode(this)) {
-            findViewById(R.id.dlg_root).setBackgroundResource(R.drawable.bg_md3_card_dark);
-            ((TextView)dialog.findViewById(R.id.et_ip_address)).setTextColor(0xFFE0E0E0);
-            ((TextView)dialog.findViewById(R.id.et_ip_address)).setHintTextColor(0xFF888888);
-            ((TextView)dialog.findViewById(R.id.et_ip_address)).setBackgroundColor(0xFF2C2C2C);
+            View dlgRoot = dialog.findViewById(R.id.dlg_root);
+            if (dlgRoot != null) dlgRoot.setBackgroundResource(R.drawable.bg_md3_card_dark);
+            EditText etIpDark = (EditText) dialog.findViewById(R.id.et_ip_address);
+            if (etIpDark != null) {
+                etIpDark.setTextColor(0xFFE0E0E0);
+                etIpDark.setHintTextColor(0xFF888888);
+                etIpDark.setBackgroundColor(0xFF2C2C2C);
+            }
         }
         Window window = dialog.getWindow();
         if (window != null) {

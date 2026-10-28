@@ -83,9 +83,11 @@ public class OldSendService extends Service {
         b.setSmallIcon(android.R.drawable.stat_sys_download)
          .setContentTitle("接收文件请求")
          .setContentText("【" + alias + "】请求发送 " + count + " 个文件")
-         .setAutoCancel(true)
-         .addAction(new android.app.Notification.Action.Builder(android.R.drawable.ic_input_add, "接收", acceptPi).build())
-         .addAction(new android.app.Notification.Action.Builder(android.R.drawable.ic_delete, "拒绝", rejectPi).build());
+         .setAutoCancel(true);
+        if (Build.VERSION.SDK_INT >= 16) {
+            b.addAction(android.R.drawable.ic_input_add, "接收", acceptPi);
+            b.addAction(android.R.drawable.ic_delete, "拒绝", rejectPi);
+        }
 
         nm.notify(100, b.build());
     }
