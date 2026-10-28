@@ -147,7 +147,27 @@ dict.put("zh", zh);
         zhTW.put("view_whitelist", "查看/移除 白名單"); zhTW.put("view_blacklist", "查看/移除 黑名單");
         zhTW.put("all_deleted", "已全部刪除"); zhTW.put("export_log", "匯出日誌");
         zhTW.put("input_address", "輸入地址"); zhTW.put("label", "標籤"); zhTW.put("ip_address", "IP 位址");
-        dict.put("zh_TW", zhTW);
+                // ---- P1 繁体覆盖 ----
+        zhTW.put("general", "一般"); zhTW.put("accept", "接受"); zhTW.put("reject", "拒絕");
+        zhTW.put("recv_completed", "接收完成"); zhTW.put("send_completed", "發送完成"); zhTW.put("interrupted", "已中斷");
+        zhTW.put("unknown_device", "未知設備"); zhTW.put("unknown_file", "未知檔案");
+        zhTW.put("save_dir_prefix", "儲存目錄: "); zhTW.put("wants_to_send", "想要傳送檔案給你");
+        zhTW.put("receive_request", "接收檔案請求"); zhTW.put("service_running", "OldSend 正在執行");
+        zhTW.put("cn_gen_pin_send", "產生密碼並開始傳送"); zhTW.put("cn_direct_send", "直連傳送已選檔案");
+        zhTW.put("cn_status_packing", "正在打包檔案..."); zhTW.put("cn_status_connecting", "正在建立連線...");
+        zhTW.put("cn_status_send_done", "傳送完成！等待對方接收完畢。");
+        zhTW.put("cn_status_recv_done", "接收完成！已解壓到 Download 目錄");
+        zhTW.put("cn_pin_invalid", "請輸入6位純數字密碼");
+        zhTW.put("cn_direct_invalid", "請輸入對方公網IP和連接埠");
+        zhTW.put("manage_list", "名單管理中心"); zhTW.put("add_files", "加入檔案");
+        zhTW.put("delete_all", "全部刪除"); zhTW.put("select_title", "選擇");
+        zhTW.put("select_app", "選擇應用 (APK)");
+        zhTW.put("removed", "已移除"); zhTW.put("added_to_list", "已加入名單"); zhTW.put("removed_from_list", "已移出名單");
+        zhTW.put("share_log_missing", "日誌檔案不存在"); zhTW.put("share_failed", "分享失敗");
+        zhTW.put("clipboard_empty", "剪貼簿為空");
+        zhTW.put("folder_prefix", "[資料夾] "); zhTW.put("empty_folder", "空資料夾");
+        zhTW.put("send_folder", ">> [傳送此資料夾] <<"); zhTW.put("manual_device", "手動設備");
+dict.put("zh_TW", zhTW);
 
         // ============ 英语 (en) ============
         Map<String, String> en = new HashMap<>();
@@ -286,7 +306,22 @@ dict.put("en", en);
         ja.put("view_whitelist", "ホワイトリストを表示/削除"); ja.put("view_blacklist", "ブラックリストを表示/削除");
         ja.put("all_deleted", "すべてクリア"); ja.put("export_log", "ログをエクスポート");
         ja.put("input_address", "アドレスを入力"); ja.put("label", "ラベル"); ja.put("ip_address", "IPアドレス");
-        dict.put("ja", ja);
+                // ---- P1 高频词条 ----
+        ja.put("general", "一般"); ja.put("accept", "受け入れる"); ja.put("reject", "拒否");
+        ja.put("recv_completed", "受信完了"); ja.put("send_completed", "送信完了"); ja.put("interrupted", "中断");
+        ja.put("unknown_device", "不明なデバイス"); ja.put("unknown_file", "不明なファイル");
+        ja.put("save_dir_prefix", "保存先: "); ja.put("wants_to_send", "ファイルを送信したい");
+        ja.put("receive_request", "ファイル受信リクエスト"); ja.put("service_running", "OldSend 実行中");
+        ja.put("cn_gen_pin_send", "パスワード生成して送信"); ja.put("cn_direct_send", "直接送信 (選択済み)");
+        ja.put("cn_status_packing", "パッキング中..."); ja.put("cn_status_connecting", "接続中...");
+        ja.put("cn_status_send_done", "送信完了！相手の受信を待っています。");
+        ja.put("cn_status_recv_done", "受信完了！Downloadに解凍しました");
+        ja.put("cn_pin_invalid", "6桁の数字パスワードを入力してください");
+        ja.put("cn_direct_invalid", "相手の公衆IPとポートを入力してください");
+        ja.put("manage_list", "リスト管理"); ja.put("add_files", "ファイル追加");
+        ja.put("delete_all", "すべて削除"); ja.put("select_title", "選択");
+        ja.put("select_app", "アプリ選択 (APK)");
+dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
         Map<String, String> ko = new HashMap<>(en);
@@ -320,7 +355,22 @@ dict.put("en", en);
         ko.put("view_whitelist", "화이트리스트 보기/제거"); ko.put("view_blacklist", "블랙리스트 보기/제거");
         ko.put("all_deleted", "모두 지워짐"); ko.put("export_log", "로그 내보내기");
         ko.put("input_address", "주소 입력"); ko.put("label", "라벨"); ko.put("ip_address", "IP 주소");
-        dict.put("ko", ko);
+                // ---- P1 高频词条 ----
+        ko.put("general", "일반"); ko.put("accept", "수락"); ko.put("reject", "거절");
+        ko.put("recv_completed", "수신 완료"); ko.put("send_completed", "전송 완료"); ko.put("interrupted", "중단됨");
+        ko.put("unknown_device", "알 수 없는 기기"); ko.put("unknown_file", "알 수 없는 파일");
+        ko.put("save_dir_prefix", "저장 위치: "); ko.put("wants_to_send", "파일을 보내려 합니다");
+        ko.put("receive_request", "파일 수신 요청"); ko.put("service_running", "OldSend 실행 중");
+        ko.put("cn_gen_pin_send", "비밀번호 생성 후 전송"); ko.put("cn_direct_send", "선택 항목 직접 전송");
+        ko.put("cn_status_packing", "파일 패킹 중..."); ko.put("cn_status_connecting", "연결 중...");
+        ko.put("cn_status_send_done", "전송 완료! 상대방 수신 대기 중.");
+        ko.put("cn_status_recv_done", "수신 완료! Download에 압축 해제됨");
+        ko.put("cn_pin_invalid", "6자리 숫자 비밀번호를 입력하세요");
+        ko.put("cn_direct_invalid", "상대방 공인 IP와 포트를 입력하세요");
+        ko.put("manage_list", "목록 관리"); ko.put("add_files", "파일 추가");
+        ko.put("delete_all", "전체 삭제"); ko.put("select_title", "선택");
+        ko.put("select_app", "앱 선택 (APK)");
+dict.put("ko", ko);
 
         // ============ 德语 (de) ============
         Map<String, String> de = new HashMap<>(en);
@@ -354,7 +404,22 @@ dict.put("en", en);
         de.put("view_whitelist", "Whitelist anzeigen/entfernen"); de.put("view_blacklist", "Blacklist anzeigen/entfernen");
         de.put("all_deleted", "Alle gelöscht"); de.put("export_log", "Protokoll exportieren");
         de.put("input_address", "Adresse eingeben"); de.put("label", "Etikett"); de.put("ip_address", "IP-Adresse");
-        dict.put("de", de);
+                // ---- P1 高频词条 ----
+        de.put("general", "Allgemein"); de.put("accept", "Annehmen"); de.put("reject", "Ablehnen");
+        de.put("recv_completed", "Empfangen"); de.put("send_completed", "Gesendet"); de.put("interrupted", "Unterbrochen");
+        de.put("unknown_device", "Unbekanntes Gerät"); de.put("unknown_file", "Unbekannte Datei");
+        de.put("save_dir_prefix", "Speichern unter: "); de.put("wants_to_send", "Möchte dir Dateien senden");
+        de.put("receive_request", "Dateiempfangsanfrage"); de.put("service_running", "OldSend läuft");
+        de.put("cn_gen_pin_send", "PIN erzeugen & senden"); de.put("cn_direct_send", "Auswahl direkt senden");
+        de.put("cn_status_packing", "Dateien werden gepackt..."); de.put("cn_status_connecting", "Verbinden...");
+        de.put("cn_status_send_done", "Gesendet! Warte auf Peer.");
+        de.put("cn_status_recv_done", "Empfangen! In Download entpackt");
+        de.put("cn_pin_invalid", "6-stellige PIN eingeben");
+        de.put("cn_direct_invalid", "Peer Public-IP und Port eingeben");
+        de.put("manage_list", "Listenverwaltung"); de.put("add_files", "Dateien hinzufügen");
+        de.put("delete_all", "Alle löschen"); de.put("select_title", "Auswählen");
+        de.put("select_app", "App auswählen (APK)");
+dict.put("de", de);
 
         // ============ 法语 (fr) ============
         Map<String, String> fr = new HashMap<>(en);
@@ -388,7 +453,22 @@ dict.put("en", en);
         fr.put("view_whitelist", "Voir/Supprimer la liste blanche"); fr.put("view_blacklist", "Voir/Supprimer la liste noire");
         fr.put("all_deleted", "Tout effacé"); fr.put("export_log", "Exporter le journal");
         fr.put("input_address", "Entrez l'adresse"); fr.put("label", "Étiquette"); fr.put("ip_address", "Adresse IP");
-        dict.put("fr", fr);
+                // ---- P1 高频词条 ----
+        fr.put("general", "Général"); fr.put("accept", "Accepter"); fr.put("reject", "Refuser");
+        fr.put("recv_completed", "Reçu"); fr.put("send_completed", "Envoyé"); fr.put("interrupted", "Interrompu");
+        fr.put("unknown_device", "Appareil inconnu"); fr.put("unknown_file", "Fichier inconnu");
+        fr.put("save_dir_prefix", "Enregistrer dans : "); fr.put("wants_to_send", "Veut t'envoyer des fichiers");
+        fr.put("receive_request", "Demande de réception"); fr.put("service_running", "OldSend en cours");
+        fr.put("cn_gen_pin_send", "Générer PIN et envoyer"); fr.put("cn_direct_send", "Envoi direct sélection");
+        fr.put("cn_status_packing", "Empaquetage..."); fr.put("cn_status_connecting", "Connexion...");
+        fr.put("cn_status_send_done", "Envoyé ! En attente du pair.");
+        fr.put("cn_status_recv_done", "Reçu ! Extrait dans Download");
+        fr.put("cn_pin_invalid", "Entrez le PIN à 6 chiffres");
+        fr.put("cn_direct_invalid", "Entrez l'IP publique et le port");
+        fr.put("manage_list", "Gestion des listes"); fr.put("add_files", "Ajouter fichiers");
+        fr.put("delete_all", "Tout supprimer"); fr.put("select_title", "Sélectionner");
+        fr.put("select_app", "Choisir l'appli (APK)");
+dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
         Map<String, String> es = new HashMap<>(en);
@@ -422,7 +502,22 @@ dict.put("en", en);
         es.put("view_whitelist", "Ver/Eliminar lista blanca"); es.put("view_blacklist", "Ver/Eliminar lista negra");
         es.put("all_deleted", "Todo borrado"); es.put("export_log", "Exportar registro");
         es.put("input_address", "Ingresar dirección"); es.put("label", "Etiqueta"); es.put("ip_address", "Dirección IP");
-        dict.put("es", es);
+                // ---- P1 高频词条 ----
+        es.put("general", "General"); es.put("accept", "Aceptar"); es.put("reject", "Rechazar");
+        es.put("recv_completed", "Recibido"); es.put("send_completed", "Enviado"); es.put("interrupted", "Interrumpido");
+        es.put("unknown_device", "Dispositivo desconocido"); es.put("unknown_file", "Archivo desconocido");
+        es.put("save_dir_prefix", "Guardar en: "); es.put("wants_to_send", "Quiere enviarte archivos");
+        es.put("receive_request", "Solicitud de recepción"); es.put("service_running", "OldSend en ejecución");
+        es.put("cn_gen_pin_send", "Generar PIN y enviar"); es.put("cn_direct_send", "Envío directo selección");
+        es.put("cn_status_packing", "Empaquetando..."); es.put("cn_status_connecting", "Conectando...");
+        es.put("cn_status_send_done", "¡Enviado! Esperando al par.");
+        es.put("cn_status_recv_done", "¡Recibido! Extraído en Download");
+        es.put("cn_pin_invalid", "Ingrese el PIN de 6 dígitos");
+        es.put("cn_direct_invalid", "Ingrese IP pública y puerto");
+        es.put("manage_list", "Gestión de listas"); es.put("add_files", "Añadir archivos");
+        es.put("delete_all", "Eliminar todo"); es.put("select_title", "Seleccionar");
+        es.put("select_app", "Elegir app (APK)");
+dict.put("es", es);
 
         // ============ 俄语 (ru) ============
         Map<String, String> ru = new HashMap<>(en);
@@ -456,7 +551,22 @@ dict.put("en", en);
         ru.put("view_whitelist", "Просмотр/Удаление белого списка"); ru.put("view_blacklist", "Просмотр/Удаление черного списка");
         ru.put("all_deleted", "Все очищено"); ru.put("export_log", "Экспорт журнала");
         ru.put("input_address", "Введите адрес"); ru.put("label", "Метка"); ru.put("ip_address", "IP-адрес");
-        dict.put("ru", ru);
+                // ---- P1 高频词条 ----
+        ru.put("general", "Общие"); ru.put("accept", "Принять"); ru.put("reject", "Отклонить");
+        ru.put("recv_completed", "Получено"); ru.put("send_completed", "Отправлено"); ru.put("interrupted", "Прервано");
+        ru.put("unknown_device", "Неизвестное устройство"); ru.put("unknown_file", "Неизвестный файл");
+        ru.put("save_dir_prefix", "Сохранить в: "); ru.put("wants_to_send", "Хочет отправить тебе файлы");
+        ru.put("receive_request", "Запрос на получение файла"); ru.put("service_running", "OldSend работает");
+        ru.put("cn_gen_pin_send", "Создать PIN и отправить"); ru.put("cn_direct_send", "Прямая отправка выбранного");
+        ru.put("cn_status_packing", "Упаковка файлов..."); ru.put("cn_status_connecting", "Подключение...");
+        ru.put("cn_status_send_done", "Отправлено! Ждём получателя.");
+        ru.put("cn_status_recv_done", "Получено! Распаковано в Download");
+        ru.put("cn_pin_invalid", "Введите 6-значный PIN");
+        ru.put("cn_direct_invalid", "Введите публичный IP и порт");
+        ru.put("manage_list", "Управление списками"); ru.put("add_files", "Добавить файлы");
+        ru.put("delete_all", "Удалить всё"); ru.put("select_title", "Выбрать");
+        ru.put("select_app", "Выбрать приложение (APK)");
+dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
         Map<String, String> pt = new HashMap<>(en);
@@ -490,7 +600,22 @@ dict.put("en", en);
         pt.put("view_whitelist", "Ver/Remover lista branca"); pt.put("view_blacklist", "Ver/Remover lista negra");
         pt.put("all_deleted", "Tudo limpo"); pt.put("export_log", "Exportar log");
         pt.put("input_address", "Digite o endereço"); pt.put("label", "Rótulo"); pt.put("ip_address", "Endereço IP");
-        dict.put("pt", pt);
+                // ---- P1 高频词条 ----
+        pt.put("general", "Geral"); pt.put("accept", "Aceitar"); pt.put("reject", "Rejeitar");
+        pt.put("recv_completed", "Recebido"); pt.put("send_completed", "Enviado"); pt.put("interrupted", "Interrompido");
+        pt.put("unknown_device", "Dispositivo desconhecido"); pt.put("unknown_file", "Arquivo desconhecido");
+        pt.put("save_dir_prefix", "Salvar em: "); pt.put("wants_to_send", "Quer te enviar arquivos");
+        pt.put("receive_request", "Pedido de recebimento"); pt.put("service_running", "OldSend em execução");
+        pt.put("cn_gen_pin_send", "Gerar PIN e enviar"); pt.put("cn_direct_send", "Envio direto seleção");
+        pt.put("cn_status_packing", "Empacotando..."); pt.put("cn_status_connecting", "Conectando...");
+        pt.put("cn_status_send_done", "Enviado! Aguardando o par.");
+        pt.put("cn_status_recv_done", "Recebido! Extraído em Download");
+        pt.put("cn_pin_invalid", "Digite o PIN de 6 dígitos");
+        pt.put("cn_direct_invalid", "Digite o IP público e a porta");
+        pt.put("manage_list", "Gerenciar listas"); pt.put("add_files", "Adicionar arquivos");
+        pt.put("delete_all", "Excluir tudo"); pt.put("select_title", "Selecionar");
+        pt.put("select_app", "Escolher app (APK)");
+dict.put("pt", pt);
     }
 
     public static void init(Context ctx) {
