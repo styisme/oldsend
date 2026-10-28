@@ -88,9 +88,9 @@ public class CrossNetActivity extends Activity {
         
         String ipv6 = OldSendService.getIpv6();
         if (ipv6 != null) {
-            tvIpv6Info.setText("本机公网 IPv6: [" + ipv6 + "]:53317 (可用直连)");
+            tvIpv6Info.setText(String.format(I18nManager.get("ipv6_local"), ipv6));
         } else {
-            tvIpv6Info.setText("本机 IPv6: 未获取到公网 IPv6，仅限内网或穿透");
+            tvIpv6Info.setText(I18nManager.get("ipv6_none"));
         }
 
         // 绑定各种点击事件

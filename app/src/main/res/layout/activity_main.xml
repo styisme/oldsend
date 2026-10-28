@@ -98,7 +98,7 @@
 
                 <!-- 自动接收白名单 -->
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="52dp" android:orientation="horizontal" android:padding="14dp" android:background="@drawable/bg_md3_card" android:tag="card" android:gravity="center_vertical" android:layout_marginTop="6dp">
-                    <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="自动保存来自收藏夹(白名单)设备的文件" android:textSize="13sp" android:textColor="#333"/>
+                    <TextView android:id="@+id/tv_auto_whitelist" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:text="Auto save favorites" android:textSize="13sp" android:textColor="#333"/>
                     <org.oldsend.ui.Md3Switch android:id="@+id/cb_auto_whitelist" android:layout_width="44dp" android:layout_height="26dp"/>
                 </LinearLayout>
                 

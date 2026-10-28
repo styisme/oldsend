@@ -650,7 +650,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
         logDialog = Md3DialogUtils.createBaseDialog(this, I18nManager.get("log"), scroll, I18nManager.get("close"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int w) { dialogLogView = null; }
-        }, "导出日志", new DialogInterface.OnClickListener() {
+        }, I18nManager.get("export_log"), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface d, int w) { shareLogFile(); }
         });
         logDialog.show();

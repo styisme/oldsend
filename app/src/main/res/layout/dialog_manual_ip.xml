@@ -8,14 +8,14 @@
     android:padding="20dp">
 
     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:text="输入地址" android:textSize="20sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
+        android:id="@+id/tv_ip_title" android:text="Input Address" android:textSize="20sp" android:textStyle="bold" android:textColor="#1C1B1F"/>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:orientation="horizontal" android:layout_marginTop="16dp">
         <TextView android:id="@+id/tab_label" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="标签" android:padding="8dp" android:textColor="#388E3C" android:textStyle="bold"/>
+            android:id="@+id/tv_label" android:text="Label" android:padding="8dp" android:textColor="#388E3C" android:textStyle="bold"/>
         <TextView android:id="@+id/tab_ip" android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="IP 地址" android:padding="8dp" android:textColor="#666" android:layout_marginLeft="16dp"/>
+            android:id="@+id/tv_ip_tab" android:text="IP Address" android:padding="8dp" android:textColor="#666" android:layout_marginLeft="16dp"/>
     </LinearLayout>
 
     <EditText android:id="@+id/et_ip_address" android:layout_width="match_parent" android:layout_height="48dp"
