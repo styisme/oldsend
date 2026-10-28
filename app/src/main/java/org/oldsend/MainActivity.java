@@ -245,6 +245,32 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
     }
 
     private void applyI18n() {
+
+        // ===== 动态绑定主界面多语言 =====
+        Button btnManualIp = (Button) findViewById(R.id.btn_manual_ip);
+        if (btnManualIp != null) btnManualIp.setText(I18nManager.get("add_ip"));
+        
+        Button btnCrossNet = (Button) findViewById(R.id.btn_cross_net);
+        if (btnCrossNet != null) btnCrossNet.setText(I18nManager.get("cross_net"));
+
+        // 绑定 6 个卡片文字 (通过找到卡片容器，再获取它的第二个子 View)
+        int[] cardLayoutIds = {R.id.card_file, R.id.card_media, R.id.card_folder, R.id.card_app, R.id.card_text, R.id.card_clipboard};
+        String[] cardTextKeys = {"file", "media", "folder", "app", "text", "clipboard"};
+        
+        for (int i = 0; i < cardLayoutIds.length; i++) {
+            View card = findViewById(cardLayoutIds[i]);
+            if (card instanceof ViewGroup) {
+                ViewGroup group = (ViewGroup) card;
+                if (group.getChildCount() >= 2) {
+                    View child = group.getChildAt(1); // 索引 1 是文字 View
+                    if (child instanceof TextView) {
+                        ((TextView) child).setText(I18nManager.get(cardTextKeys[i]));
+                    }
+                }
+            }
+        }
+        // =================================
+    
         tabReceiveText.setText(I18nManager.get("receive"));
         tabSettingsText.setText(I18nManager.get("settings"));
         tabSendText.setText(I18nManager.get("send"));
@@ -820,6 +846,13 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         final TextView tvError = (TextView) dialog.findViewById(R.id.tv_error_msg);
         TextView btnCancel = (TextView) dialog.findViewById(R.id.btn_cancel);
         TextView btnConfirm = (TextView) dialog.findViewById(R.id.btn_confirm);
+
+        // 动态绑定多语言
+        ((TextView)dialog.findViewById(R.id.tv_ip_title)).setText(I18nManager.get("input_address"));
+        ((TextView)dialog.findViewById(R.id.tv_tab_label)).setText(I18nManager.get("label"));
+        ((TextView)dialog.findViewById(R.id.tv_tab_ip)).setText(I18nManager.get("ip_address"));
+        btnCancel.setText(I18nManager.get("cancel"));
+        btnConfirm.setText(I18nManager.get("confirm"));
 
         btnCancel.setOnClickListener(new View.OnClickListener() { public void onClick(View v) { dialog.dismiss(); } });
         btnConfirm.setOnClickListener(new View.OnClickListener() {
