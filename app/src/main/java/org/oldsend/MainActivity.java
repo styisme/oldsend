@@ -952,7 +952,12 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         });
     }
 
-    public void onChanged() { if (adapter != null) adapter.setData(DeviceStore.get().snapshot()); if (emptyHint != null && adapter != null) emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE); if (deviceList != null) setListViewHeightBasedOnChildren(deviceList); updateStatus(); }
+    public void onChanged() {
+        if (adapter != null) adapter.setData(DeviceStore.get().snapshot());
+        if (emptyHint != null && adapter != null) emptyHint.setVisibility(adapter.getCount() == 0 ? View.VISIBLE : View.GONE);
+        if (deviceList != null) setListViewHeightBasedOnChildren(deviceList);
+        updateStatus();
+    }
     
     private void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter(); if (listAdapter == null) return;
