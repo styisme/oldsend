@@ -40,7 +40,7 @@ import org.oldsend.util.I18nManager;
 import org.oldsend.util.ThemeUtils;
 import org.oldsend.util.FileLogger;
 
-public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener, ReceiveManager.DialogListener {
+public class MainActivity extends Activity implements OldSendService.LogSink, DeviceStore.Listener {
     private static final int REQ_FILE = 1001;
     private static final int REQ_MEDIA = 1002;
 
@@ -107,7 +107,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         OldSendService.setSink(this);
         DeviceStore.get().setListener(this);
-        ReceiveManager.setListener(this);
+        
 
         findViewById(R.id.card_file).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(false, false); } });
         findViewById(R.id.card_media).setOnClickListener(new View.OnClickListener() { public void onClick(View v) { pickFile(true, false); } });
@@ -927,15 +927,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         android.view.ViewGroup.LayoutParams params = listView.getLayoutParams(); params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1)); listView.setLayoutParams(params);
     }
 
-    @Override
-    public void showConfirmDialog(String senderAlias, int fileCount, final ReceiveManager.Callback callback) {
-        if (isFinishing()) { callback.onResult(false); return; }
-        Md3DialogUtils.showConfirm(this, "接收文件", "设备【" + senderAlias + "】请求发送 " + fileCount + " 个文件，是否接收？", "接收", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                callback.onResult(true);
-            }
-        }).show();
-    }
+    
 
     private void refreshHistory() {
         List<HistoryStore.Record> list = HistoryStore.get().snapshot();
@@ -963,6 +955,6 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         }
     }
 
-    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null); ReceiveManager.setListener(null); if (progressReceiver != null) { try { unregisterReceiver(progressReceiver); } catch (Exception ignored) {} }
+    @Override protected void onDestroy() { OldSendService.setSink(null); DeviceStore.get().setListener(null);  if (progressReceiver != null) { try { unregisterReceiver(progressReceiver); } catch (Exception ignored) {} }
         if (receiveConfirmReceiver != null) { try { unregisterReceiver(receiveConfirmReceiver); } catch (Exception ignored) {} } super.onDestroy(); }
 }
