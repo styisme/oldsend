@@ -111,7 +111,7 @@ public class TransferActivity extends Activity {
             
             btnAccept.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    sendBroadcast(new Intent("org.oldsend.MANUAL_ACCEPT"));
+                    if (ReceiveManager.pendingCallback != null) { ReceiveManager.pendingCallback.onResult(true); ReceiveManager.pendingCallback = null; }
                     layoutConfirm.setVisibility(View.GONE);
                     layoutProgress.setVisibility(View.VISIBLE);
                     tvTitle.setText("正在接收文件");
@@ -123,7 +123,7 @@ public class TransferActivity extends Activity {
             
             btnReject.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    sendBroadcast(new Intent("org.oldsend.MANUAL_REJECT"));
+                    if (ReceiveManager.pendingCallback != null) { ReceiveManager.pendingCallback.onResult(false); ReceiveManager.pendingCallback = null; }
                     finish();
                 }
             });

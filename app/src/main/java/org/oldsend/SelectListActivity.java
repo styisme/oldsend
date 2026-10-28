@@ -44,7 +44,7 @@ public class SelectListActivity extends Activity {
             public void onClick(View v) {
                 MainActivity.pendingUris.clear();
                 refreshList();
-                Toast.makeText(SelectListActivity.this, "已全部删除", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectListActivity.this, org.oldsend.util.I18nManager.get("all_deleted"), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -124,7 +124,7 @@ public class SelectListActivity extends Activity {
             }
             
             if (itemSize != null) {
-                itemSize.setText(size > 0 ? sizeStr : "未知大小");
+                itemSize.setText(size > 0 ? sizeStr : org.oldsend.util.I18nManager.get("unknown_size"));
                 if (ThemeUtils.isDarkMode(this)) itemSize.setTextColor(0xFFAAAAAA);
             }
             
@@ -140,8 +140,8 @@ public class SelectListActivity extends Activity {
             listContainer.addView(itemView);
         }
 
-        if (tvFileCount != null) tvFileCount.setText("文件: " + uris.size());
+        if (tvFileCount != null) tvFileCount.setText(String.format(org.oldsend.util.I18nManager.get("file_count"), uris.size()));
         String totalSizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
-        if (tvTotalSize != null) tvTotalSize.setText("大小: " + (totalSize > 0 ? totalSizeStr : "未知"));
+        if (tvTotalSize != null) tvTotalSize.setText(String.format(org.oldsend.util.I18nManager.get("size_label"), (totalSize > 0 ? totalSizeStr : org.oldsend.util.I18nManager.get("unknown_size"))));
     }
 }

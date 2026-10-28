@@ -80,6 +80,15 @@ public class I18nManager {
         zh.put("stun_probe", "STUN探测");
         zh.put("stun_tip", "NAT公网地址: 点击右侧探测");
         zh.put("advanced_tip", "高级玩法：可配合 FRP/Ngrok 或 ZeroTier 组网后，将生成的公网地址填入下方极速直连。");
+        
+        zh.put("file_count", "文件: %d");
+        zh.put("size_label", "大小: %s");
+        zh.put("unknown_size", "未知大小");
+        zh.put("manage", "管理");
+        zh.put("clear_all", "清空所有名单");
+        zh.put("view_whitelist", "查看/移除 白名单");
+        zh.put("view_blacklist", "查看/移除 黑名单");
+        zh.put("all_deleted", "已全部删除");
         dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -144,6 +153,15 @@ public class I18nManager {
         en.put("pin_incorrect", "Incorrect PIN, try again");
         en.put("modify_pin", "Modify PIN");
         en.put("pin_code", "PIN Code");
+        
+        en.put("file_count", "Files: %d");
+        en.put("size_label", "Size: %s");
+        en.put("unknown_size", "Unknown Size");
+        en.put("manage", "Manage");
+        en.put("clear_all", "Clear all lists");
+        en.put("view_whitelist", "View/Remove Whitelist");
+        en.put("view_blacklist", "View/Remove Blacklist");
+        en.put("all_deleted", "All cleared");
         dict.put("en", en);
 
         // ============ 日语 (ja) ============

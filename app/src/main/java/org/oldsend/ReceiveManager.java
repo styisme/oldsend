@@ -5,47 +5,43 @@ import android.os.Looper;
 import org.oldsend.util.FileLogger;
 
 public class ReceiveManager {
-    public interface DialogListener {
-        void showConfirmDialog(String senderAlias, int fileCount, final Callback callback);
-    }
-
     public interface Callback {
         void onResult(boolean accepted);
     }
 
-    private static DialogListener listener;
-    public static Callback pendingCallback; // 新增：用于外部唤醒
-    public static void setListener(DialogListener l) { listener = l; }
+    public static Callback pendingCallback;
+    private static final Object lock = new Object();
+    private static boolean waiting = false;
+    private static boolean result = false;
 
     public static boolean askUser(final String alias, final int count) {
         FileLogger.log("ReceiveManager", "Ask user to receive from: " + alias);
-        if (listener == null) return true;
-
-        final Object lock = new Object();
-        final boolean[] result = new boolean[]{false};
-        final boolean[] waiting = new boolean[]{true};
-        
         pendingCallback = new Callback() {
             public void onResult(boolean accepted) {
                 synchronized (lock) {
-                    result[0] = accepted;
-                    waiting[0] = false;
+                    result = accepted;
+                    waiting = false;
                     lock.notifyAll();
                 }
             }
         };
 
-        Handler mainHandler = new Handler(Looper.getMainLooper());
-        mainHandler.post(new Runnable() {
+        waiting = true;
+        result = false;
+
+        // 直接拉起全屏 UI，带上必要参数
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             public void run() {
-                if (listener != null) {
-                    listener.showConfirmDialog(alias, count, pendingCallback);
-                } else {
-                    synchronized (lock) {
-                        result[0] = true;
-                        waiting[0] = false;
-                        lock.notifyAll();
-                    }
+                try {
+                    android.content.Intent intent = new android.content.Intent(OldSendService.getContext(), TransferActivity.class);
+                    intent.putExtra("mode", 1); // 接收模式
+                    intent.putExtra("senderName", alias);
+                    intent.putExtra("fileCount", count);
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    OldSendService.getContext().startActivity(intent);
+                } catch (Exception e) {
+                    FileLogger.log("ReceiveManager", "Failed to start TransferActivity: " + e);
+                    synchronized (lock) { result = false; waiting = false; lock.notifyAll(); }
                 }
             }
         });
@@ -53,12 +49,12 @@ public class ReceiveManager {
         synchronized (lock) {
             try {
                 long start = System.currentTimeMillis();
-                while (waiting[0]) {
+                while (waiting) {
                     lock.wait(30000);
                     if (System.currentTimeMillis() - start > 30000) break;
                 }
             } catch (Exception ignored) {}
         }
-        return result[0];
+        return result;
     }
 }

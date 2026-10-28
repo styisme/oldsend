@@ -181,8 +181,8 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                 final boolean isBl = bl.contains(fp);
 
                 final String[] items = new String[]{
-                    isWl ? "移除白名单" : "⭐ 加入白名单",
-                    isBl ? "移除黑名单" : "🚫 加入黑名单"
+                    isWl ? "Remove Whitelist" : "⭐ Add Whitelist",
+                    isBl ? "Remove Blacklist" : "🚫 Add Blacklist"
                 };
                 Md3DialogUtils.showList(MainActivity.this, target.alias, items, new Md3DialogUtils.OnItemSelectListener() {
                     public void onItemSelect(int p) {
@@ -456,12 +456,12 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
     
     
     private void showAclManager() {
-        final String[] items = new String[]{"查看/移除 白名单", "查看/移除 黑名单", "清空所有名单"};
+        final String[] items = new String[]{I18nManager.get("view_whitelist"), I18nManager.get("view_blacklist"), I18nManager.get("clear_all")};
         Md3DialogUtils.showList(this, "名单管理中心", items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int pos) {
                 if (pos == 2) {
                     getSharedPreferences("oldsend", MODE_PRIVATE).edit().remove("whitelist").remove("blacklist").commit();
-                    Toast.makeText(MainActivity.this, "已清空所有黑白名单", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, I18nManager.get("all_deleted"), Toast.LENGTH_SHORT).show();
                 } else {
                     showSpecificList(pos == 0 ? "whitelist" : "blacklist");
                 }
