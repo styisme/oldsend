@@ -37,6 +37,10 @@ public class SelectListActivity extends Activity {
         btnDeleteAll = (Button) findViewById(R.id.btn_delete_all);
         btnBack = (Button) findViewById(R.id.btn_back);
 
+        TextView tvSltTitle = (TextView) findViewById(R.id.tv_slt_title);
+        if (tvSltTitle != null) tvSltTitle.setText(I18nManager.get("select_title"));
+        if (btnDeleteAll != null) btnDeleteAll.setText(I18nManager.get("delete_all"));
+
         btnBack.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) { finish(); }
         });
@@ -68,7 +72,7 @@ public class SelectListActivity extends Activity {
             final Uri uri = uris.get(i);
             final int index = i;
             
-            String name = "未知文件";
+            String name = I18nManager.get("unknown_file");
             long size = 0;
             
             try {

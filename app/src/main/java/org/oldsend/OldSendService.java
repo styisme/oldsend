@@ -21,6 +21,7 @@ import org.oldsend.http.HttpServer;
 import org.oldsend.http.Router;
 import org.oldsend.protocol.Identity;
 import org.oldsend.model.HistoryStore;
+import org.oldsend.util.I18nManager;
 
 public class OldSendService extends Service {
     public interface LogSink { void log(String msg); }
@@ -81,12 +82,12 @@ public class OldSendService extends Service {
             b = new android.app.Notification.Builder(ctx);
         }
         b.setSmallIcon(android.R.drawable.stat_sys_download)
-         .setContentTitle("接收文件请求")
-         .setContentText("【" + alias + "】请求发送 " + count + " 个文件")
+         .setContentTitle(I18nManager.get("receive_request"))
+         .setContentText("【" + alias + "】 " + count + " files")
          .setAutoCancel(true);
         if (Build.VERSION.SDK_INT >= 16) {
-            b.addAction(android.R.drawable.ic_input_add, "接收", acceptPi);
-            b.addAction(android.R.drawable.ic_delete, "拒绝", rejectPi);
+            b.addAction(android.R.drawable.ic_input_add, I18nManager.get("accept"), acceptPi);
+            b.addAction(android.R.drawable.ic_delete, I18nManager.get("reject"), rejectPi);
         }
 
         nm.notify(100, b.build());
@@ -158,8 +159,8 @@ public class OldSendService extends Service {
         } else {
             builder = new Notification.Builder(this);
         }
-        builder.setContentTitle("OldSend 正在运行")
-               .setContentText("局域网文件传输已就绪，点击返回")
+        builder.setContentTitle(I18nManager.get("service_running"))
+               .setContentText(I18nManager.get("service_ready"))
                .setSmallIcon(android.R.drawable.stat_sys_download_done)
                .setContentIntent(pi);
 

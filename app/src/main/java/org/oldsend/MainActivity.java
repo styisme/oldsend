@@ -287,7 +287,7 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         ((TextView)findViewById(R.id.tv_receive_title)).setText(I18nManager.get("receive_history"));
 
-        safeSetText(R.id.tv_set_rx, I18nManager.get("receive"));
+        safeSetText(R.id.tv_set_rx, I18nManager.get("general"));
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_filter_title, I18nManager.get("filter_ext_title"));
@@ -352,6 +352,19 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         tvTimeout = (TextView) findViewById(R.id.tv_timeout_value);
 
         if (tvName != null) tvName.setText(OldSendService.getAlias(this));
+        
+        TextView tvLang = (TextView) findViewById(R.id.tv_lang_value);
+        if (tvLang != null) {
+            String lang = getSharedPreferences("oldsend", MODE_PRIVATE).getString("app_lang", "system");
+            String[] codes = {"system", "zh", "zh_TW", "en", "ja", "ko", "de", "fr", "es", "ru", "pt"};
+            String[] names = {I18nManager.get("follow_system"), "简体中文", "繁體中文", "English", "日本語", "한국어", "Deutsch", "Français", "Español", "Русский", "Português"};
+            String display = I18nManager.get("follow_system");
+            for (int i = 0; i < codes.length; i++) {
+                if (codes[i].equals(lang)) { display = names[i]; break; }
+            }
+            tvLang.setText(display);
+        }
+        
         if (cbAutoSave != null) cbAutoSave.setChecked(OldSendService.getPrefBooleanGlobal("auto_save", false));
         if (cbSaveAlbum != null) cbSaveAlbum.setChecked(OldSendService.getPrefBooleanGlobal("save_album", true));
         if (cbSaveHistory != null) cbSaveHistory.setChecked(OldSendService.getPrefBooleanGlobal("save_history", true));
@@ -437,12 +450,12 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         findViewById(R.id.row_filter_ext).setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 String current = OldSendService.getPrefStringGlobal("filter_ext", "exe,bat,cmd,vbs,sh");
-                Md3DialogUtils.showInput(MainActivity.this, "拦截后缀 (逗号分隔, 留空为不拦截)", current, new Md3DialogUtils.OnInputListener() {
+                Md3DialogUtils.showInput(MainActivity.this, I18nManager.get("filter_ext_hint"), current, new Md3DialogUtils.OnInputListener() {
                     public void onInput(String text) {
                         String val = text.replace(" ", "").toLowerCase();
                         getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString("filter_ext", val).commit();
                         ((TextView) findViewById(R.id.tv_filter_value)).setText(val);
-                        Toast.makeText(MainActivity.this, "拦截规则已更新", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, I18nManager.get("filter_updated"), Toast.LENGTH_SHORT).show();
                     }
                 }).show();
             }
@@ -478,13 +491,13 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
             current += fp + ",";
         }
         getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString(key, current).commit();
-        Toast.makeText(this, exists ? "已移出名单" : "已加入名单", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, exists ? I18nManager.get("removed_from_list") : I18nManager.get("added_to_list"), Toast.LENGTH_SHORT).show();
     }
     
     
     private void showAclManager() {
         final String[] items = new String[]{I18nManager.get("view_whitelist"), I18nManager.get("view_blacklist"), I18nManager.get("clear_all")};
-        Md3DialogUtils.showList(this, "名单管理中心", items, new Md3DialogUtils.OnItemSelectListener() {
+        Md3DialogUtils.showList(this, I18nManager.get("manage_list"), items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int pos) {
                 if (pos == 2) {
                     getSharedPreferences("oldsend", MODE_PRIVATE).edit().remove("whitelist").remove("blacklist").commit();
@@ -499,7 +512,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
     private void showSpecificList(final String key) {
         String listStr = OldSendService.getPrefStringGlobal(key, "");
         if (listStr.trim().isEmpty()) {
-            Toast.makeText(this, "当前名单为空", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, I18nManager.get("list_empty"), Toast.LENGTH_SHORT).show();
             return;
         }
         
@@ -510,14 +523,14 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
             displayArr[i] = arr[i].length() > 16 ? arr[i].substring(0, 16) + "..." : arr[i];
         }
 
-        Md3DialogUtils.showList(this, "点击移除设备 (" + arr.length + "个)", displayArr, new Md3DialogUtils.OnItemSelectListener() {
+        Md3DialogUtils.showList(this, String.format(I18nManager.get("remove_device_fmt"), arr.length), displayArr, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int pos) {
                 String target = arr[pos];
                 String current = OldSendService.getPrefStringGlobal(key, "");
                 // 移除并更新
                 current = current.replace(target + ",", "").replace(target, "");
                 getSharedPreferences("oldsend", MODE_PRIVATE).edit().putString(key, current).commit();
-                Toast.makeText(MainActivity.this, "已移除", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, I18nManager.get("removed"), Toast.LENGTH_SHORT).show();
                 showSpecificList(key); // 递归刷新列表
             }
         }).show();
@@ -584,7 +597,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         if (clip != null && clip.getItemCount() > 0) {
             CharSequence text = clip.getItemAt(0).coerceToText(this);
             if (text != null && text.length() > 0) prepareText(text.toString());
-        } else { Toast.makeText(this, "Clipboard empty", Toast.LENGTH_SHORT).show(); }
+        } else { Toast.makeText(this, I18nManager.get("clipboard_empty"), Toast.LENGTH_SHORT).show(); }
     }
 
     private void showSendTextDialog() {
@@ -610,15 +623,15 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         if (files == null) return;
         List<String> folderNames = new ArrayList<String>();
         final List<File> folders = new ArrayList<File>();
-        folderNames.add(">> [Send this folder] <<");
-        for (File f : files) { if (f.isDirectory() && !f.isHidden()) { folderNames.add("[Folder] " + f.getName()); folders.add(f); } }
+        folderNames.add(I18nManager.get("send_folder"));
+        for (File f : files) { if (f.isDirectory() && !f.isHidden()) { folderNames.add(I18nManager.get("folder_prefix") + f.getName()); folders.add(f); } }
         String[] items = folderNames.toArray(new String[0]);
         Dialog d = Md3DialogUtils.showList(this, dir.getAbsolutePath(), items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int position) {
                 if (position == 0) {
                     List<File> allFiles = new ArrayList<File>();
                     getAllFiles(dir, allFiles);
-                    if (allFiles.isEmpty()) { Toast.makeText(MainActivity.this, "Empty folder", Toast.LENGTH_SHORT).show(); }
+                    if (allFiles.isEmpty()) { Toast.makeText(MainActivity.this, I18nManager.get("empty_folder"), Toast.LENGTH_SHORT).show(); }
                     else {
                         if (!pendingAppend) pendingUris.clear();
                         for (File f : allFiles) pendingUris.add(Uri.fromFile(f));
@@ -644,7 +657,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
         List<String> appNames = new ArrayList<String>();
         for (PackageInfo pkg : packages) { ApplicationInfo app = pkg.applicationInfo; if ((app.flags & ApplicationInfo.FLAG_SYSTEM) == 0) { apps.add(app); appNames.add(app.loadLabel(pm).toString()); } }
         String[] items = appNames.toArray(new String[0]);
-        Dialog d = Md3DialogUtils.showList(this, "Select App (APK)", items, new Md3DialogUtils.OnItemSelectListener() {
+        Dialog d = Md3DialogUtils.showList(this, I18nManager.get("select_app"), items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int position) {
                 ApplicationInfo app = apps.get(position); String apkPath = app.sourceDir;
                 if (!pendingAppend) pendingUris.clear(); 
@@ -685,13 +698,13 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
     private void shareLogFile() {
         File logFile = new File(android.os.Environment.getExternalStorageDirectory(), "Download/OldSend/debug_log.txt");
-        if (!logFile.exists()) { Toast.makeText(this, "Log file not found", Toast.LENGTH_SHORT).show(); return; }
+        if (!logFile.exists()) { Toast.makeText(this, I18nManager.get("share_log_missing"), Toast.LENGTH_SHORT).show(); return; }
         try {
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.setType("text/plain");
             intent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(logFile));
             startActivity(Intent.createChooser(intent, "Share Log"));
-        } catch (Exception e) { Toast.makeText(this, "Share failed", Toast.LENGTH_SHORT).show(); }
+        } catch (Exception e) { Toast.makeText(this, I18nManager.get("share_failed"), Toast.LENGTH_SHORT).show(); }
     }
 
     private void showSetNameDialog() {
@@ -702,6 +715,11 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
 
     private void showAboutDialog() {
         View v = getLayoutInflater().inflate(R.layout.dialog_about, null);
+        
+        TextView tvDesc = (TextView) v.findViewById(R.id.tv_about_desc);
+        if (tvDesc != null) tvDesc.setText(I18nManager.get("about_desc"));
+        TextView tvCredits = (TextView) v.findViewById(R.id.tv_about_credits);
+        if (tvCredits != null) tvCredits.setText(I18nManager.get("about_credits"));
         
         // 适配深色模式下的文字颜色
         if (ThemeUtils.isDarkMode(this)) {
@@ -816,8 +834,8 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
     }
 
     private void showAddFilesDialog() {
-        final String[] items = new String[]{"文件", "媒体", "应用", "文件夹"};
-        Md3DialogUtils.showList(this, "加入文件", items, new Md3DialogUtils.OnItemSelectListener() {
+        final String[] items = new String[]{I18nManager.get("file"), I18nManager.get("media"), I18nManager.get("app"), I18nManager.get("folder")};
+        Md3DialogUtils.showList(this, I18nManager.get("add_files"), items, new Md3DialogUtils.OnItemSelectListener() {
             public void onItemSelect(int pos) {
                 if (pos == 0) pickFile(false, true);
                 else if (pos == 1) pickFile(true, true);
@@ -867,7 +885,7 @@ findViewById(R.id.row_set_name).setOnClickListener(new View.OnClickListener() { 
                     tvError.setVisibility(View.GONE);
                     dialog.dismiss();
                     Device d = new Device();
-                    d.alias = "手动设备";
+                    d.alias = I18nManager.get("manual_device");
                     d.ip = ip;
                     d.port = 53317;
                     d.https = false;

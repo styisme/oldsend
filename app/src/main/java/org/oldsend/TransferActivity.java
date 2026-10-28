@@ -88,6 +88,8 @@ public class TransferActivity extends Activity {
 
         btnCancel.setText("✕ " + I18nManager.get("cancel"));
         btnDone.setText("✔ " + I18nManager.get("completed"));
+        if (btnAccept != null) btnAccept.setText("✔ " + I18nManager.get("accept"));
+        if (btnReject != null) btnReject.setText("✕ " + I18nManager.get("reject"));
 
         handleIntent(getIntent());
     }
@@ -105,7 +107,9 @@ public class TransferActivity extends Activity {
 
         if (mode == 1) {
             String senderName = intent.getStringExtra("senderName");
-            tvSenderName.setText(senderName != null ? senderName : "Unknown Device");
+            tvSenderName.setText(senderName != null ? senderName : I18nManager.get("unknown_device"));
+            TextView tvWant = (TextView) findViewById(R.id.tv_want_to_send);
+            if (tvWant != null) tvWant.setText(I18nManager.get("wants_to_send"));
             layoutConfirm.setVisibility(View.VISIBLE);
             layoutProgress.setVisibility(View.GONE);
             
@@ -114,9 +118,9 @@ public class TransferActivity extends Activity {
                     if (ReceiveManager.pendingCallback != null) { ReceiveManager.pendingCallback.onResult(true); ReceiveManager.pendingCallback = null; }
                     layoutConfirm.setVisibility(View.GONE);
                     layoutProgress.setVisibility(View.VISIBLE);
-                    tvTitle.setText("正在接收文件");
+                    tvTitle.setText(I18nManager.get("receiving_title"));
                     tvSaveDir.setVisibility(View.VISIBLE);
-                    tvSaveDir.setText("保存目录: /storage/emulated/0/Download/OldSend");
+                    tvSaveDir.setText(I18nManager.get("save_dir_prefix") + "/storage/emulated/0/Download/OldSend");
                     startTime = System.currentTimeMillis();
                 }
             });
@@ -130,7 +134,7 @@ public class TransferActivity extends Activity {
         } else {
             layoutConfirm.setVisibility(View.GONE);
             layoutProgress.setVisibility(View.VISIBLE);
-            tvTitle.setText("正在发送文件");
+            tvTitle.setText(I18nManager.get("sending_title"));
             
             targetDevice = (Device) intent.getSerializableExtra("device");
             filePaths = intent.getStringArrayListExtra("files");
@@ -222,7 +226,7 @@ public class TransferActivity extends Activity {
     }
 
     private void showPinDialog() {
-        org.oldsend.ui.Md3DialogUtils.showInput(this, "请输入接收方 PIN 码", "", new org.oldsend.ui.Md3DialogUtils.OnInputListener() {
+        org.oldsend.ui.Md3DialogUtils.showInput(this, I18nManager.get("enter_pin"), "", new org.oldsend.ui.Md3DialogUtils.OnInputListener() {
             public void onInput(String pin) {
                 if (pin != null && pin.length() > 0) {
                     startUpload(pin);
@@ -251,8 +255,8 @@ public class TransferActivity extends Activity {
             long remain = (long)((total - current) / (speed + 1));
             String timeStr = String.format(Locale.US, "%02d:%02d", remain / 60, remain % 60);
             
-            tvTotalTitle.setText("总进度 (" + timeStr + ")");
-            tvSpeedInfo.setText("文件: " + (mode==1?"0":"0") + " / 1\n大小: " + formatSize(current) + " / " + formatSize(total) + "\n速度: " + speedStr);
+            tvTotalTitle.setText(I18nManager.get("total_progress") + " (" + timeStr + ")");
+            tvSpeedInfo.setText(I18nManager.get("file") + ": 0 / 1\n" + I18nManager.get("size") + ": " + formatSize(current) + " / " + formatSize(total) + "\n" + I18nManager.get("speed") + ": " + speedStr);
         }
     }
 
@@ -269,24 +273,24 @@ public class TransferActivity extends Activity {
         btnDone.setVisibility(View.VISIBLE);
         
         if (ok) {
-            tvTitle.setText(mode == 1 ? "接收完成" : "发送完成");
-            tvTotalTitle.setText("已完成");
+            tvTitle.setText(mode == 1 ? I18nManager.get("recv_completed") : I18nManager.get("send_completed"));
+            tvTotalTitle.setText(I18nManager.get("completed"));
             pbTotal.setProgress(100);
             pbFile.setProgress(100);
             tvFileStatus.setVisibility(View.VISIBLE);
             
             if (mode == 1) {
-                tvFileStatus.setText("已保存到相册");
-                tvSaveDir.setText("保存目录: /storage/emulated/0/Download/OldSend");
+                tvFileStatus.setText(I18nManager.get("save_to_dir"));
+                tvSaveDir.setText(I18nManager.get("save_dir_prefix") + "/storage/emulated/0/Download/OldSend");
                 tvFileStatus.setTextColor(0xFF388E3C);
             } else {
-                tvFileStatus.setText("完成");
+                tvFileStatus.setText(I18nManager.get("completed"));
                 tvFileStatus.setTextColor(0xFF388E3C);
             }
         } else {
-            tvTitle.setText("传输失败");
-            tvTotalTitle.setText("已中断");
-            tvFileStatus.setText("失败");
+            tvTitle.setText(I18nManager.get("send_failed"));
+            tvTotalTitle.setText(I18nManager.get("interrupted"));
+            tvFileStatus.setText(I18nManager.get("failed"));
             tvFileStatus.setTextColor(0xFFD32F2F);
             tvFileStatus.setVisibility(View.VISIBLE);
         }

@@ -36,7 +36,7 @@ public class PrepareUploadHandler implements Router.Handler {
         JSONObject files = o.optJSONObject("files");
         if (files == null) files = new JSONObject();
 
-        String senderAlias = "未知设备";
+        String senderAlias = org.oldsend.util.I18nManager.get("unknown_device");
         String senderFingerprint = req.remoteAddress.getHostAddress(); // 默认用 IP 兜底
 
         JSONObject info = o.optJSONObject("info");
