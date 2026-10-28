@@ -16,6 +16,10 @@ public class ReceiveManager {
 
     public static boolean askUser(final String alias, final int count) {
         FileLogger.log("ReceiveManager", "Ask user to receive from: " + alias);
+        
+        // 防御性清理上一次的残留
+        pendingCallback = null;
+
         pendingCallback = new Callback() {
             public void onResult(boolean accepted) {
                 synchronized (lock) {
@@ -29,18 +33,17 @@ public class ReceiveManager {
         waiting = true;
         result = false;
 
-        // 直接拉起全屏 UI，带上必要参数
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             public void run() {
                 try {
                     android.content.Intent intent = new android.content.Intent(OldSendService.getContext(), TransferActivity.class);
-                    intent.putExtra("mode", 1); // 接收模式
+                    intent.putExtra("mode", 1);
                     intent.putExtra("senderName", alias);
                     intent.putExtra("fileCount", count);
                     intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     OldSendService.getContext().startActivity(intent);
                 } catch (Exception e) {
-                    FileLogger.log("ReceiveManager", "Failed to start TransferActivity: " + e);
+                    FileLogger.log("ReceiveManager", "Failed to start UI: " + e.getMessage());
                     synchronized (lock) { result = false; waiting = false; lock.notifyAll(); }
                 }
             }

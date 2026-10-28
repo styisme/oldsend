@@ -15,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.oldsend.util.ThemeUtils;
+import org.oldsend.util.I18nManager;
 import java.io.File;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class SelectListActivity extends Activity {
             public void onClick(View v) {
                 MainActivity.pendingUris.clear();
                 refreshList();
-                Toast.makeText(SelectListActivity.this, org.oldsend.util.I18nManager.get("all_deleted"), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SelectListActivity.this, I18nManager.get("all_deleted"), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -124,7 +125,7 @@ public class SelectListActivity extends Activity {
             }
             
             if (itemSize != null) {
-                itemSize.setText(size > 0 ? sizeStr : org.oldsend.util.I18nManager.get("unknown_size"));
+                itemSize.setText(size > 0 ? sizeStr : I18nManager.get("unknown_size"));
                 if (ThemeUtils.isDarkMode(this)) itemSize.setTextColor(0xFFAAAAAA);
             }
             
@@ -140,8 +141,8 @@ public class SelectListActivity extends Activity {
             listContainer.addView(itemView);
         }
 
-        if (tvFileCount != null) tvFileCount.setText(String.format(org.oldsend.util.I18nManager.get("file_count"), uris.size()));
+        if (tvFileCount != null) tvFileCount.setText(String.format(I18nManager.get("file_count"), uris.size()));
         String totalSizeStr = totalSize > 1024*1024 ? String.format("%.1f MB", totalSize/1024.0/1024.0) : String.format("%.1f KB", totalSize/1024.0);
-        if (tvTotalSize != null) tvTotalSize.setText(String.format(org.oldsend.util.I18nManager.get("size_label"), (totalSize > 0 ? totalSizeStr : org.oldsend.util.I18nManager.get("unknown_size"))));
+        if (tvTotalSize != null) tvTotalSize.setText(String.format(I18nManager.get("size_label"), (totalSize > 0 ? totalSizeStr : I18nManager.get("unknown_size"))));
     }
 }
