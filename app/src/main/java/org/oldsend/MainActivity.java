@@ -287,11 +287,12 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
 
         ((TextView)findViewById(R.id.tv_receive_title)).setText(I18nManager.get("receive_history"));
 
+        safeSetText(R.id.tv_settings_title, I18nManager.get("settings"));
         safeSetText(R.id.tv_set_rx, I18nManager.get("general"));
         safeSetText(R.id.tv_dark, I18nManager.get("dark_mode"));
+        safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist"));
         safeSetText(R.id.tv_auto_save, I18nManager.get("auto_save"));
         safeSetText(R.id.tv_filter_title, I18nManager.get("filter_ext_title"));
-        // safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist")); // UI 缺失，跳过
         safeSetText(R.id.tv_manage_acl_title, I18nManager.get("manage_acl"));
         safeSetText(R.id.tv_save_album, I18nManager.get("save_album"));
         safeSetText(R.id.tv_save_history, I18nManager.get("save_history"));
@@ -310,6 +311,10 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
         safeSetText(R.id.tv_set_name, I18nManager.get("set_name"));
         safeSetText(R.id.tv_backup, I18nManager.get("backup"));
         safeSetText(R.id.tv_about, I18nManager.get("about"));
+        safeSetText(R.id.tv_settings_title, I18nManager.get("settings"));
+        safeSetText(R.id.tv_auto_whitelist, I18nManager.get("auto_whitelist"));
+        safeSetText(R.id.tv_manage_acl_arrow, I18nManager.get("manage_arrow"));
+        safeSetText(R.id.btn_add_files_more, I18nManager.get("add_btn"));
     }
 
     private void safeSetText(int id, String text) {

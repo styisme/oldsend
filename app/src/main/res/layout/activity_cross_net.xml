@@ -47,8 +47,8 @@
                 <LinearLayout android:id="@+id/layout_cn_selected_files" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone" android:layout_marginTop="12dp" android:background="@drawable/bg_md3_edittext" android:padding="12dp">
                     <TextView android:id="@+id/tv_cn_file_info" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="13sp" android:textColor="#388E3C"/>
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="end" android:layout_marginTop="8dp">
-                        <Button android:id="@+id/btn_cn_edit_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="编辑" android:textSize="12sp" android:textColor="#49454F" android:background="@android:color/transparent" android:minHeight="0dp"/>
-                        <Button android:id="@+id/btn_cn_add_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="+ 添加" android:textSize="12sp" android:textColor="#FFFFFF" android:background="@drawable/btn_md3_primary" android:minHeight="0dp" android:layout_marginLeft="8dp"/>
+                        <Button android:id="@+id/btn_cn_edit_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="Edit" android:textSize="12sp" android:textColor="#49454F" android:background="@android:color/transparent" android:minHeight="0dp"/>
+                        <Button android:id="@+id/btn_cn_add_files" android:layout_width="wrap_content" android:layout_height="32dp" android:text="+ Add" android:textSize="12sp" android:textColor="#FFFFFF" android:background="@drawable/btn_md3_primary" android:minHeight="0dp" android:layout_marginLeft="8dp"/>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -64,7 +64,7 @@
             </LinearLayout>
 
             <TextView android:id="@+id/tv_cn_status" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#388E3C" android:textSize="14sp" android:layout_marginTop="20dp" android:gravity="center"/>
-            <TextView android:id="@+id/tv_advanced_tip" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="高级玩法..." android:textSize="12sp" android:textColor="#888" android:layout_marginTop="16dp" android:lineSpacingExtra="4dp"/>
+            <TextView android:id="@+id/tv_advanced_tip" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="" android:textSize="12sp" android:textColor="#888" android:layout_marginTop="16dp" android:lineSpacingExtra="4dp"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

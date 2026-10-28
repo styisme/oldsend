@@ -113,6 +113,8 @@ public class I18nManager {
         zh.put("cn_upnp_api_err", "映射失败：路由器 UPnP 接口异常。");
         zh.put("cn_upnp_rejected_fmt", "穿透失败：路由器拒绝映射请求(%d)。");
         zh.put("cn_upnp_exception_fmt", "穿透异常: %s");
+        zh.put("edit_btn", "编辑"); zh.put("add_btn", "+ 添加"); zh.put("manage_arrow", "管理 >");
+        zh.put("advanced_tip", "高级玩法：可配合 FRP/Ngrok 或 ZeroTier 组网后，将生成的公网地址填入下方极速直连。");
 dict.put("zh", zh);
 
         // ============ 繁体中文 (zh_TW) ============
@@ -272,6 +274,8 @@ dict.put("zh_TW", zhTW);
         en.put("cn_upnp_api_err", "Failed: router UPnP API error.");
         en.put("cn_upnp_rejected_fmt", "Failed: router rejected mapping (%d).");
         en.put("cn_upnp_exception_fmt", "Error: %s");
+        en.put("edit_btn", "Edit"); en.put("add_btn", "+ Add"); en.put("manage_arrow", "Manage >");
+        en.put("advanced_tip", "Pro Tip: Combine with FRP/Ngrok or ZeroTier, and fill the generated public address into Direct Connect.");
 dict.put("en", en);
 
         // ============ 日语 (ja) ============

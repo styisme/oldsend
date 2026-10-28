@@ -85,6 +85,9 @@ public class CrossNetActivity extends Activity {
         etPin.setHint(I18nManager.get("input_pin_hint"));
         cbUseDirect.setText(I18nManager.get("direct_mode"));
         btnUpnpPunch.setText(I18nManager.get("upnp_punch"));
+        ((Button) findViewById(R.id.btn_cn_add_files)).setText(I18nManager.get("add_btn"));
+        ((Button) findViewById(R.id.btn_cn_edit_files)).setText(I18nManager.get("edit_btn"));
+        ((TextView) findViewById(R.id.tv_advanced_tip)).setText(I18nManager.get("advanced_tip"));
         
         String ipv6 = OldSendService.getIpv6();
         if (ipv6 != null) {
