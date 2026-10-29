@@ -85,13 +85,21 @@ public class CrossNetActivity extends Activity {
         etPin.setHint(I18nManager.get("input_pin_hint"));
         cbUseDirect.setText(I18nManager.get("direct_mode"));
         btnUpnpPunch.setText(I18nManager.get("upnp_punch"));
+        ((TextView) findViewById(R.id.tv_select_mode)).setText(I18nManager.get("select_mode"));
+        ((TextView) findViewById(R.id.tv_stun_info)).setText(I18nManager.get("nat_public_untested"));
+        ((Button) findViewById(R.id.btn_stun_probe)).setText(I18nManager.get("stun_probe_btn"));
+        
+        // 深色模式下把那个丑陋的灰框 CheckBox 染成浅绿色
+        if (ThemeUtils.isDarkMode(this) && Build.VERSION.SDK_INT >= 21) {
+            cbUseDirect.setButtonTintList(android.content.res.ColorStateList.valueOf(0xFF81C784));
+        }
         ((Button) findViewById(R.id.btn_cn_add_files)).setText(I18nManager.get("add_btn"));
         ((Button) findViewById(R.id.btn_cn_edit_files)).setText(I18nManager.get("edit_btn"));
         ((TextView) findViewById(R.id.tv_advanced_tip)).setText(I18nManager.get("advanced_tip"));
         
         String ipv6 = OldSendService.getIpv6();
         if (ipv6 != null) {
-            tvIpv6Info.setText(String.format(I18nManager.get("ipv6_local"), ipv6));
+            tvIpv6Info.setText(String.format(I18nManager.get("ipv6_format_direct"), ipv6));
         } else {
             tvIpv6Info.setText(I18nManager.get("ipv6_none"));
         }

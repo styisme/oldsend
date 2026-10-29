@@ -29,6 +29,8 @@ public class ThemeUtils {
         // 替换背景色
         if (view.getTag() != null && "card".equals(view.getTag())) {
             view.setBackgroundResource(R.drawable.bg_md3_card_dark);
+        } else if (view.getTag() != null && "bottom_bar".equals(view.getTag())) {
+            view.setBackgroundColor(Color.parseColor("#1E1E1E"));
         } else if (view.getBackground() instanceof ColorDrawable) {
             int color = ((ColorDrawable) view.getBackground()).getColor();
             if (color == Color.parseColor("#F4F6F8") || color == Color.parseColor("#FFFFFF")) {

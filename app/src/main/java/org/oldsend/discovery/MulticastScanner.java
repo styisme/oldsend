@@ -4,6 +4,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import android.content.Context;
+import android.net.wifi.WifiManager;
+
 import org.json.JSONObject;
 import org.oldsend.OldSendService;
 import org.oldsend.Protocol;
@@ -25,9 +28,18 @@ public class MulticastScanner {
 
     static void doScan(Callback cb) {
         DatagramSocket sock = null;
+        WifiManager.MulticastLock lock = null;
         try {
+            Context ctx = OldSendService.getContext();
+            if (ctx != null) {
+                WifiManager wm = (WifiManager) ctx.getSystemService(Context.WIFI_SERVICE);
+                if (wm != null) {
+                    lock = wm.createMulticastLock("oldsend_scan");
+                    lock.acquire();
+                }
+            }
             sock = new DatagramSocket();
-            sock.setSoTimeout(1000);
+            sock.setSoTimeout(2000);
             sock.setBroadcast(true);
 
             JSONObject self = new JSONObject();
@@ -45,7 +57,7 @@ public class MulticastScanner {
             DatagramPacket out = new DatagramPacket(data, data.length, group, Protocol.DEFAULT_PORT);
             sock.send(out);
 
-            long deadline = System.currentTimeMillis() + 600;
+            long deadline = System.currentTimeMillis() + 2000;
             byte[] buf = new byte[65535];
             while (System.currentTimeMillis() < deadline) {
                 try {
@@ -66,6 +78,7 @@ public class MulticastScanner {
             OldSendService.log("scan error: " + e);
         } finally {
             try { if (sock != null) sock.close(); } catch (Exception ignored) {}
+            if (lock != null && lock.isHeld()) lock.release();
             if (cb != null) cb.onFinished();
         }
     }

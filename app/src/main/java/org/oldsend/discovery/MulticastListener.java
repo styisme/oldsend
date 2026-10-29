@@ -69,8 +69,11 @@ public class MulticastListener {
 
             JSONObject self = new JSONObject(InfoHandler.buildSelfJson(alias));
             byte[] data = self.toString().getBytes("UTF-8");
+            // 用新的普通 DatagramSocket 回单播，避免部分路由器丢弃 MulticastSocket 发出的单播包
+            DatagramSocket replySocket = new DatagramSocket();
             DatagramPacket out = new DatagramPacket(data, data.length, p.getAddress(), p.getPort());
-            socket.send(out);
+            replySocket.send(out);
+            replySocket.close();
         } catch (Exception e) {
             OldSendService.log("multicast handle: " + e);
         }

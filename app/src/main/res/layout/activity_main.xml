@@ -206,7 +206,7 @@
     </FrameLayout>
 
     <!-- 底部导航 -->
-    <LinearLayout android:layout_width="match_parent" android:layout_height="72dp" android:orientation="horizontal" android:background="#FFFFFF" android:tag="card" android:padding="8dp" android:gravity="center">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="72dp" android:orientation="horizontal" android:background="#FFFFFF" android:tag="bottom_bar" android:padding="8dp" android:gravity="center">
         <LinearLayout android:id="@+id/tab_receive" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical">
             <TextView android:id="@+id/tab_receive_icon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="📡" android:textSize="20sp"/>
             <TextView android:id="@+id/tab_receive_text" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="接收" android:textColor="#666666" android:textSize="11sp" android:layout_marginTop="2dp"/>

@@ -114,6 +114,9 @@ public class I18nManager {
         zh.put("cn_upnp_rejected_fmt", "穿透失败：路由器拒绝映射请求(%d)。");
         zh.put("cn_upnp_exception_fmt", "穿透异常: %s");
         zh.put("edit_btn", "编辑"); zh.put("add_btn", "+ 添加"); zh.put("manage_arrow", "管理 >");
+        zh.put("select_mode", "选择传输模式"); zh.put("nat_public_untested", "NAT公网地址: 未探测");
+        zh.put("ipv6_format_direct", "本机公网 IPv6: [%s]:53317 (可用直连)");
+        zh.put("stun_probe_btn", "STUN探测");
         zh.put("advanced_tip", "高级玩法：可配合 FRP/Ngrok 或 ZeroTier 组网后，将生成的公网地址填入下方极速直连。");
 dict.put("zh", zh);
 
@@ -275,6 +278,9 @@ dict.put("zh_TW", zhTW);
         en.put("cn_upnp_rejected_fmt", "Failed: router rejected mapping (%d).");
         en.put("cn_upnp_exception_fmt", "Error: %s");
         en.put("edit_btn", "Edit"); en.put("add_btn", "+ Add"); en.put("manage_arrow", "Manage >");
+        en.put("select_mode", "Select Transfer Mode"); en.put("nat_public_untested", "NAT Public Addr: Untested");
+        en.put("ipv6_format_direct", "Local IPv6: [%s]:53317 (Direct connect)");
+        en.put("stun_probe_btn", "STUN Probe");
         en.put("advanced_tip", "Pro Tip: Combine with FRP/Ngrok or ZeroTier, and fill the generated public address into Direct Connect.");
 dict.put("en", en);
 
@@ -325,6 +331,15 @@ dict.put("en", en);
         ja.put("manage_list", "リスト管理"); ja.put("add_files", "ファイル追加");
         ja.put("delete_all", "すべて削除"); ja.put("select_title", "選択");
         ja.put("select_app", "アプリ選択 (APK)");
+        ja.put("dark_mode", "ダークモード"); ja.put("modify_pin", "PINを変更");
+        ja.put("https_enable", "HTTPSを有効化"); ja.put("auto_save", "自動保存");
+        ja.put("save_album", "アルバムに保存"); ja.put("save_history", "履歴に保存");
+        ja.put("use_pin", "PINを有効化"); ja.put("web_enable", "Web共有を有効化");
+        ja.put("auto_start", "起動時に自動開始"); ja.put("receive_notif", "通知から受信");
+        ja.put("port", "ポート"); ja.put("timeout", "検索タイムアウト");
+        ja.put("language", "言語"); ja.put("anim", "UIアニメーション");
+        ja.put("set_name", "デバイス名"); ja.put("backup", "バックアップ / 復元");
+        ja.put("about", "OldSendについて"); ja.put("manage_acl", "ホワイト/ブラックリスト管理");
 dict.put("ja", ja);
 
         // ============ 韩语 (ko) ============
@@ -374,6 +389,15 @@ dict.put("ja", ja);
         ko.put("manage_list", "목록 관리"); ko.put("add_files", "파일 추가");
         ko.put("delete_all", "전체 삭제"); ko.put("select_title", "선택");
         ko.put("select_app", "앱 선택 (APK)");
+        ko.put("dark_mode", "다크 모드"); ko.put("modify_pin", "PIN 변경");
+        ko.put("https_enable", "HTTPS 활성화"); ko.put("auto_save", "자동 저장");
+        ko.put("save_album", "앨범에 저장"); ko.put("save_history", "기록에 저장");
+        ko.put("use_pin", "PIN 활성화"); ko.put("web_enable", "웹 공유 활성화");
+        ko.put("auto_start", "부팅 시 자동 시작"); ko.put("receive_notif", "알림으로 받기");
+        ko.put("port", "포트"); ko.put("timeout", "검색 시간 초과");
+        ko.put("language", "언어"); ko.put("anim", "UI 애니메이션");
+        ko.put("set_name", "기기 이름"); ko.put("backup", "백업 / 복원");
+        ko.put("about", "OldSend 정보"); ko.put("manage_acl", "화이트/블랙리스트 관리");
 dict.put("ko", ko);
 
         // ============ 德语 (de) ============
@@ -423,6 +447,15 @@ dict.put("ko", ko);
         de.put("manage_list", "Listenverwaltung"); de.put("add_files", "Dateien hinzufügen");
         de.put("delete_all", "Alle löschen"); de.put("select_title", "Auswählen");
         de.put("select_app", "App auswählen (APK)");
+        de.put("dark_mode", "Dunkelmodus"); de.put("modify_pin", "PIN ändern");
+        de.put("https_enable", "HTTPS aktivieren"); de.put("auto_save", "Automatisch speichern");
+        de.put("save_album", "Im Album speichern"); de.put("save_history", "Im Verlauf speichern");
+        de.put("use_pin", "PIN aktivieren"); de.put("web_enable", "Web-Freigabe");
+        de.put("auto_start", "Autostart"); de.put("receive_notif", "Über Benachrichtigung");
+        de.put("port", "Port"); de.put("timeout", "Such-Timeout");
+        de.put("language", "Sprache"); de.put("anim", "UI-Animation");
+        de.put("set_name", "Gerätename"); de.put("backup", "Sicherung / Wiederherstellung");
+        de.put("about", "Über OldSend"); de.put("manage_acl", "Weiß-/Schwarzliste verwalten");
 dict.put("de", de);
 
         // ============ 法语 (fr) ============
@@ -472,6 +505,15 @@ dict.put("de", de);
         fr.put("manage_list", "Gestion des listes"); fr.put("add_files", "Ajouter fichiers");
         fr.put("delete_all", "Tout supprimer"); fr.put("select_title", "Sélectionner");
         fr.put("select_app", "Choisir l'appli (APK)");
+        fr.put("dark_mode", "Mode sombre"); fr.put("modify_pin", "Modifier le PIN");
+        fr.put("https_enable", "Activer HTTPS"); fr.put("auto_save", "Sauvegarde auto");
+        fr.put("save_album", "Sauver dans l'album"); fr.put("save_history", "Sauver dans l'historique");
+        fr.put("use_pin", "Activer le PIN"); fr.put("web_enable", "Partage Web");
+        fr.put("auto_start", "Démarrage auto"); fr.put("receive_notif", "Via notification");
+        fr.put("port", "Port"); fr.put("timeout", "Délai de recherche");
+        fr.put("language", "Langue"); fr.put("anim", "Animations");
+        fr.put("set_name", "Nom de l'appareil"); fr.put("backup", "Sauvegarde / Restauration");
+        fr.put("about", "À propos d'OldSend"); fr.put("manage_acl", "Gérer liste blanche/noire");
 dict.put("fr", fr);
 
         // ============ 西班牙语 (es) ============
@@ -521,6 +563,15 @@ dict.put("fr", fr);
         es.put("manage_list", "Gestión de listas"); es.put("add_files", "Añadir archivos");
         es.put("delete_all", "Eliminar todo"); es.put("select_title", "Seleccionar");
         es.put("select_app", "Elegir app (APK)");
+        es.put("dark_mode", "Modo oscuro"); es.put("modify_pin", "Modificar PIN");
+        es.put("https_enable", "Activar HTTPS"); es.put("auto_save", "Guardar auto");
+        es.put("save_album", "Guardar en álbum"); es.put("save_history", "Guardar en historial");
+        es.put("use_pin", "Activar PIN"); es.put("web_enable", "Compartir Web");
+        es.put("auto_start", "Inicio automático"); es.put("receive_notif", "Vía notificación");
+        es.put("port", "Puerto"); es.put("timeout", "Tiempo de búsqueda");
+        es.put("language", "Idioma"); es.put("anim", "Animaciones");
+        es.put("set_name", "Nombre del dispositivo"); es.put("backup", "Copia / Restaurar");
+        es.put("about", "Acerca de OldSend"); es.put("manage_acl", "Gestionar lista blanca/negra");
 dict.put("es", es);
 
         // ============ 俄语 (ru) ============
@@ -570,6 +621,15 @@ dict.put("es", es);
         ru.put("manage_list", "Управление списками"); ru.put("add_files", "Добавить файлы");
         ru.put("delete_all", "Удалить всё"); ru.put("select_title", "Выбрать");
         ru.put("select_app", "Выбрать приложение (APK)");
+        ru.put("dark_mode", "Темная тема"); ru.put("modify_pin", "Изменить PIN");
+        ru.put("https_enable", "Включить HTTPS"); ru.put("auto_save", "Автосохранение");
+        ru.put("save_album", "В альбом"); ru.put("save_history", "В историю");
+        ru.put("use_pin", "Включить PIN"); ru.put("web_enable", "Веб-обмен");
+        ru.put("auto_start", "Автозапуск"); ru.put("receive_notif", "Через уведомление");
+        ru.put("port", "Порт"); ru.put("timeout", "Таймаут поиска");
+        ru.put("language", "Язык"); ru.put("anim", "Анимации");
+        ru.put("set_name", "Имя устройства"); ru.put("backup", "Резервная копия");
+        ru.put("about", "О OldSend"); ru.put("manage_acl", "Управление белым/черным списком");
 dict.put("ru", ru);
 
         // ============ 葡萄牙语 (pt) ============
@@ -619,6 +679,15 @@ dict.put("ru", ru);
         pt.put("manage_list", "Gerenciar listas"); pt.put("add_files", "Adicionar arquivos");
         pt.put("delete_all", "Excluir tudo"); pt.put("select_title", "Selecionar");
         pt.put("select_app", "Escolher app (APK)");
+        pt.put("dark_mode", "Modo escuro"); pt.put("modify_pin", "Modificar PIN");
+        pt.put("https_enable", "Ativar HTTPS"); pt.put("auto_save", "Salvar auto");
+        pt.put("save_album", "Salvar no álbum"); pt.put("save_history", "Salvar no histórico");
+        pt.put("use_pin", "Ativar PIN"); pt.put("web_enable", "Compartilhar Web");
+        pt.put("auto_start", "Início automático"); pt.put("receive_notif", "Via notificação");
+        pt.put("port", "Porta"); pt.put("timeout", "Tempo de busca");
+        pt.put("language", "Idioma"); pt.put("anim", "Animações");
+        pt.put("set_name", "Nome do dispositivo"); pt.put("backup", "Backup / Restaurar");
+        pt.put("about", "Sobre o OldSend"); pt.put("manage_acl", "Gerenciar lista branca/negra");
 dict.put("pt", pt);
     }
 
