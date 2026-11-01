@@ -10,6 +10,18 @@
 
 ---
 
+## [2.0.1] - 2026-11-01
+
+### Fixed
+- **网络与发现**：补充 MulticastLock 并改用独立 DatagramSocket 发送单播回包，彻底修复部分 ROM 下组播扫描被拦截、无法发现设备的问题。
+- **Web 端 404**：修复 OldSendService 未注册 `/web/info`、`/web/files` 等 API 导致网页端无法拉取列表和剪贴板的问题。
+- **深色模式适配**：修复深色模式下底部导航栏及部分卡片白底灰字“瞎眼”的问题，增加对无 tag 纯白底 View 的递归染黑处理。
+- **历史记录交互**：修复历史记录点击因 MIME 写死导致无法打开的问题；新增长按历史记录弹出“分享 / 删除”菜单。
+- **接收 APK 体验**：修复接收 APK 完成后仅提示“已保存”的问题，现在接收完毕会在广播中附带文件路径并直接唤起系统安装器。
+- **多语言与 UI 补齐**：清理跨网页及设置页残留的硬编码中文，补齐 ja/ko/de/fr/es/ru/pt 及 zh_TW 的高频词条，修复深色模式下 CheckBox 框刺眼的问题。
+
+---
+
 ## [2.0.0] - 2026-10-19
 
 本次更新将 OldSend 从单纯的局域网工具，彻底升维成了广域网全能大杀器。
@@ -60,7 +72,8 @@
 
 ## 版本对比链接
 
-[Unreleased]: https://github.com/styisme/oldsend/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/styisme/oldsend/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/styisme/oldsend/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/styisme/oldsend/compare/v1.1.0...v2.0.0
 [1.1.0]: https://github.com/styisme/oldsend/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/styisme/oldsend/releases/tag/v1.0.0

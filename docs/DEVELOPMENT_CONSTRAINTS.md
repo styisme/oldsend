@@ -39,6 +39,7 @@
 ### 门禁
 
 - [x] **CI 编译通过才发版**（这是本项目唯一的自动化门禁）
+- [x] **Release 流水线自动签名与发版**（配置了 GitHub Secrets 私密密钥，修改 `CHANGELOG.md` 自动打 Tag 发 Release）
 - [x] 发布产物有版本号与 tag
 - [x] `CHANGELOG.md` 记录每次变更
 
@@ -72,8 +73,11 @@
 | `StunClient.java`（手写 UDP STUN 探测） | ⚠️ 仅 CI 编译 / 部分真机测试（受限于公网环境） |
 | `OldSendService.java`（手写 UPnP 端口映射） | ⚠️ 仅 CI 编译（依赖路由器是否开启 UPnP） |
 | `HttpServer.java` / `Router.java`（手写网络底层） | ✅ 真机测试（局域网内多设备收发正常） |
+| `MulticastScanner.java` / `MulticastListener.java`（组播发现） | ✅ 真机测试（v2.0.1 修复部分 ROM 下被拦截问题） |
+| `WebShareHandler.java`（Web 端并发上传及路径沙箱） | ✅ 真机测试（v2.0.1 补全路由及前端 API） |
 | `PrepareUploadHandler.java`（PIN 码鉴权与拦截） | ✅ 真机测试 |
-| `WebShareHandler.java`（Web 端并发上传及路径沙箱） | ✅ 真机测试（浏览器互传及多文件切片正常） |
+| `ThemeUtils.java`（深色模式递归渲染） | ✅ 真机测试（v2.0.1 修复白底灰字瞎眼问题） |
+| `HistoryStore.java` / `MainActivity.java`（历史记录与 APK 唤起安装） | ✅ 真机测试（v2.0.1 修复点击打开及长按菜单） |
 
 > 标注 `⚠️ 仅 CI` 或 `❌ 未验证` 的模块，**不代表不能发布**，但使用前请评估风险。
 
