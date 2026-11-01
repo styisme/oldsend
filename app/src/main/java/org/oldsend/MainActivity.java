@@ -204,12 +204,41 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 String path = historyPaths.get(pos);
                 File f = new File(path);
-                if (!f.exists()) { Toast.makeText(MainActivity.this, "File not found", Toast.LENGTH_SHORT).show(); return; }
+                if (!f.exists()) { Toast.makeText(MainActivity.this, I18nManager.get("unknown_file") + " not found", Toast.LENGTH_SHORT).show(); return; }
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setDataAndType(Uri.fromFile(f), "application/*");
+                    String mime = android.webkit.MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                        android.webkit.MimeTypeMap.getFileExtensionFromUrl(f.getName()));
+                    if (mime == null) mime = "*/*";
+                    intent.setDataAndType(Uri.fromFile(f), mime);
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     startActivity(intent);
                 } catch (Exception e) { Toast.makeText(MainActivity.this, "Cannot open", Toast.LENGTH_SHORT).show(); }
+            }
+        });
+
+        historyList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int pos, long id) {
+                final String path = historyPaths.get(pos);
+                final File f = new File(path);
+                if (!f.exists()) return true;
+                String[] items = new String[]{"Share / 分享", "Delete / 删除"};
+                Md3DialogUtils.showList(MainActivity.this, f.getName(), items, new Md3DialogUtils.OnItemSelectListener() {
+                    public void onItemSelect(int p) {
+                        if (p == 0) {
+                            Intent share = new Intent(Intent.ACTION_SEND);
+                            share.setType("*/*");
+                            share.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(f));
+                            startActivity(Intent.createChooser(share, "Share"));
+                        } else {
+                            if (f.delete()) {
+                                Toast.makeText(MainActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                refreshHistory();
+                            }
+                        }
+                    }
+                }).show();
+                return true;
             }
         });
 
@@ -219,6 +248,16 @@ public class MainActivity extends Activity implements OldSendService.LogSink, De
                     sendBroadcast(intent);
                 } else if (TransferActivity.ACTION_TRANSFER_DONE.equals(intent.getAction())) {
                     sendBroadcast(intent);
+                    String lastPath = intent.getStringExtra("lastFilePath");
+                    if (lastPath != null && lastPath.endsWith(".apk")) {
+                        Toast.makeText(MainActivity.this, "APK 接收完成", Toast.LENGTH_LONG).show();
+                        try {
+                            Intent install = new Intent(Intent.ACTION_VIEW);
+                            install.setDataAndType(Uri.fromFile(new File(lastPath)), "application/vnd.android.package-archive");
+                            install.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(install);
+                        } catch (Exception ignored) {}
+                    }
                 }
             }
         };

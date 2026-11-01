@@ -199,9 +199,15 @@ public class OldSendService extends Service {
             router.register(V1_PREFIX + "/prepare-upload", new PrepareUploadHandler(store));
             router.register(V1_PREFIX + "/upload", new UploadHandler(store));
             router.register(V1_PREFIX + "/cancel", new CancelHandler(store));
-            router.register("/", new WebShareHandler());
-            router.register("/index.html", new WebShareHandler());
-            router.register("/web-upload", new WebShareHandler());
+            WebShareHandler webHandler = new WebShareHandler();
+            router.register("/", webHandler);
+            router.register("/index.html", webHandler);
+            router.register("/web/info", webHandler);
+            router.register("/web/clipboard", webHandler);
+            router.register("/web/text", webHandler);
+            router.register("/web/upload", webHandler);
+            router.register("/web/files", webHandler);
+            router.register("/web/download", webHandler);
 
             boolean useHttps = getSharedPreferences("oldsend", MODE_PRIVATE).getBoolean("use_https", false);
             javax.net.ssl.SSLContext sslContext = useHttps ? TlsHelper.getServerSSLContext(this) : null;

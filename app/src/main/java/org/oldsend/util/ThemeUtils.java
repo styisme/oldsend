@@ -33,8 +33,13 @@ public class ThemeUtils {
             view.setBackgroundColor(Color.parseColor("#1E1E1E"));
         } else if (view.getBackground() instanceof ColorDrawable) {
             int color = ((ColorDrawable) view.getBackground()).getColor();
-            if (color == Color.parseColor("#F4F6F8") || color == Color.parseColor("#FFFFFF")) {
-                view.setBackgroundColor(Color.parseColor("#1E1E1E"));
+            if (color == Color.parseColor("#F4F6F8") || color == Color.parseColor("#FFFFFF") || color == Color.WHITE) {
+                view.setBackgroundColor(Color.parseColor("#121212")); // 整体底色更黑
+            }
+        } else if (view instanceof android.widget.LinearLayout || view instanceof android.widget.FrameLayout) {
+            // 兜底：如果是没打 tag 的布局，但有着白色的背景或者默认的背景
+            if (view.getBackground() == null && view.getId() == android.R.id.content) {
+                 view.setBackgroundColor(Color.parseColor("#121212"));
             }
         }
 
