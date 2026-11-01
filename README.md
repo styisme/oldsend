@@ -2,8 +2,8 @@
 
 > 极客级全能文件传输神器。完美兼容 LocalSend 协议，独创 6 位密码跨网传输与公网 P2P 直连。
 
-[![Build Android APK](https://github.com/styisme/oldsend/actions/workflows/android.yml/badge.svg)](https://github.com/styisme/oldsend/actions/workflows/android.yml)
-[![Version](https://img.shields.io/badge/version-2.0.0-512BD4)]()
+[![Build & Auto Release](https://github.com/styisme/oldsend/actions/workflows/android.yml/badge.svg)](https://github.com/styisme/oldsend/actions/workflows/android.yml)
+[![Version](https://img.shields.io/badge/version-2.0.1-512BD4)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Made with AI](https://img.shields.io/badge/made%20with-AI-FF6B6B)](docs/AI_DISCLOSURE.md)
 [![Platform](https://img.shields.io/badge/platform-Android%202.3%2B-brightgreen)]()
@@ -16,13 +16,15 @@
 > 
 > 绝大多数代码（包括架构、业务逻辑、UI 布局、文档）由大型语言模型（LLM）在开发者指导下生成，并经过人工审阅、测试与修正。开发者负责需求定义、功能验收、bug 定位与最终发布决策。
 > 
+> 本声明同样适用于同一开发者维护的配套手表版项目 [WatchSend](https://github.com/styisme/watchsend)，两者遵循同一套 [AI Development Guidelines](https://github.com/styisme/ai-development-guidelines)。
+> 
 > 详细说明请见 [docs/AI_DISCLOSURE.md](docs/AI_DISCLOSURE.md)。
 
 ---
 
-## 📦 最新版本 (v2.0.0 史诗级更新)
+## 📦 最新版本 (v2.0.1)
 
-当前版本：**v2.0.0**。完整版本历史请见 [CHANGELOG.md](CHANGELOG.md)。
+当前版本：**v2.0.1**。修复了网页端路由 404、深色模式适配、历史记录交互、组播发现及接收 APK 等关键体验问题。完整版本历史请见 [CHANGELOG.md](CHANGELOG.md)。
 
 ---
 
@@ -40,11 +42,12 @@
 - **极低兼容**：最低支持 Android 2.3 (API 10)，现代手机也可完美运行。
 - **多内容发送**：支持发送 文件、媒体、文件夹、应用(APK)、文本、剪贴板，支持多选打包。
 - **断点续传**：接收端已支持 `.tmp` 追加模式，弱网断线自动续传。
+- **智能安装**：接收 APK 后自动唤起系统安装器，无需手动去文件夹寻找。
 
 ### 🛡️ 安全管理与自动化
 - **黑名单/白名单**：长按设备即可加入，拉黑直接返回 403，白名单可自动接收文件。
 - **后缀拦截**：完全自定义拦截危险后缀（如 exe、bat、apk）。
-- **历史记录持久化**：所有传输记录本地保存，重开 App 依然在列。
+- **历史记录持久化**：所有传输记录本地保存，重开 App 依然在列。支持一键分享或删除。
 
 ### 🖥️ Web 端全面重构
 - **现代 SPA UI**：支持深浅色模式自动切换的网页端界面。
@@ -52,6 +55,19 @@
 - **剪贴板双向同步**：网页端直接读取手机剪贴板，手机端也能接收网页发送的文本。
 - **拖拽生成文件**：网页拖入纯文本，自动打包为 `.txt` 发送至手机。
 - **反向索要**：网页端直接列出手机相册和下载目录文件，一键下载回电脑。
+
+---
+
+## ⌚ 配套应用：WatchSend (Wear OS 手表版)
+
+> **[WatchSend](https://github.com/styisme/watchsend)** 是 OldSend 的**手表进化版**。保留全部硬核传输能力，将 UI 彻底重塑为 Wear OS 原生的 **3D 滚轮** 与 **药丸卡片** 形态，为小屏幕与圆表盘而生。
+
+- **深度硬件适配**：旋转表冠丝滑滚动、全局触觉反馈、传输屏幕常亮、快捷磁贴。
+- **圆屏沉浸优化**：3D 滚轮特效、药丸卡片布局，告别手指遮挡。
+- **协议完整继承**：与 OldSend 共享同一套 LocalSend 协议栈、HTTP 服务、组播发现与跨网传输逻辑。
+- **独立包名**：`org.watchsend`，可与 OldSend 在同一设备或同一网络下共存。
+
+👉 **前往 [github.com/styisme/watchsend](https://github.com/styisme/watchsend) 查看详情与下载。**
 
 ---
 
@@ -72,9 +88,9 @@
 
 ---
 
-## 🛠️ 自行编译
+## 🛠️ 自行编译与发版
 
-本项目使用 **AGP 3.6.3 + Gradle 5.6.4 + JDK 8** 构建，专门为了支持 `minSdkVersion 10` 而保留的古早工具链。代码推送到主分支后，GitHub Actions 会自动完成编译。
+本项目使用 **AGP 3.6.3 + Gradle 5.6.4 + JDK 8** 构建，专门为了支持 `minSdkVersion 10` 而保留的古早工具链。代码推送到主分支后，GitHub Actions 会自动完成编译。如果更新了 `CHANGELOG.md` 中的版本号，Actions 还会自动触发构建、静默签名、打 Tag 并发布 GitHub Release。
 
 ---
 
@@ -85,7 +101,7 @@
 3. **手搓网络底层**：底层 HTTP 服务端/客户端由 AI 辅助生成，在弱网或并发异常时可能卡死。
 4. **古早工具链的技术债**：为强制支持 API 10，项目锁死了旧版构建环境。
 
-**总结**：OldSend 只建议在极客折腾、内网办公或特定怀旧场景下使用。日常跨平台传输，建议直接使用官方原版 LocalSend。
+**总结**：OldSend 只建议在极客折腾、内网办公或特定怀旧场景下使用。日常跨平台传输，建议直接使用官方原版 LocalSend。如果你有 Wear OS 手表，建议同时尝试 [WatchSend](https://github.com/styisme/watchsend)。
 
 ---
 

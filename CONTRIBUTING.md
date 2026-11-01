@@ -2,6 +2,8 @@
 
 感谢参与 **OldSend** 的开发！本项目采用轻量但明确的源代码管理规范：**Conventional Commits + SemVer 2.0.0 + CHANGELOG**。
 
+本项目的协作流程与 AI 使用规范遵循 [AI Development Guidelines](https://github.com/styisme/ai-development-guidelines)（若链接失效，请参考 `docs/AI_DISCLOSURE.md` 里的核心声明）。
+
 ---
 
 ## ⚠️ 关于 AI 生成代码
@@ -10,6 +12,8 @@
 - 说明改动是否由 AI 生成
 - 人工验证过功能（至少在真机上跑过一次）
 - 如果你也是用 AI 改的，请在 PR 描述里注明
+
+详细的 AI 参与范围、人类责任及局限性，请参阅 [docs/AI_DISCLOSURE.md](docs/AI_DISCLOSURE.md)。
 
 ---
 
@@ -31,10 +35,10 @@ cd oldsend
 gradle assembleDebug
 ```
 
-### 云端构建
-项目已配置 GitHub Actions：
-- Push 到 `main` 或 `master` 自动编译。
-- 编译产物在 **Artifacts** 区域下载。
+### 云端构建与自动发版
+项目已全面配置 GitHub Actions 流水线：
+- **日常测试 (Debug)**：Push 到 `main` 或 `master` 会自动触发编译，产物在 Actions 的 **Artifacts** 区域下载。
+- **正式发版 (Release)**：修改 `CHANGELOG.md` 顶部的版本号并 Push，流水线会自动执行 `sync_version.py` 同步 Gradle 版本号，静默解密签名文件进行签名打包，最后自动打 Git Tag 并在 GitHub 创建 Release 发布页。
 
 ---
 
@@ -164,7 +168,8 @@ Closes #123
 | 向后兼容的新功能 | **MINOR** |
 | Bug 修复 | **PATCH** |
 
-在开发前，请更新 `CHANGELOG.md`，然后再修改 `app/build.gradle` 中的 `versionCode` 和 `versionName`。
+**注意**：现在版本号由 CI 自动同步，**请勿手动修改 `app/build.gradle` 中的 `versionCode` 和 `versionName`**。 
+正确做法是：直接在 `CHANGELOG.md` 顶部添加新的版本记录（如 `## [2.0.1] - 2026-11-01`），然后提交推送。流水线会自动提取版本号并完成后续发版动作。
 
 ---
 
